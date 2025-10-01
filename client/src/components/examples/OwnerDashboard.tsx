@@ -18,6 +18,12 @@ export default function OwnerDashboardExample() {
   const soldPlayers = mockPlayers.filter(p => p.status === 'sold');
   const unsoldPlayers = mockPlayers.filter(p => p.status === 'unsold');
 
+  const allTeamsData = [
+    { team: 'Mumbai Indians', flag: '🔵', playersCount: 1, purseUsed: 3500000, purseRemaining: 96500000, gradeCount: { A: 1, B: 0, C: 0 } },
+    { team: 'Chennai Super Kings', flag: '🟡', playersCount: 1, purseUsed: 3000000, purseRemaining: 97000000, gradeCount: { A: 1, B: 0, C: 0 } },
+    { team: 'Royal Challengers', flag: '🔴', playersCount: 0, purseUsed: 0, purseRemaining: 100000000, gradeCount: { A: 0, B: 0, C: 0 } },
+  ];
+
   return (
     <OwnerDashboard
       teamName="Mumbai Indians"
@@ -28,6 +34,7 @@ export default function OwnerDashboardExample() {
       myTeamPlayers={myTeamPlayers}
       soldPlayers={soldPlayers}
       unsoldPlayers={unsoldPlayers}
+      allTeamsData={allTeamsData}
     />
   );
 }

@@ -1,9 +1,20 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Search, Trophy, Users } from "lucide-react";
 import PurseTracker from "./PurseTracker";
 import GradeQuotaTracker from "./GradeQuotaTracker";
 import PlayerCard from "./PlayerCard";
+
+interface TeamData {
+  team: string;
+  flag?: string;
+  playersCount: number;
+  purseUsed: number;
+  purseRemaining: number;
+  gradeCount: Record<string, number>;
+}
 
 interface OwnerDashboardProps {
   teamName: string;
@@ -14,6 +25,7 @@ interface OwnerDashboardProps {
   myTeamPlayers: any[];
   soldPlayers: any[];
   unsoldPlayers: any[];
+  allTeamsData: TeamData[];
 }
 
 export default function OwnerDashboard({
@@ -25,6 +37,7 @@ export default function OwnerDashboard({
   myTeamPlayers,
   soldPlayers,
   unsoldPlayers,
+  allTeamsData,
 }: OwnerDashboardProps) {
   return (
     <div className="p-6 space-y-6">
@@ -38,8 +51,60 @@ export default function OwnerDashboard({
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">Grade Quota Status</h3>
+        <h3 className="text-lg font-semibold mb-4">My Grade Quota Status</h3>
         <GradeQuotaTracker quotas={gradeQuotas} />
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Trophy className="w-5 h-5" />
+          All Teams Overview
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {allTeamsData.map((team) => (
+            <Card key={team.team} data-testid={`card-team-overview-${team.team}`}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {team.flag && <span className="text-2xl">{team.flag}</span>}
+                    <span>{team.team}</span>
+                  </div>
+                  <Badge variant="outline" className="gap-1">
+                    <Users className="w-3 h-3" />
+                    {team.playersCount}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Purse Used</p>
+                    <p className="font-mono font-semibold text-destructive">
+                      ₹{team.purseUsed.toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Remaining</p>
+                    <p className="font-mono font-semibold text-auction-sold">
+                      ₹{team.purseRemaining.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Badge className="bg-grade-a text-white text-xs">
+                    A: {team.gradeCount.A || 0}
+                  </Badge>
+                  <Badge className="bg-grade-b text-white text-xs">
+                    B: {team.gradeCount.B || 0}
+                  </Badge>
+                  <Badge className="bg-grade-c text-white text-xs">
+                    C: {team.gradeCount.C || 0}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
 
       <Tabs defaultValue="all" className="w-full">
