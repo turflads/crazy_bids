@@ -2,34 +2,33 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import NavBar from "@/components/NavBar";
 import ViewerDashboard from "@/components/ViewerDashboard";
+import { useAuctionSync } from "@/hooks/useAuctionSync";
 
 export default function Viewer() {
   const [, setLocation] = useLocation();
   const [user, setUser] = useState<{ username: string; role: string } | null>(null);
   
-  //todo: remove mock functionality
-  const allPlayers = [
-    { id: '1', firstName: 'Virat', lastName: 'Kohli', grade: 'A', basePrice: 2000000, status: 'sold' as const, soldPrice: 3500000, team: 'Mumbai Indians' },
-    { id: '2', firstName: 'Rohit', lastName: 'Sharma', grade: 'A', basePrice: 2000000, status: 'sold' as const, soldPrice: 3000000, team: 'Chennai Super Kings' },
-    { id: '3', firstName: 'MS', lastName: 'Dhoni', grade: 'B', basePrice: 1500000, status: 'unsold' as const },
-    { id: '4', firstName: 'Jasprit', lastName: 'Bumrah', grade: 'A', basePrice: 2000000, status: 'unsold' as const },
-    { id: '5', firstName: 'Ravindra', lastName: 'Jadeja', grade: 'B', basePrice: 1500000, status: 'unsold' as const },
-    { id: '6', firstName: 'Hardik', lastName: 'Pandya', grade: 'B', basePrice: 1500000, status: 'sold' as const, soldPrice: 2000000, team: 'Mumbai Indians' },
-  ];
+  // Use synced auction and team state
+  const { auctionState, teamState } = useAuctionSync();
+  
+  const allPlayers = auctionState?.players || [];
+  const currentPlayerIndex = auctionState?.currentPlayerIndex || 0;
+  const currentPlayer = allPlayers[currentPlayerIndex];
 
-  const currentAuction = {
-    player: allPlayers[2],
-    currentBid: 1800000,
-    leadingTeam: 'Royal Challengers',
-  };
+  const currentAuction = currentPlayer && auctionState?.isAuctionActive ? {
+    player: currentPlayer,
+    currentBid: auctionState.currentBid || currentPlayer.basePrice,
+    leadingTeam: currentPlayer.lastBidTeam || 'No bids yet',
+  } : undefined;
 
-  const recentSales = allPlayers.filter(p => p.status === 'sold').slice(0, 3);
+  const recentSales = allPlayers.filter((p: any) => p.status === 'sold').slice(-3).reverse();
 
-  const teamStandings = [
-    { team: 'Mumbai Indians', playersCount: 2, purseUsed: 5500000, purseRemaining: 94500000 },
-    { team: 'Chennai Super Kings', playersCount: 1, purseUsed: 3000000, purseRemaining: 97000000 },
-    { team: 'Royal Challengers', playersCount: 0, purseUsed: 0, purseRemaining: 100000000 },
-  ];
+  const teamStandings = Object.values(teamState).map((team: any) => ({
+    team: team.name,
+    playersCount: team.players.length,
+    purseUsed: team.usedPurse,
+    purseRemaining: team.totalPurse - team.usedPurse,
+  }));
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");

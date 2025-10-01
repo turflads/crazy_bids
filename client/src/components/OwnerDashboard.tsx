@@ -3,8 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, Trophy, Users } from "lucide-react";
-import PurseTracker from "./PurseTracker";
-import GradeQuotaTracker from "./GradeQuotaTracker";
 import PlayerCard from "./PlayerCard";
 
 interface TeamData {
@@ -13,28 +11,20 @@ interface TeamData {
   playersCount: number;
   purseUsed: number;
   purseRemaining: number;
+  totalPurse: number;
   gradeCount: Record<string, number>;
+  players: any[];
 }
 
 interface OwnerDashboardProps {
-  teamName: string;
-  totalPurse: number;
-  usedPurse: number;
-  gradeQuotas: any[];
   allPlayers: any[];
-  myTeamPlayers: any[];
   soldPlayers: any[];
   unsoldPlayers: any[];
   allTeamsData: TeamData[];
 }
 
 export default function OwnerDashboard({
-  teamName,
-  totalPurse,
-  usedPurse,
-  gradeQuotas,
   allPlayers,
-  myTeamPlayers,
   soldPlayers,
   unsoldPlayers,
   allTeamsData,
@@ -42,32 +32,22 @@ export default function OwnerDashboard({
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-6">Team Dashboard - {teamName}</h2>
-        <PurseTracker
-          totalPurse={totalPurse}
-          usedPurse={usedPurse}
-          teamName={teamName}
-        />
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-4">My Grade Quota Status</h3>
-        <GradeQuotaTracker quotas={gradeQuotas} />
+        <h2 className="text-2xl font-bold mb-6">Auction Overview - All Teams</h2>
       </div>
 
       <div>
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Trophy className="w-5 h-5" />
-          All Teams Overview
+          Teams Status
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {allTeamsData.map((team) => (
             <Card key={team.team} data-testid={`card-team-overview-${team.team}`}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {team.flag && <span className="text-2xl">{team.flag}</span>}
-                    <span>{team.team}</span>
+                    <span className="text-sm">{team.team}</span>
                   </div>
                   <Badge variant="outline" className="gap-1">
                     <Users className="w-3 h-3" />
@@ -76,18 +56,21 @@ export default function OwnerDashboard({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Purse Used</p>
-                    <p className="font-mono font-semibold text-destructive">
-                      ₹{team.purseUsed.toLocaleString()}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Remaining</p>
-                    <p className="font-mono font-semibold text-auction-sold">
-                      ₹{team.purseRemaining.toLocaleString()}
-                    </p>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Purse Status</p>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Used:</span>
+                      <span className="font-mono font-semibold text-destructive">
+                        ₹{team.purseUsed.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Left:</span>
+                      <span className="font-mono font-semibold text-auction-sold">
+                        ₹{team.purseRemaining.toLocaleString()}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -108,12 +91,9 @@ export default function OwnerDashboard({
       </div>
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 max-w-2xl">
+        <TabsList className="grid w-full grid-cols-3 max-w-lg">
           <TabsTrigger value="all" data-testid="tab-all-players">
             All Players ({allPlayers.length})
-          </TabsTrigger>
-          <TabsTrigger value="myteam" data-testid="tab-my-team">
-            My Team ({myTeamPlayers.length})
           </TabsTrigger>
           <TabsTrigger value="sold" data-testid="tab-sold">
             Sold ({soldPlayers.length})
@@ -135,29 +115,15 @@ export default function OwnerDashboard({
 
           <TabsContent value="all" className="mt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {allPlayers.map((player) => (
+              {allPlayers.map((player: any) => (
                 <PlayerCard key={player.id} player={player} />
               ))}
             </div>
           </TabsContent>
 
-          <TabsContent value="myteam" className="mt-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {myTeamPlayers.length > 0 ? (
-                myTeamPlayers.map((player) => (
-                  <PlayerCard key={player.id} player={player} />
-                ))
-              ) : (
-                <p className="text-muted-foreground col-span-full text-center py-12">
-                  No players in your team yet
-                </p>
-              )}
-            </div>
-          </TabsContent>
-
           <TabsContent value="sold" className="mt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {soldPlayers.map((player) => (
+              {soldPlayers.map((player: any) => (
                 <PlayerCard key={player.id} player={player} />
               ))}
             </div>
@@ -165,7 +131,7 @@ export default function OwnerDashboard({
 
           <TabsContent value="unsold" className="mt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {unsoldPlayers.map((player) => (
+              {unsoldPlayers.map((player: any) => (
                 <PlayerCard key={player.id} player={player} />
               ))}
             </div>

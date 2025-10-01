@@ -2,33 +2,18 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import NavBar from "@/components/NavBar";
 import OwnerDashboard from "@/components/OwnerDashboard";
-import { getAuctionState } from "@/lib/auctionState";
-import { getTeamState } from "@/lib/teamState";
+import { useAuctionSync } from "@/hooks/useAuctionSync";
 
 export default function Owner() {
   const [, setLocation] = useLocation();
   const [user, setUser] = useState<{ username: string; role: string } | null>(null);
   
-  // Get live auction and team state
-  const auctionState = getAuctionState();
-  const teamState = getTeamState();
+  // Use synced auction and team state
+  const { auctionState, teamState } = useAuctionSync();
   
   const allPlayers = auctionState?.players || [];
-  const myTeamPlayers = allPlayers.filter((p: any) => p.team === 'Mumbai Indians');
   const soldPlayers = allPlayers.filter((p: any) => p.status === 'sold');
   const unsoldPlayers = allPlayers.filter((p: any) => p.status === 'unsold');
-  
-  const myTeamData = teamState['Mumbai Indians'] || {
-    totalPurse: 100000000,
-    usedPurse: 0,
-    gradeCount: { A: 0, B: 0, C: 0 },
-  };
-
-  const gradeQuotas = [
-    { grade: 'A', required: 4, current: myTeamData.gradeCount.A || 0, color: 'bg-grade-a' },
-    { grade: 'B', required: 3, current: myTeamData.gradeCount.B || 0, color: 'bg-grade-b' },
-    { grade: 'C', required: 4, current: myTeamData.gradeCount.C || 0, color: 'bg-grade-c' },
-  ];
   
   // Convert team state to array for display
   const allTeamsData = Object.values(teamState).map((team: any) => ({
@@ -37,7 +22,9 @@ export default function Owner() {
     playersCount: team.players.length,
     purseUsed: team.usedPurse,
     purseRemaining: team.totalPurse - team.usedPurse,
+    totalPurse: team.totalPurse,
     gradeCount: team.gradeCount,
+    players: team.players,
   }));
 
   useEffect(() => {
@@ -69,12 +56,7 @@ export default function Owner() {
         onLogout={handleLogout}
       />
       <OwnerDashboard
-        teamName="Mumbai Indians"
-        totalPurse={myTeamData.totalPurse}
-        usedPurse={myTeamData.usedPurse}
-        gradeQuotas={gradeQuotas}
         allPlayers={allPlayers}
-        myTeamPlayers={myTeamPlayers}
         soldPlayers={soldPlayers}
         unsoldPlayers={unsoldPlayers}
         allTeamsData={allTeamsData}
