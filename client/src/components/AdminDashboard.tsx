@@ -6,11 +6,17 @@ import AuctionControls from "./AuctionControls";
 import PlayerCard from "./PlayerCard";
 import ExcelUpload from "./ExcelUpload";
 
+interface Team {
+  name: string;
+  flag?: string;
+}
+
 interface AdminDashboardProps {
   players: any[];
   currentPlayerIndex: number;
   currentBid: number;
-  teams: string[];
+  teams: Team[];
+  gradeIncrements: Record<string, number>;
   isAuctionActive: boolean;
   onNextPlayer: () => void;
   onPrevPlayer: () => void;
@@ -27,6 +33,7 @@ export default function AdminDashboard({
   currentPlayerIndex,
   currentBid,
   teams,
+  gradeIncrements,
   isAuctionActive,
   onNextPlayer,
   onPrevPlayer,
@@ -113,7 +120,7 @@ export default function AdminDashboard({
               <AuctionControls
                 currentPlayer={currentPlayer}
                 currentBid={currentBid}
-                increment={500000}
+                gradeIncrements={gradeIncrements}
                 teams={teams}
                 onBid={onBid}
                 onSold={onSold}

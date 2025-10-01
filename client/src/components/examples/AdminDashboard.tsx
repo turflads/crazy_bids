@@ -12,7 +12,18 @@ export default function AdminDashboardExample() {
     { id: '4', firstName: 'Jasprit', lastName: 'Bumrah', grade: 'A', basePrice: 2000000, status: 'unsold' },
   ];
 
-  const teams = ['Mumbai Indians', 'Chennai Super Kings', 'Royal Challengers'];
+  const teams = [
+    { name: 'Mumbai Indians', flag: '🔵' },
+    { name: 'Chennai Super Kings', flag: '🟡' },
+    { name: 'Royal Challengers', flag: '🔴' },
+    { name: 'Delhi Capitals', flag: '🔷' },
+  ];
+
+  const gradeIncrements = {
+    A: 500000,
+    B: 300000,
+    C: 200000,
+  };
 
   return (
     <AdminDashboard
@@ -20,6 +31,7 @@ export default function AdminDashboardExample() {
       currentPlayerIndex={currentPlayerIndex}
       currentBid={currentBid}
       teams={teams}
+      gradeIncrements={gradeIncrements}
       isAuctionActive={true}
       onNextPlayer={() => setCurrentPlayerIndex(Math.min(currentPlayerIndex + 1, mockPlayers.length - 1))}
       onPrevPlayer={() => setCurrentPlayerIndex(Math.max(currentPlayerIndex - 1, 0))}

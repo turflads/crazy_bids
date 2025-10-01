@@ -21,7 +21,18 @@ export default function Admin() {
   const [currentBid, setCurrentBid] = useState(2000000);
   const [isAuctionActive, setIsAuctionActive] = useState(false);
   
-  const teams = ['Mumbai Indians', 'Chennai Super Kings', 'Royal Challengers', 'Delhi Capitals'];
+  const teams = [
+    { name: 'Mumbai Indians', flag: '🔵' },
+    { name: 'Chennai Super Kings', flag: '🟡' },
+    { name: 'Royal Challengers', flag: '🔴' },
+    { name: 'Delhi Capitals', flag: '🔷' },
+  ];
+
+  const gradeIncrements = {
+    A: 500000,
+    B: 300000,
+    C: 200000,
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -57,6 +68,7 @@ export default function Admin() {
         currentPlayerIndex={currentPlayerIndex}
         currentBid={currentBid}
         teams={teams}
+        gradeIncrements={gradeIncrements}
         isAuctionActive={isAuctionActive}
         onNextPlayer={() => setCurrentPlayerIndex(Math.min(currentPlayerIndex + 1, players.length - 1))}
         onPrevPlayer={() => setCurrentPlayerIndex(Math.max(currentPlayerIndex - 1, 0))}

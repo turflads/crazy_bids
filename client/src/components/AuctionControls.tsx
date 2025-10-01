@@ -1,11 +1,12 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Gavel, Plus, Minus, CheckCircle, XCircle } from "lucide-react";
+import { Gavel, CheckCircle, XCircle, Flag } from "lucide-react";
+
+interface Team {
+  name: string;
+  flag?: string;
+}
 
 interface AuctionControlsProps {
   currentPlayer?: {
@@ -15,8 +16,8 @@ interface AuctionControlsProps {
     basePrice: number;
   };
   currentBid: number;
-  increment: number;
-  teams: string[];
+  gradeIncrements: Record<string, number>;
+  teams: Team[];
   onBid: (team: string, amount: number) => void;
   onSold: () => void;
   onUnsold: () => void;
@@ -25,33 +26,18 @@ interface AuctionControlsProps {
 export default function AuctionControls({
   currentPlayer,
   currentBid,
-  increment,
+  gradeIncrements,
   teams,
   onBid,
   onSold,
   onUnsold,
 }: AuctionControlsProps) {
-  const [selectedTeam, setSelectedTeam] = useState<string>("");
-  const [customAmount, setCustomAmount] = useState("");
-
-  const handleQuickBid = (amount: number) => {
-    if (!selectedTeam) {
-      alert("Please select a team first");
-      return;
-    }
-    onBid(selectedTeam, currentBid + amount);
-  };
-
-  const handleCustomBid = () => {
-    if (!selectedTeam) {
-      alert("Please select a team first");
-      return;
-    }
-    const amount = parseInt(customAmount);
-    if (amount > currentBid) {
-      onBid(selectedTeam, amount);
-      setCustomAmount("");
-    }
+  const handleTeamBid = (teamName: string) => {
+    if (!currentPlayer) return;
+    
+    const increment = gradeIncrements[currentPlayer.grade] || 500000;
+    const newBid = currentBid + increment;
+    onBid(teamName, newBid);
   };
 
   if (!currentPlayer) {
@@ -94,65 +80,36 @@ export default function AuctionControls({
           </p>
         </div>
 
-        <div className="space-y-2">
-          <Label>Select Team</Label>
-          <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-            <SelectTrigger data-testid="select-team">
-              <SelectValue placeholder="Choose team to bid for" />
-            </SelectTrigger>
-            <SelectContent>
-              {teams.map((team) => (
-                <SelectItem key={team} value={team}>
-                  {team}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {currentPlayer && (
+          <div className="p-4 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground mb-1">Next Increment</p>
+            <p className="text-lg font-semibold font-mono">
+              +₹{gradeIncrements[currentPlayer.grade]?.toLocaleString() || '0'}
+            </p>
+          </div>
+        )}
 
         <div className="space-y-3">
-          <Label>Quick Bid Increments</Label>
-          <div className="grid grid-cols-3 gap-2">
-            <Button
-              variant="outline"
-              onClick={() => handleQuickBid(500000)}
-              data-testid="button-bid-5l"
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              ₹5L
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleQuickBid(1000000)}
-              data-testid="button-bid-10l"
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              ₹10L
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleQuickBid(2500000)}
-              data-testid="button-bid-25l"
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              ₹25L
-            </Button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Custom Amount</Label>
-          <div className="flex gap-2">
-            <Input
-              type="number"
-              placeholder="Enter amount"
-              value={customAmount}
-              onChange={(e) => setCustomAmount(e.target.value)}
-              data-testid="input-custom-bid"
-            />
-            <Button onClick={handleCustomBid} data-testid="button-custom-bid">
-              Bid
-            </Button>
+          <p className="text-sm font-medium">Click team to place bid:</p>
+          <div className="grid grid-cols-2 gap-3">
+            {teams.map((team) => (
+              <Button
+                key={team.name}
+                variant="outline"
+                className="h-auto py-4 flex flex-col items-center gap-2 hover-elevate"
+                onClick={() => handleTeamBid(team.name)}
+                data-testid={`button-bid-${team.name.toLowerCase().replace(/\s+/g, '-')}`}
+              >
+                {team.flag ? (
+                  <div className="text-3xl">{team.flag}</div>
+                ) : (
+                  <Flag className="w-8 h-8 text-primary" />
+                )}
+                <span className="text-sm font-medium text-center leading-tight">
+                  {team.name}
+                </span>
+              </Button>
+            ))}
           </div>
         </div>
 
