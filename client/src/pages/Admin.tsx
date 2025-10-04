@@ -154,21 +154,24 @@ export default function Admin() {
           
           console.log('Player sold to', soldTeam, 'for ₹', soldPrice);
           
-          // Move to next player after a short delay
+          // Move to next player after a short delay using updated players array
           setTimeout(() => {
-            const nextIndex = Math.min(currentPlayerIndex + 1, players.length - 1);
+            const nextIndex = Math.min(currentPlayerIndex + 1, updatedPlayers.length - 1);
             setCurrentPlayerIndex(nextIndex);
-            setCurrentBid(players[nextIndex]?.basePrice || 0);
+            setCurrentBid(updatedPlayers[nextIndex]?.basePrice || 0);
           }, 500);
         }}
         onUnsold={() => {
           const currentPlayer = players[currentPlayerIndex];
           
-          // Re-queue the unsold player at the end
+          // Re-queue the unsold player at the end with cleared bid data
           const updatedPlayers = [...players];
           const unsoldPlayer = {
             ...currentPlayer,
             status: 'unsold' as const,
+            lastBidTeam: undefined,
+            lastBidAmount: undefined,
+            soldPrice: undefined,
           };
           
           // Remove from current position
@@ -181,8 +184,13 @@ export default function Admin() {
           
           console.log('Player unsold and re-queued at the end');
           
-          // Stay at the same index (which now shows the next player)
-          setCurrentBid(updatedPlayers[currentPlayerIndex]?.basePrice || 0);
+          // Adjust index if we removed the last player
+          const newIndex = currentPlayerIndex >= updatedPlayers.length 
+            ? Math.max(0, updatedPlayers.length - 1)
+            : currentPlayerIndex;
+          
+          setCurrentPlayerIndex(newIndex);
+          setCurrentBid(updatedPlayers[newIndex]?.basePrice || 0);
         }}
         onUploadPlayers={(file) => console.log('File uploaded:', file.name)}
       />
