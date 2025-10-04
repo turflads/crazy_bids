@@ -47,6 +47,7 @@ export default function Admin() {
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(auctionState.currentPlayerIndex);
   const [currentBid, setCurrentBid] = useState(auctionState.currentBid);
   const [isAuctionActive, setIsAuctionActive] = useState(auctionState.isAuctionActive);
+  const [bidHistory, setBidHistory] = useState<Array<{team: string, amount: number}>>([]);
 
   // Initialize teams
   useEffect(() => {
@@ -111,6 +112,13 @@ export default function Admin() {
           console.log('Auction paused');
         }}
         onBid={(team, amount) => {
+          // Store current state in history
+          const currentPlayer = players[currentPlayerIndex];
+          setBidHistory([...bidHistory, {
+            team: currentPlayer.lastBidTeam || '',
+            amount: currentBid
+          }]);
+
           setCurrentBid(amount);
           const updatedPlayers = [...players];
           updatedPlayers[currentPlayerIndex] = {
@@ -120,6 +128,36 @@ export default function Admin() {
           };
           setPlayers(updatedPlayers);
           console.log(`${team} bid ₹${amount}`);
+        }}
+        onCancelBid={() => {
+          if (bidHistory.length === 0) {
+            // No bids to cancel, reset to base price
+            const currentPlayer = players[currentPlayerIndex];
+            setCurrentBid(currentPlayer.basePrice);
+            const updatedPlayers = [...players];
+            updatedPlayers[currentPlayerIndex] = {
+              ...updatedPlayers[currentPlayerIndex],
+              lastBidTeam: undefined,
+              lastBidAmount: undefined,
+            };
+            setPlayers(updatedPlayers);
+            console.log('Bid cancelled - reset to base price');
+            return;
+          }
+
+          // Restore previous bid from history
+          const previousBid = bidHistory[bidHistory.length - 1];
+          setBidHistory(bidHistory.slice(0, -1));
+          setCurrentBid(previousBid.amount);
+          
+          const updatedPlayers = [...players];
+          updatedPlayers[currentPlayerIndex] = {
+            ...updatedPlayers[currentPlayerIndex],
+            lastBidTeam: previousBid.team || undefined,
+            lastBidAmount: previousBid.amount,
+          };
+          setPlayers(updatedPlayers);
+          console.log('Bid cancelled - restored previous bid');
         }}
         onSold={() => {
           const currentPlayer = players[currentPlayerIndex];
@@ -159,6 +197,7 @@ export default function Admin() {
             const nextIndex = Math.min(currentPlayerIndex + 1, updatedPlayers.length - 1);
             setCurrentPlayerIndex(nextIndex);
             setCurrentBid(updatedPlayers[nextIndex]?.basePrice || 0);
+            setBidHistory([]); // Clear bid history for new player
           }, 500);
         }}
         onUnsold={() => {
@@ -191,6 +230,7 @@ export default function Admin() {
           
           setCurrentPlayerIndex(newIndex);
           setCurrentBid(updatedPlayers[newIndex]?.basePrice || 0);
+          setBidHistory([]); // Clear bid history for new player
         }}
         onUploadPlayers={(file) => console.log('File uploaded:', file.name)}
       />

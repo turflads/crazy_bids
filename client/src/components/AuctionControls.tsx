@@ -1,7 +1,17 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Gavel, CheckCircle, XCircle, Flag } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Gavel, CheckCircle, XCircle, Flag, Undo2 } from "lucide-react";
 
 interface Team {
   name: string;
@@ -21,6 +31,7 @@ interface AuctionControlsProps {
   onBid: (team: string, amount: number) => void;
   onSold: () => void;
   onUnsold: () => void;
+  onCancelBid: () => void;
 }
 
 export default function AuctionControls({
@@ -31,13 +42,30 @@ export default function AuctionControls({
   onBid,
   onSold,
   onUnsold,
+  onCancelBid,
 }: AuctionControlsProps) {
+  const [customAmount, setCustomAmount] = useState("");
+  const [selectedTeam, setSelectedTeam] = useState("");
+
   const handleTeamBid = (teamName: string) => {
     if (!currentPlayer) return;
     
     const increment = gradeIncrements[currentPlayer.grade] || 500000;
     const newBid = currentBid + increment;
     onBid(teamName, newBid);
+  };
+
+  const handleCustomBid = () => {
+    if (!customAmount || !selectedTeam || !currentPlayer) return;
+    
+    const amount = parseInt(customAmount.replace(/,/g, ''));
+    if (isNaN(amount) || amount <= currentBid) {
+      alert('Custom bid must be greater than current bid');
+      return;
+    }
+    
+    onBid(selectedTeam, amount);
+    setCustomAmount("");
   };
 
   if (!currentPlayer) {
@@ -113,7 +141,56 @@ export default function AuctionControls({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 pt-4">
+        <div className="space-y-3 pt-4 border-t">
+          <p className="text-sm font-medium">Custom Bid:</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="custom-amount" className="text-xs">Amount (₹)</Label>
+              <Input
+                id="custom-amount"
+                type="text"
+                placeholder="5000000"
+                value={customAmount}
+                onChange={(e) => setCustomAmount(e.target.value)}
+                data-testid="input-custom-bid"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="team-select" className="text-xs">Team</Label>
+              <Select value={selectedTeam} onValueChange={setSelectedTeam}>
+                <SelectTrigger id="team-select" data-testid="select-team">
+                  <SelectValue placeholder="Select team" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teams.map((team) => (
+                    <SelectItem key={team.name} value={team.name}>
+                      {team.flag} {team.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={handleCustomBid}
+            disabled={!customAmount || !selectedTeam}
+            data-testid="button-custom-bid"
+          >
+            Place Custom Bid
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3 pt-4 border-t">
+          <Button
+            variant="outline"
+            onClick={onCancelBid}
+            data-testid="button-cancel-bid"
+          >
+            <Undo2 className="w-4 h-4 mr-2" />
+            Cancel Bid
+          </Button>
           <Button
             variant="default"
             className="bg-auction-sold hover:bg-auction-sold/90"

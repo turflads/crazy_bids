@@ -25,6 +25,7 @@ interface AdminDashboardProps {
   onBid: (team: string, amount: number) => void;
   onSold: () => void;
   onUnsold: () => void;
+  onCancelBid: () => void;
   onUploadPlayers: (file: File) => void;
 }
 
@@ -42,6 +43,7 @@ export default function AdminDashboard({
   onBid,
   onSold,
   onUnsold,
+  onCancelBid,
   onUploadPlayers,
 }: AdminDashboardProps) {
   const currentPlayer = players[currentPlayerIndex];
@@ -125,6 +127,7 @@ export default function AdminDashboard({
                 onBid={onBid}
                 onSold={onSold}
                 onUnsold={onUnsold}
+                onCancelBid={onCancelBid}
               />
             </div>
           </div>
