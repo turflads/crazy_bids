@@ -15,6 +15,12 @@ export default function Owner() {
   const soldPlayers = allPlayers.filter((p: any) => p.status === 'sold');
   const unsoldPlayers = allPlayers.filter((p: any) => p.status === 'unsold');
   
+  // Get current auction info
+  const currentPlayerIndex = auctionState?.currentPlayerIndex || 0;
+  const currentPlayer = allPlayers[currentPlayerIndex];
+  const currentBid = auctionState?.currentBid || currentPlayer?.basePrice;
+  const isAuctionActive = auctionState?.isAuctionActive;
+  
   // Convert team state to array for display
   const allTeamsData = Object.values(teamState).map((team: any) => ({
     team: team.name,
@@ -60,6 +66,9 @@ export default function Owner() {
         soldPlayers={soldPlayers}
         unsoldPlayers={unsoldPlayers}
         allTeamsData={allTeamsData}
+        currentPlayer={currentPlayer}
+        currentBid={currentBid}
+        isAuctionActive={isAuctionActive}
       />
     </div>
   );

@@ -17,12 +17,17 @@ export default function OwnerDashboardExample() {
     { team: 'Royal Challengers', flag: '🔴', playersCount: 0, purseUsed: 0, purseRemaining: 100000000, totalPurse: 100000000, gradeCount: { A: 0, B: 0, C: 0 }, players: [] },
   ];
 
+  const currentPlayer = mockPlayers[0];
+
   return (
     <OwnerDashboard
       allPlayers={mockPlayers}
       soldPlayers={soldPlayers}
       unsoldPlayers={unsoldPlayers}
       allTeamsData={allTeamsData}
+      currentPlayer={currentPlayer}
+      currentBid={2500000}
+      isAuctionActive={true}
     />
   );
 }

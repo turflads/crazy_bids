@@ -2,7 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, Trophy, Users } from "lucide-react";
+import { Search, Trophy, Users, Gavel } from "lucide-react";
 import PlayerCard from "./PlayerCard";
 
 interface TeamData {
@@ -21,6 +21,9 @@ interface OwnerDashboardProps {
   soldPlayers: any[];
   unsoldPlayers: any[];
   allTeamsData: TeamData[];
+  currentPlayer?: any;
+  currentBid?: number;
+  isAuctionActive?: boolean;
 }
 
 export default function OwnerDashboard({
@@ -28,12 +31,61 @@ export default function OwnerDashboard({
   soldPlayers,
   unsoldPlayers,
   allTeamsData,
+  currentPlayer,
+  currentBid,
+  isAuctionActive,
 }: OwnerDashboardProps) {
+  const gradeColorMap: Record<string, string> = {
+    A: 'bg-grade-a',
+    B: 'bg-grade-b',
+    C: 'bg-grade-c',
+  };
+  const gradeColor = currentPlayer ? (gradeColorMap[currentPlayer.grade] || 'bg-primary') : 'bg-primary';
+
   return (
     <div className="p-6 space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-6">Auction Overview - All Teams</h2>
       </div>
+
+      {currentPlayer && isAuctionActive && (
+        <Card className="border-primary/50 bg-primary/5" data-testid="card-current-auction">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Gavel className="w-5 h-5 text-primary" />
+              Current Auction
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Badge className={`${gradeColor} text-white`}>
+                    Grade {currentPlayer.grade}
+                  </Badge>
+                </div>
+                <h3 className="text-2xl font-bold" data-testid="text-current-player-name">
+                  {currentPlayer.firstName} {currentPlayer.lastName}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Base Price: ₹{currentPlayer.basePrice?.toLocaleString()}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground mb-1">Current Bid</p>
+                <p className="text-3xl font-bold font-mono text-primary" data-testid="text-current-bid">
+                  ₹{currentBid?.toLocaleString()}
+                </p>
+                {currentPlayer.lastBidTeam && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    by {currentPlayer.lastBidTeam}
+                  </p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div>
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
