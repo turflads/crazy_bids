@@ -2,12 +2,21 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import NavBar from "@/components/NavBar";
 import AdminDashboard from "@/components/AdminDashboard";
+import CelebrationPopup from "@/components/CelebrationPopup";
 import { getAuctionState, saveAuctionState, initializeAuctionState } from "@/lib/auctionState";
 import { initializeTeams, updateTeamAfterPurchase } from "@/lib/teamState";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
   const [user, setUser] = useState<{ username: string; role: string } | null>(null);
+  const [celebrationData, setCelebrationData] = useState<{
+    open: boolean;
+    playerName: string;
+    teamName: string;
+    teamFlag: string;
+    soldPrice: number;
+    grade: string;
+  } | null>(null);
   
   //todo: remove mock functionality
   const initialPlayers = [
@@ -130,30 +139,68 @@ export default function Admin() {
           // Update team state
           updateTeamAfterPurchase(soldTeam, currentPlayer, soldPrice);
           
+          // Find team flag
+          const team = teams.find(t => t.name === soldTeam);
+          
+          // Show celebration popup
+          setCelebrationData({
+            open: true,
+            playerName: `${currentPlayer.firstName} ${currentPlayer.lastName}`,
+            teamName: soldTeam,
+            teamFlag: team?.flag || '🏆',
+            soldPrice: soldPrice,
+            grade: currentPlayer.grade,
+          });
+          
           console.log('Player sold to', soldTeam, 'for ₹', soldPrice);
           
-          // Move to next player
-          const nextIndex = Math.min(currentPlayerIndex + 1, players.length - 1);
-          setCurrentPlayerIndex(nextIndex);
-          setCurrentBid(players[nextIndex]?.basePrice || 0);
+          // Move to next player after a short delay
+          setTimeout(() => {
+            const nextIndex = Math.min(currentPlayerIndex + 1, players.length - 1);
+            setCurrentPlayerIndex(nextIndex);
+            setCurrentBid(players[nextIndex]?.basePrice || 0);
+          }, 500);
         }}
         onUnsold={() => {
+          const currentPlayer = players[currentPlayerIndex];
+          
+          // Re-queue the unsold player at the end
           const updatedPlayers = [...players];
-          updatedPlayers[currentPlayerIndex] = {
-            ...updatedPlayers[currentPlayerIndex],
-            status: 'unsold',
+          const unsoldPlayer = {
+            ...currentPlayer,
+            status: 'unsold' as const,
           };
+          
+          // Remove from current position
+          updatedPlayers.splice(currentPlayerIndex, 1);
+          
+          // Add to the end
+          updatedPlayers.push(unsoldPlayer);
+          
           setPlayers(updatedPlayers);
           
-          console.log('Player unsold');
+          console.log('Player unsold and re-queued at the end');
           
-          // Move to next player
-          const nextIndex = Math.min(currentPlayerIndex + 1, players.length - 1);
-          setCurrentPlayerIndex(nextIndex);
-          setCurrentBid(players[nextIndex]?.basePrice || 0);
+          // Stay at the same index (which now shows the next player)
+          setCurrentBid(updatedPlayers[currentPlayerIndex]?.basePrice || 0);
         }}
         onUploadPlayers={(file) => console.log('File uploaded:', file.name)}
       />
+      {celebrationData && (
+        <CelebrationPopup
+          open={celebrationData.open}
+          onOpenChange={(open) => {
+            if (!open) {
+              setCelebrationData(null);
+            }
+          }}
+          playerName={celebrationData.playerName}
+          teamName={celebrationData.teamName}
+          teamFlag={celebrationData.teamFlag}
+          soldPrice={celebrationData.soldPrice}
+          grade={celebrationData.grade}
+        />
+      )}
     </div>
   );
 }
