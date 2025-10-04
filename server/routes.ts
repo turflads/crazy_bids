@@ -2,13 +2,12 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import xlsx from "xlsx";
-import path from "path";
 import { storage } from "./storage";
 import { insertPlayerSchema } from "@shared/schema";
 
-// Configure multer for file uploads
+// Configure multer for file uploads using memory storage
 const upload = multer({
-  dest: "uploads/",
+  storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter: (req, file, cb) => {
     if (file.mimetype === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
@@ -33,35 +32,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/players/upload", upload.single("file"), async (req, res) => {
     try {
-      if (!req.file) {
+      if (!req.file || !req.file.buffer) {
         return res.status(400).json({ error: "No file uploaded" });
       }
 
-      // Parse Excel file
-      const workbook = xlsx.readFile(req.file.path);
+      // Parse Excel file from buffer
+      const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const data = xlsx.utils.sheet_to_json(sheet);
 
-      // Clear existing players
-      await storage.deletePlayers();
+      if (!data || data.length === 0) {
+        return res.status(400).json({ error: "Excel file is empty or has no data" });
+      }
 
-      // Transform and validate players data
-      const players = data.map((row: any) => {
-        // Map Excel columns to player fields
-        const player = {
-          firstName: row["First Name"] || row["first name"] || row["firstName"] || "",
-          lastName: row["Last Name"] || row["last name"] || row["lastName"] || "",
-          grade: row["Grade"] || row["grade"] || "C",
-          basePrice: parseInt(row["Base Price"] || row["base price"] || row["basePrice"] || "0"),
-          imagePath: row["Image Path"] || row["image path"] || row["imagePath"] || null,
-          cricheroesLink: row["Cricheroes Link"] || row["cricheroes link"] || row["cricheroesLink"] || null,
-          status: "unsold",
-        };
+      // Transform and validate players data BEFORE deleting existing players
+      const players = data.map((row: any, index: number) => {
+        try {
+          // Map Excel columns to player fields with better normalization
+          const firstName = String(row["First Name"] || row["first name"] || row["firstName"] || "").trim();
+          const lastName = String(row["Last Name"] || row["last name"] || row["lastName"] || "").trim();
+          const grade = String(row["Grade"] || row["grade"] || "C").trim().toUpperCase();
+          const basePriceStr = String(row["Base Price"] || row["base price"] || row["basePrice"] || "0").trim();
+          const basePrice = parseInt(basePriceStr.replace(/[^0-9]/g, '')) || 0;
+          
+          const player = {
+            firstName,
+            lastName,
+            grade,
+            basePrice,
+            imagePath: row["Image Path"] || row["image path"] || row["imagePath"] || null,
+            cricheroesLink: row["Cricheroes Link"] || row["cricheroes link"] || row["cricheroesLink"] || null,
+            status: "unsold",
+          };
 
-        // Validate with zod schema
-        return insertPlayerSchema.parse(player);
+          // Validate with zod schema
+          return insertPlayerSchema.parse(player);
+        } catch (err) {
+          throw new Error(`Row ${index + 2} validation failed: ${err instanceof Error ? err.message : 'Invalid data'}`);
+        }
       });
+
+      // Only delete existing players after validation succeeds
+      await storage.deletePlayers();
 
       // Bulk create players
       const createdPlayers = await storage.bulkCreatePlayers(players);

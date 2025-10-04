@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import NavBar from "@/components/NavBar";
 import AdminDashboard from "@/components/AdminDashboard";
 import CelebrationPopup from "@/components/CelebrationPopup";
 import { getAuctionState, saveAuctionState, initializeAuctionState } from "@/lib/auctionState";
 import { initializeTeams, updateTeamAfterPurchase } from "@/lib/teamState";
+import type { Player } from "@shared/schema";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
@@ -18,15 +20,10 @@ export default function Admin() {
     grade: string;
   } | null>(null);
   
-  //todo: remove mock functionality
-  const initialPlayers = [
-    { id: '1', firstName: 'Virat', lastName: 'Kohli', grade: 'A', basePrice: 2000000, status: 'unsold' as const },
-    { id: '2', firstName: 'Rohit', lastName: 'Sharma', grade: 'A', basePrice: 2000000, status: 'unsold' as const },
-    { id: '3', firstName: 'MS', lastName: 'Dhoni', grade: 'B', basePrice: 1500000, status: 'unsold' as const },
-    { id: '4', firstName: 'Jasprit', lastName: 'Bumrah', grade: 'A', basePrice: 2000000, status: 'unsold' as const },
-    { id: '5', firstName: 'Ravindra', lastName: 'Jadeja', grade: 'B', basePrice: 1500000, status: 'unsold' as const },
-    { id: '6', firstName: 'Hardik', lastName: 'Pandya', grade: 'B', basePrice: 1500000, status: 'unsold' as const },
-  ];
+  // Fetch players from API
+  const { data: apiPlayers, isLoading: isLoadingPlayers } = useQuery<Player[]>({
+    queryKey: ["/api/players"],
+  });
   
   const teams = [
     { name: 'Mumbai Indians', flag: '🔵' },
@@ -41,13 +38,25 @@ export default function Admin() {
     C: 200000,
   };
 
-  // Initialize auction state from localStorage or create new
-  const auctionState = initializeAuctionState(initialPlayers);
-  const [players, setPlayers] = useState(auctionState.players);
-  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(auctionState.currentPlayerIndex);
-  const [currentBid, setCurrentBid] = useState(auctionState.currentBid);
-  const [isAuctionActive, setIsAuctionActive] = useState(auctionState.isAuctionActive);
+  // Initialize auction state - wait for API players to load first
+  const [players, setPlayers] = useState<any[]>([]);
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+  const [currentBid, setCurrentBid] = useState(0);
+  const [isAuctionActive, setIsAuctionActive] = useState(false);
   const [bidHistory, setBidHistory] = useState<Array<{team: string, amount: number}>>([]);
+
+  // Initialize or update auction state when API data changes
+  useEffect(() => {
+    if (apiPlayers && apiPlayers.length > 0) {
+      // Always reinitialize from API players
+      // initializeAuctionState will use localStorage if available, or create new state
+      const newAuctionState = initializeAuctionState(apiPlayers);
+      setPlayers(newAuctionState.players);
+      setCurrentPlayerIndex(newAuctionState.currentPlayerIndex);
+      setCurrentBid(newAuctionState.currentBid);
+      setIsAuctionActive(newAuctionState.isAuctionActive);
+    }
+  }, [apiPlayers]);
 
   // Initialize teams
   useEffect(() => {
@@ -84,7 +93,7 @@ export default function Admin() {
     setLocation("/");
   };
 
-  if (!user) return null;
+  if (!user || isLoadingPlayers) return null;
 
   return (
     <div className="min-h-screen bg-background">

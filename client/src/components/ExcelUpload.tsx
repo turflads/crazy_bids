@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Upload, FileSpreadsheet, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
+import { clearAuctionState } from "@/lib/auctionState";
 
 interface ExcelUploadProps {
   onUpload?: (file: File) => void;
@@ -69,10 +71,16 @@ export default function ExcelUpload({ onUpload, onSuccess }: ExcelUploadProps) {
 
       const result = await response.json();
       
+      // Clear auction state to force reinitialization with new players
+      clearAuctionState();
+      
       toast({
         title: "Success!",
         description: result.message || `Uploaded ${result.count} players`,
       });
+
+      // Invalidate player queries to refresh data
+      await queryClient.invalidateQueries({ queryKey: ["/api/players"] });
 
       setSelectedFile(null);
       if (fileInputRef.current) {
