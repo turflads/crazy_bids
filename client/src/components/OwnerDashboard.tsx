@@ -1,7 +1,14 @@
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Search, Trophy, Users, Gavel } from "lucide-react";
 import PlayerCard from "./PlayerCard";
 
@@ -35,6 +42,8 @@ export default function OwnerDashboard({
   currentBid,
   isAuctionActive,
 }: OwnerDashboardProps) {
+  const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
+
   const gradeColorMap: Record<string, string> = {
     A: 'bg-grade-a',
     B: 'bg-grade-b',
@@ -94,7 +103,12 @@ export default function OwnerDashboard({
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {allTeamsData.map((team) => (
-            <Card key={team.team} data-testid={`card-team-overview-${team.team}`}>
+            <Card 
+              key={team.team} 
+              data-testid={`card-team-overview-${team.team}`}
+              className="cursor-pointer hover-elevate active-elevate-2"
+              onClick={() => setSelectedTeam(team)}
+            >
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -190,6 +204,54 @@ export default function OwnerDashboard({
           </TabsContent>
         </div>
       </Tabs>
+
+      <Dialog open={!!selectedTeam} onOpenChange={() => setSelectedTeam(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto" data-testid="dialog-team-players">
+          {selectedTeam && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3 text-2xl">
+                  {selectedTeam.flag && <span className="text-3xl">{selectedTeam.flag}</span>}
+                  <span>{selectedTeam.team} - Players</span>
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Players</p>
+                    <p className="text-2xl font-bold">{selectedTeam.playersCount}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Purse Used</p>
+                    <p className="text-2xl font-bold font-mono text-destructive">
+                      ₹{selectedTeam.purseUsed.toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Purse Remaining</p>
+                    <p className="text-2xl font-bold font-mono text-auction-sold">
+                      ₹{selectedTeam.purseRemaining.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+
+                {selectedTeam.players.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {selectedTeam.players.map((player: any) => (
+                      <PlayerCard key={player.id} player={player} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                    <p className="text-lg text-muted-foreground">No players purchased yet</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
