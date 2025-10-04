@@ -1,22 +1,16 @@
 import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload, FileSpreadsheet, CheckCircle, XCircle, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { queryClient } from "@/lib/queryClient";
-import { clearAuctionState } from "@/lib/auctionState";
+import { Upload, FileSpreadsheet, CheckCircle, XCircle } from "lucide-react";
 
 interface ExcelUploadProps {
-  onUpload?: (file: File) => void;
-  onSuccess?: () => void;
+  onUpload: (file: File) => void;
 }
 
-export default function ExcelUpload({ onUpload, onSuccess }: ExcelUploadProps) {
+export default function ExcelUpload({ onUpload }: ExcelUploadProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -44,62 +38,13 @@ export default function ExcelUpload({ onUpload, onSuccess }: ExcelUploadProps) {
     }
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) return;
-
-    setIsUploading(true);
-
-    try {
-      // Call legacy onUpload if provided
-      if (onUpload) {
-        onUpload(selectedFile);
-      }
-
-      // Upload to API
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-
-      const response = await fetch("/api/players/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.details || error.error || "Upload failed");
-      }
-
-      const result = await response.json();
-      
-      // Clear auction state to force reinitialization with new players
-      clearAuctionState();
-      
-      toast({
-        title: "Success!",
-        description: result.message || `Uploaded ${result.count} players`,
-      });
-
-      // Invalidate player queries to refresh data
-      await queryClient.invalidateQueries({ queryKey: ["/api/players"] });
-
+  const handleUpload = () => {
+    if (selectedFile) {
+      onUpload(selectedFile);
       setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-
-      // Call success callback
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (error) {
-      console.error("Upload error:", error);
-      toast({
-        title: "Upload Failed",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -168,21 +113,12 @@ export default function ExcelUpload({ onUpload, onSuccess }: ExcelUploadProps) {
 
         <Button
           className="w-full"
-          disabled={!selectedFile || isUploading}
+          disabled={!selectedFile}
           onClick={handleUpload}
           data-testid="button-upload"
         >
-          {isUploading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Uploading...
-            </>
-          ) : (
-            <>
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Upload Players
-            </>
-          )}
+          <CheckCircle className="w-4 h-4 mr-2" />
+          Upload Players
         </Button>
       </CardContent>
     </Card>
