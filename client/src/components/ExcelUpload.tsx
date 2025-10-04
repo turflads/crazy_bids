@@ -1,16 +1,20 @@
 import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload, FileSpreadsheet, CheckCircle, XCircle } from "lucide-react";
+import { Upload, FileSpreadsheet, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ExcelUploadProps {
-  onUpload: (file: File) => void;
+  onUpload?: (file: File) => void;
+  onSuccess?: () => void;
 }
 
-export default function ExcelUpload({ onUpload }: ExcelUploadProps) {
+export default function ExcelUpload({ onUpload, onSuccess }: ExcelUploadProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -38,13 +42,56 @@ export default function ExcelUpload({ onUpload }: ExcelUploadProps) {
     }
   };
 
-  const handleUpload = () => {
-    if (selectedFile) {
-      onUpload(selectedFile);
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+
+    setIsUploading(true);
+
+    try {
+      // Call legacy onUpload if provided
+      if (onUpload) {
+        onUpload(selectedFile);
+      }
+
+      // Upload to API
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      const response = await fetch("/api/players/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details || error.error || "Upload failed");
+      }
+
+      const result = await response.json();
+      
+      toast({
+        title: "Success!",
+        description: result.message || `Uploaded ${result.count} players`,
+      });
+
       setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+
+      // Call success callback
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast({
+        title: "Upload Failed",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -113,12 +160,21 @@ export default function ExcelUpload({ onUpload }: ExcelUploadProps) {
 
         <Button
           className="w-full"
-          disabled={!selectedFile}
+          disabled={!selectedFile || isUploading}
           onClick={handleUpload}
           data-testid="button-upload"
         >
-          <CheckCircle className="w-4 h-4 mr-2" />
-          Upload Players
+          {isUploading ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Uploading...
+            </>
+          ) : (
+            <>
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Upload Players
+            </>
+          )}
         </Button>
       </CardContent>
     </Card>
