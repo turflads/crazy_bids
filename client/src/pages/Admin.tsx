@@ -4,7 +4,7 @@ import NavBar from "@/components/NavBar";
 import AdminDashboard from "@/components/AdminDashboard";
 import CelebrationPopup from "@/components/CelebrationPopup";
 import { getAuctionState, saveAuctionState, initializeAuctionState } from "@/lib/auctionState";
-import { initializeTeams, updateTeamAfterPurchase } from "@/lib/teamState";
+import { initializeTeams, updateTeamAfterPurchase, clearTeamState } from "@/lib/teamState";
 import { loadPlayersFromExcel } from "@/lib/playerLoader";
 
 export default function Admin() {
@@ -263,6 +263,9 @@ export default function Admin() {
           setBidHistory([]); // Clear bid history for new player
         }}
         onResetAuction={async () => {
+          clearTeamState();
+          initializeTeams(teams);
+          
           const loadedPlayers = await loadPlayersFromExcel();
           const auctionState = initializeAuctionState(loadedPlayers);
           setPlayers(auctionState.players);
