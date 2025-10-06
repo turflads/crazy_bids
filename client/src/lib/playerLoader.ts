@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx';
+import { loadAuctionConfig } from './auctionConfig';
 
 export interface PlayerData {
   id: string;
@@ -10,14 +11,9 @@ export interface PlayerData {
   image?: string;
 }
 
-const gradeBasePrices: Record<string, number> = {
-  A: 2000000,
-  B: 1500000,
-  C: 1000000,
-};
-
 export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
   try {
+    const config = await loadAuctionConfig();
     const response = await fetch('/players.xlsx');
     const arrayBuffer = await response.arrayBuffer();
     const workbook = XLSX.read(arrayBuffer, { type: 'array' });
@@ -37,7 +33,7 @@ export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
         firstName,
         lastName,
         grade,
-        basePrice: gradeBasePrices[grade] || 1000000,
+        basePrice: config.gradeBasePrices[grade] || 1000000,
         status: 'unsold' as const,
         image: photo ? `/player_images/${photo}` : undefined,
       };

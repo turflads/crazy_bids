@@ -1,0 +1,133 @@
+==================================================================
+   HOW TO CONFIGURE YOUR CRICKET PLAYER AUCTION
+==================================================================
+
+To customize the auction settings for each new auction, you only need to 
+edit ONE file: client/public/config.json
+
+No code changes required!
+
+------------------------------------------------------------------
+CONFIGURATION FILE LOCATION
+------------------------------------------------------------------
+File: client/public/config.json
+
+------------------------------------------------------------------
+WHAT YOU CAN CONFIGURE
+------------------------------------------------------------------
+
+1. GRADE BASE PRICES
+   - Set the starting price for each grade (A, B, C)
+   - Example: Grade A players start at ₹20,00,000
+
+2. GRADE INCREMENTS
+   - Set how much the bid increases with each increment for each grade
+   - Example: Grade A increments by ₹5,00,000
+
+3. TEAMS
+   - Add/remove teams
+   - Change team names
+   - Change team logos (emoji or text)
+   - Set total purse for each team
+
+4. GRADE QUOTAS
+   - Set maximum players allowed per grade for each team
+
+------------------------------------------------------------------
+EXAMPLE CONFIGURATION
+------------------------------------------------------------------
+
+{
+  "gradeBasePrices": {
+    "A": 2000000,       <- Grade A starts at ₹20,00,000
+    "B": 1500000,       <- Grade B starts at ₹15,00,000
+    "C": 1000000        <- Grade C starts at ₹10,00,000
+  },
+  "gradeIncrements": {
+    "A": 500000,        <- Grade A increases by ₹5,00,000 per bid
+    "B": 300000,        <- Grade B increases by ₹3,00,000 per bid
+    "C": 200000         <- Grade C increases by ₹2,00,000 per bid
+  },
+  "teams": [
+    {
+      "name": "Mumbai Indians",
+      "flag": "🔵",
+      "totalPurse": 100000000    <- Each team has ₹10,00,00,000
+    },
+    {
+      "name": "Chennai Super Kings",
+      "flag": "🟡",
+      "totalPurse": 100000000
+    }
+  ],
+  "gradeQuotas": {
+    "A": 3,             <- Maximum 3 Grade A players per team
+    "B": 4,             <- Maximum 4 Grade B players per team
+    "C": 5              <- Maximum 5 Grade C players per team
+  }
+}
+
+------------------------------------------------------------------
+STEPS TO CONFIGURE FOR A NEW AUCTION
+------------------------------------------------------------------
+
+1. Open: client/public/config.json
+
+2. Update the values as needed:
+   - Change base prices
+   - Change increments
+   - Add/remove/modify teams
+   - Update team purse amounts
+   - Adjust grade quotas
+
+3. Save the file
+
+4. Refresh your browser - changes will take effect immediately!
+
+------------------------------------------------------------------
+PLAYER DATA (EXCEL FILE)
+------------------------------------------------------------------
+
+Location: client/public/players.xlsx
+
+The Excel file should contain:
+- Column: name     (e.g., "Virat Kohli")
+- Column: grade    (e.g., "A", "B", or "C")
+- Column: photo    (e.g., "Virat_Kohli.png")
+
+Player images should be in: client/public/player_images/
+
+------------------------------------------------------------------
+ADDING/REMOVING TEAMS
+------------------------------------------------------------------
+
+To add a new team, simply add another entry in the "teams" array:
+
+{
+  "name": "Kolkata Knight Riders",
+  "flag": "🟣",
+  "totalPurse": 100000000
+}
+
+To remove a team, delete its entry from the array.
+
+------------------------------------------------------------------
+TEAM LOGOS
+------------------------------------------------------------------
+
+You can use:
+- Emojis: 🔵 🟡 🔴 🟢 🟣 🟠 ⚫ ⚪
+- Text: "MI", "CSK", "RCB", etc.
+- Or leave as color emoji
+
+------------------------------------------------------------------
+IMPORTANT NOTES
+------------------------------------------------------------------
+
+1. All prices are in Indian Rupees (₹)
+2. Make sure the JSON format is correct (commas, brackets, quotes)
+3. Don't forget to save the file after editing
+4. If the file has errors, the app will use default values
+5. Changes take effect when you reload the browser
+
+==================================================================

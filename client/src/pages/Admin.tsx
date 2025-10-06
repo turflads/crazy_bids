@@ -6,6 +6,7 @@ import CelebrationPopup from "@/components/CelebrationPopup";
 import { getAuctionState, saveAuctionState, initializeAuctionState } from "@/lib/auctionState";
 import { initializeTeams, updateTeamAfterPurchase, clearTeamState } from "@/lib/teamState";
 import { loadPlayersFromExcel } from "@/lib/playerLoader";
+import { loadAuctionConfig, type Team } from "@/lib/auctionConfig";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
@@ -19,19 +20,8 @@ export default function Admin() {
     grade: string;
   } | null>(null);
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(true);
-  
-  const teams = [
-    { name: 'Mumbai Indians', flag: '🔵' },
-    { name: 'Chennai Super Kings', flag: '🟡' },
-    { name: 'Royal Challengers', flag: '🔴' },
-    { name: 'Delhi Capitals', flag: '🔷' },
-  ];
-
-  const gradeIncrements = {
-    A: 500000,
-    B: 300000,
-    C: 200000,
-  };
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [gradeIncrements, setGradeIncrements] = useState<Record<string, number>>({});
 
   // Initialize auction state
   const [players, setPlayers] = useState<any[]>([]);
@@ -40,10 +30,15 @@ export default function Admin() {
   const [isAuctionActive, setIsAuctionActive] = useState(false);
   const [bidHistory, setBidHistory] = useState<Array<{team: string, amount: number}>>([]);
 
-  // Load players from Excel file
+  // Load configuration and players
   useEffect(() => {
-    const loadPlayers = async () => {
+    const loadData = async () => {
       setIsLoadingPlayers(true);
+      
+      const config = await loadAuctionConfig();
+      setTeams(config.teams);
+      setGradeIncrements(config.gradeIncrements);
+      
       const loadedPlayers = await loadPlayersFromExcel();
       
       if (loadedPlayers.length > 0) {
@@ -66,13 +61,15 @@ export default function Admin() {
       setIsLoadingPlayers(false);
     };
     
-    loadPlayers();
+    loadData();
   }, []);
 
   // Initialize teams
   useEffect(() => {
-    initializeTeams(teams);
-  }, []);
+    if (teams.length > 0) {
+      initializeTeams(teams);
+    }
+  }, [teams]);
 
   // Save auction state whenever it changes
   useEffect(() => {
