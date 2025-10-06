@@ -28,6 +28,8 @@ interface AuctionControlsProps {
   currentBid: number;
   gradeIncrements: Record<string, number>;
   teams: Team[];
+  isAuctionActive: boolean;
+  hasBids: boolean;
   onBid: (team: string, amount: number) => void;
   onSold: () => void;
   onUnsold: () => void;
@@ -39,6 +41,8 @@ export default function AuctionControls({
   currentBid,
   gradeIncrements,
   teams,
+  isAuctionActive,
+  hasBids,
   onBid,
   onSold,
   onUnsold,
@@ -48,19 +52,26 @@ export default function AuctionControls({
   const [selectedTeam, setSelectedTeam] = useState("");
 
   const handleTeamBid = (teamName: string) => {
-    if (!currentPlayer) return;
+    if (!currentPlayer || !isAuctionActive) return;
     
-    const increment = gradeIncrements[currentPlayer.grade] || 500000;
-    const newBid = currentBid + increment;
+    let newBid: number;
+    if (!hasBids) {
+      newBid = currentPlayer.basePrice;
+    } else {
+      const increment = gradeIncrements[currentPlayer.grade] || 500000;
+      newBid = currentBid + increment;
+    }
     onBid(teamName, newBid);
   };
 
   const handleCustomBid = () => {
-    if (!customAmount || !selectedTeam || !currentPlayer) return;
+    if (!customAmount || !selectedTeam || !currentPlayer || !isAuctionActive) return;
     
     const amount = parseInt(customAmount.replace(/,/g, ''));
-    if (isNaN(amount) || amount <= currentBid) {
-      alert('Custom bid must be greater than current bid');
+    const minBid = hasBids ? currentBid + 1 : currentPlayer.basePrice;
+    
+    if (isNaN(amount) || amount < minBid) {
+      alert(`Custom bid must be at least ₹${minBid.toLocaleString()}`);
       return;
     }
     
@@ -117,6 +128,14 @@ export default function AuctionControls({
           </div>
         )}
 
+        {!isAuctionActive && (
+          <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+            <p className="text-sm text-amber-600 dark:text-amber-400 text-center">
+              Start the auction to enable bidding
+            </p>
+          </div>
+        )}
+
         <div className="space-y-3">
           <p className="text-sm font-medium">Click team to place bid:</p>
           <div className="grid grid-cols-2 gap-3">
@@ -126,6 +145,7 @@ export default function AuctionControls({
                 variant="outline"
                 className="h-auto py-4 flex flex-col items-center gap-2 hover-elevate"
                 onClick={() => handleTeamBid(team.name)}
+                disabled={!isAuctionActive}
                 data-testid={`button-bid-${team.name.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 {team.flag ? (
@@ -175,7 +195,7 @@ export default function AuctionControls({
             variant="outline"
             className="w-full"
             onClick={handleCustomBid}
-            disabled={!customAmount || !selectedTeam}
+            disabled={!customAmount || !selectedTeam || !isAuctionActive}
             data-testid="button-custom-bid"
           >
             Place Custom Bid
@@ -186,6 +206,7 @@ export default function AuctionControls({
           <Button
             variant="outline"
             onClick={onCancelBid}
+            disabled={!isAuctionActive || !hasBids}
             data-testid="button-cancel-bid"
           >
             <Undo2 className="w-4 h-4 mr-2" />
@@ -195,6 +216,7 @@ export default function AuctionControls({
             variant="default"
             className="bg-auction-sold hover:bg-auction-sold/90"
             onClick={onSold}
+            disabled={!isAuctionActive || !hasBids}
             data-testid="button-sold"
           >
             <CheckCircle className="w-4 h-4 mr-2" />
@@ -203,6 +225,7 @@ export default function AuctionControls({
           <Button
             variant="destructive"
             onClick={onUnsold}
+            disabled={!isAuctionActive}
             data-testid="button-unsold"
           >
             <XCircle className="w-4 h-4 mr-2" />

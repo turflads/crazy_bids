@@ -3,10 +3,14 @@ import { useLocation } from "wouter";
 import NavBar from "@/components/NavBar";
 import OwnerDashboard from "@/components/OwnerDashboard";
 import { useAuctionSync } from "@/hooks/useAuctionSync";
+import { loadAuctionConfig } from "@/lib/auctionConfig";
+import { calculateMaxBidSync } from "@/lib/maxBidCalculator";
 
 export default function Owner() {
   const [, setLocation] = useLocation();
   const [user, setUser] = useState<{ username: string; role: string } | null>(null);
+  const [gradeQuotas, setGradeQuotas] = useState<Record<string, number>>({});
+  const [gradeBasePrices, setGradeBasePrices] = useState<Record<string, number>>({});
   
   // Use synced auction and team state
   const { auctionState, teamState } = useAuctionSync();
@@ -21,17 +25,41 @@ export default function Owner() {
   const currentBid = auctionState?.currentBid || currentPlayer?.basePrice;
   const isAuctionActive = auctionState?.isAuctionActive;
   
-  // Convert team state to array for display
-  const allTeamsData = Object.values(teamState).map((team: any) => ({
-    team: team.name,
-    flag: team.flag,
-    playersCount: team.players.length,
-    purseUsed: team.usedPurse,
-    purseRemaining: team.totalPurse - team.usedPurse,
-    totalPurse: team.totalPurse,
-    gradeCount: team.gradeCount,
-    players: team.players,
-  }));
+  // Convert team state to array for display with max bid calculations
+  const allTeamsData = Object.values(teamState).map((team: any) => {
+    const maxBid = currentPlayer && Object.keys(gradeQuotas).length > 0 ? calculateMaxBidSync(
+      {
+        totalPurse: team.totalPurse,
+        usedPurse: team.usedPurse,
+        gradeCount: team.gradeCount,
+        quotas: gradeQuotas,
+      },
+      currentPlayer.grade,
+      gradeBasePrices,
+      gradeQuotas
+    ) : 0;
+
+    return {
+      team: team.name,
+      flag: team.flag,
+      playersCount: team.players.length,
+      purseUsed: team.usedPurse,
+      purseRemaining: team.totalPurse - team.usedPurse,
+      totalPurse: team.totalPurse,
+      gradeCount: team.gradeCount,
+      players: team.players,
+      maxBid,
+    };
+  });
+
+  useEffect(() => {
+    const loadConfig = async () => {
+      const config = await loadAuctionConfig();
+      setGradeQuotas(config.gradeQuotas);
+      setGradeBasePrices(config.gradeBasePrices);
+    };
+    loadConfig();
+  }, []);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");

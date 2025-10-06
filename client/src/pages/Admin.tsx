@@ -4,9 +4,10 @@ import NavBar from "@/components/NavBar";
 import AdminDashboard from "@/components/AdminDashboard";
 import CelebrationPopup from "@/components/CelebrationPopup";
 import { getAuctionState, saveAuctionState, initializeAuctionState } from "@/lib/auctionState";
-import { initializeTeams, updateTeamAfterPurchase, clearTeamState } from "@/lib/teamState";
+import { initializeTeams, updateTeamAfterPurchase, clearTeamState, getTeamState } from "@/lib/teamState";
 import { loadPlayersFromExcel } from "@/lib/playerLoader";
 import { loadAuctionConfig, type Team } from "@/lib/auctionConfig";
+import { calculateMaxBidSync } from "@/lib/maxBidCalculator";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
@@ -22,6 +23,8 @@ export default function Admin() {
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(true);
   const [teams, setTeams] = useState<Team[]>([]);
   const [gradeIncrements, setGradeIncrements] = useState<Record<string, number>>({});
+  const [gradeQuotas, setGradeQuotas] = useState<Record<string, number>>({});
+  const [gradeBasePrices, setGradeBasePrices] = useState<Record<string, number>>({});
 
   // Initialize auction state
   const [players, setPlayers] = useState<any[]>([]);
@@ -29,6 +32,7 @@ export default function Admin() {
   const [currentBid, setCurrentBid] = useState(0);
   const [isAuctionActive, setIsAuctionActive] = useState(false);
   const [bidHistory, setBidHistory] = useState<Array<{team: string, amount: number}>>([]);
+  const [hasBids, setHasBids] = useState(false);
 
   // Load configuration and players
   useEffect(() => {
@@ -38,6 +42,8 @@ export default function Admin() {
       const config = await loadAuctionConfig();
       setTeams(config.teams);
       setGradeIncrements(config.gradeIncrements);
+      setGradeQuotas(config.gradeQuotas);
+      setGradeBasePrices(config.gradeBasePrices);
       
       const loadedPlayers = await loadPlayersFromExcel();
       
@@ -113,6 +119,43 @@ export default function Admin() {
     );
   }
 
+  // Get team data with max bid calculations
+  const teamState = getTeamState();
+  const currentPlayer = players[currentPlayerIndex];
+  const teamData = teams.map(team => {
+    const state = teamState[team.name] || {
+      name: team.name,
+      flag: team.flag,
+      totalPurse: team.totalPurse,
+      usedPurse: 0,
+      players: [],
+      gradeCount: { A: 0, B: 0, C: 0 },
+    };
+    
+    const maxBid = currentPlayer ? calculateMaxBidSync(
+      {
+        totalPurse: state.totalPurse,
+        usedPurse: state.usedPurse,
+        gradeCount: state.gradeCount,
+        quotas: gradeQuotas,
+      },
+      currentPlayer.grade,
+      gradeBasePrices,
+      gradeQuotas
+    ) : 0;
+
+    return {
+      name: team.name,
+      flag: team.flag,
+      playersCount: state.players.length,
+      purseUsed: state.usedPurse,
+      purseRemaining: state.totalPurse - state.usedPurse,
+      totalPurse: state.totalPurse,
+      gradeCount: state.gradeCount,
+      maxBid,
+    };
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <NavBar
@@ -127,7 +170,11 @@ export default function Admin() {
         currentBid={currentBid}
         teams={teams}
         gradeIncrements={gradeIncrements}
+        gradeQuotas={gradeQuotas}
+        gradeBasePrices={gradeBasePrices}
         isAuctionActive={isAuctionActive}
+        hasBids={hasBids}
+        teamData={teamData}
         onNextPlayer={() => setCurrentPlayerIndex(Math.min(currentPlayerIndex + 1, players.length - 1))}
         onPrevPlayer={() => setCurrentPlayerIndex(Math.max(currentPlayerIndex - 1, 0))}
         onStartAuction={() => {
@@ -141,12 +188,16 @@ export default function Admin() {
         onBid={(team, amount) => {
           // Store current state in history
           const currentPlayer = players[currentPlayerIndex];
-          setBidHistory([...bidHistory, {
-            team: currentPlayer.lastBidTeam || '',
-            amount: currentBid
-          }]);
+          
+          if (hasBids) {
+            setBidHistory([...bidHistory, {
+              team: currentPlayer.lastBidTeam || '',
+              amount: currentBid
+            }]);
+          }
 
           setCurrentBid(amount);
+          setHasBids(true);
           const updatedPlayers = [...players];
           updatedPlayers[currentPlayerIndex] = {
             ...updatedPlayers[currentPlayerIndex],
@@ -161,6 +212,7 @@ export default function Admin() {
             // No bids to cancel, reset to base price
             const currentPlayer = players[currentPlayerIndex];
             setCurrentBid(currentPlayer.basePrice);
+            setHasBids(false);
             const updatedPlayers = [...players];
             updatedPlayers[currentPlayerIndex] = {
               ...updatedPlayers[currentPlayerIndex],
@@ -176,6 +228,10 @@ export default function Admin() {
           const previousBid = bidHistory[bidHistory.length - 1];
           setBidHistory(bidHistory.slice(0, -1));
           setCurrentBid(previousBid.amount);
+          
+          if (bidHistory.length === 1) {
+            setHasBids(false);
+          }
           
           const updatedPlayers = [...players];
           updatedPlayers[currentPlayerIndex] = {
@@ -224,7 +280,8 @@ export default function Admin() {
             const nextIndex = Math.min(currentPlayerIndex + 1, updatedPlayers.length - 1);
             setCurrentPlayerIndex(nextIndex);
             setCurrentBid(updatedPlayers[nextIndex]?.basePrice || 0);
-            setBidHistory([]); // Clear bid history for new player
+            setBidHistory([]);
+            setHasBids(false);
           }, 500);
         }}
         onUnsold={() => {
@@ -257,7 +314,8 @@ export default function Admin() {
           
           setCurrentPlayerIndex(newIndex);
           setCurrentBid(updatedPlayers[newIndex]?.basePrice || 0);
-          setBidHistory([]); // Clear bid history for new player
+          setBidHistory([]);
+          setHasBids(false);
         }}
         onResetAuction={async () => {
           clearTeamState();
@@ -270,6 +328,7 @@ export default function Admin() {
           setCurrentBid(auctionState.currentBid);
           setIsAuctionActive(false);
           setBidHistory([]);
+          setHasBids(false);
         }}
       />
       {celebrationData && (

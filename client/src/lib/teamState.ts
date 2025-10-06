@@ -22,7 +22,7 @@ export const saveTeamState = (teams: Record<string, TeamData>) => {
   localStorage.setItem(TEAM_STATE_KEY, JSON.stringify(teams));
 };
 
-export const initializeTeams = (teamNames: { name: string; flag?: string }[], totalPurse: number = 100000000) => {
+export const initializeTeams = (teamNames: { name: string; flag?: string; totalPurse?: number }[]) => {
   const existing = getTeamState();
   if (Object.keys(existing).length > 0) {
     return existing;
@@ -33,7 +33,7 @@ export const initializeTeams = (teamNames: { name: string; flag?: string }[], to
     teams[team.name] = {
       name: team.name,
       flag: team.flag,
-      totalPurse,
+      totalPurse: team.totalPurse || 100000000,
       usedPurse: 0,
       players: [],
       gradeCount: { A: 0, B: 0, C: 0 },

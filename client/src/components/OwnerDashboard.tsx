@@ -21,6 +21,7 @@ interface TeamData {
   totalPurse: number;
   gradeCount: Record<string, number>;
   players: any[];
+  maxBid?: number;
 }
 
 interface OwnerDashboardProps {
@@ -139,7 +140,15 @@ export default function OwnerDashboard({
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                {team.maxBid !== undefined && (
+                  <div className="pt-2 border-t">
+                    <p className="text-xs text-muted-foreground mb-1">Max Bid</p>
+                    <p className="font-mono font-bold text-primary" data-testid={`text-max-bid-${team.team.toLowerCase().replace(/\s+/g, '-')}`}>
+                      ₹{team.maxBid.toLocaleString()}
+                    </p>
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2">
                   <Badge className="bg-grade-a text-white text-xs">
                     A: {team.gradeCount.A || 0}
                   </Badge>
