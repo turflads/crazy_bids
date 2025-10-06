@@ -5,6 +5,7 @@ import AdminDashboard from "@/components/AdminDashboard";
 import CelebrationPopup from "@/components/CelebrationPopup";
 import { getAuctionState, saveAuctionState, initializeAuctionState } from "@/lib/auctionState";
 import { initializeTeams, updateTeamAfterPurchase } from "@/lib/teamState";
+import { loadPlayersFromExcel } from "@/lib/playerLoader";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
@@ -17,15 +18,7 @@ export default function Admin() {
     soldPrice: number;
     grade: string;
   } | null>(null);
-  
-  const initialPlayers = [
-    { id: '1', firstName: 'Virat', lastName: 'Kohli', grade: 'A', basePrice: 2000000, status: 'unsold' as const },
-    { id: '2', firstName: 'Rohit', lastName: 'Sharma', grade: 'A', basePrice: 2000000, status: 'unsold' as const },
-    { id: '3', firstName: 'MS', lastName: 'Dhoni', grade: 'B', basePrice: 1500000, status: 'unsold' as const },
-    { id: '4', firstName: 'Jasprit', lastName: 'Bumrah', grade: 'A', basePrice: 2000000, status: 'unsold' as const },
-    { id: '5', firstName: 'Ravindra', lastName: 'Jadeja', grade: 'B', basePrice: 1500000, status: 'unsold' as const },
-    { id: '6', firstName: 'Hardik', lastName: 'Pandya', grade: 'B', basePrice: 1500000, status: 'unsold' as const },
-  ];
+  const [isLoadingPlayers, setIsLoadingPlayers] = useState(true);
   
   const teams = [
     { name: 'Mumbai Indians', flag: '🔵' },
@@ -40,13 +33,41 @@ export default function Admin() {
     C: 200000,
   };
 
-  // Initialize auction state from localStorage or create new
-  const auctionState = initializeAuctionState(initialPlayers);
-  const [players, setPlayers] = useState(auctionState.players);
-  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(auctionState.currentPlayerIndex);
-  const [currentBid, setCurrentBid] = useState(auctionState.currentBid);
-  const [isAuctionActive, setIsAuctionActive] = useState(auctionState.isAuctionActive);
+  // Initialize auction state
+  const [players, setPlayers] = useState<any[]>([]);
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+  const [currentBid, setCurrentBid] = useState(0);
+  const [isAuctionActive, setIsAuctionActive] = useState(false);
   const [bidHistory, setBidHistory] = useState<Array<{team: string, amount: number}>>([]);
+
+  // Load players from Excel file
+  useEffect(() => {
+    const loadPlayers = async () => {
+      setIsLoadingPlayers(true);
+      const loadedPlayers = await loadPlayersFromExcel();
+      
+      if (loadedPlayers.length > 0) {
+        const existingState = getAuctionState();
+        
+        if (existingState && existingState.players.length > 0) {
+          setPlayers(existingState.players);
+          setCurrentPlayerIndex(existingState.currentPlayerIndex);
+          setCurrentBid(existingState.currentBid);
+          setIsAuctionActive(existingState.isAuctionActive);
+        } else {
+          const auctionState = initializeAuctionState(loadedPlayers);
+          setPlayers(auctionState.players);
+          setCurrentPlayerIndex(auctionState.currentPlayerIndex);
+          setCurrentBid(auctionState.currentBid);
+          setIsAuctionActive(auctionState.isAuctionActive);
+        }
+      }
+      
+      setIsLoadingPlayers(false);
+    };
+    
+    loadPlayers();
+  }, []);
 
   // Initialize teams
   useEffect(() => {
@@ -84,6 +105,16 @@ export default function Admin() {
   };
 
   if (!user) return null;
+
+  if (isLoadingPlayers) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-muted-foreground">Loading players...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -231,7 +262,15 @@ export default function Admin() {
           setCurrentBid(updatedPlayers[newIndex]?.basePrice || 0);
           setBidHistory([]); // Clear bid history for new player
         }}
-        onUploadPlayers={(file) => console.log('File uploaded:', file.name)}
+        onResetAuction={async () => {
+          const loadedPlayers = await loadPlayersFromExcel();
+          const auctionState = initializeAuctionState(loadedPlayers);
+          setPlayers(auctionState.players);
+          setCurrentPlayerIndex(auctionState.currentPlayerIndex);
+          setCurrentBid(auctionState.currentBid);
+          setIsAuctionActive(false);
+          setBidHistory([]);
+        }}
       />
       {celebrationData && (
         <CelebrationPopup
