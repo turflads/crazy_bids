@@ -7,7 +7,7 @@ export interface PlayerData {
   grade: string;
   basePrice: number;
   status: 'unsold' | 'sold';
-  photo?: string;
+  image?: string;
 }
 
 const gradeBasePrices: Record<string, number> = {
@@ -39,7 +39,7 @@ export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
         grade,
         basePrice: gradeBasePrices[grade] || 1000000,
         status: 'unsold' as const,
-        photo: photo ? `/player_images/${photo}` : undefined,
+        image: photo ? `/player_images/${photo}` : undefined,
       };
     });
 
