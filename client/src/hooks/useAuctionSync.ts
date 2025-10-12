@@ -8,29 +8,28 @@ export function useAuctionSync() {
   const [teamState, setTeamState] = useState(getTeamState());
   const [lastUpdate, setLastUpdate] = useState(Date.now());
 
-  // Manual refresh function that can be called to immediately sync state
-  const refresh = () => {
-    setAuctionState(getAuctionState());
-    setTeamState(getTeamState());
-    setLastUpdate(Date.now());
-  };
-
   useEffect(() => {
     // Sync on storage events (when another tab/window updates)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'cricket_auction_state' || e.key === 'cricket_auction_teams') {
-        refresh();
+        setAuctionState(getAuctionState());
+        setTeamState(getTeamState());
+        setLastUpdate(Date.now());
       }
     };
 
     // Sync on window focus (when user switches back to the tab)
     const handleFocus = () => {
-      refresh();
+      setAuctionState(getAuctionState());
+      setTeamState(getTeamState());
+      setLastUpdate(Date.now());
     };
 
     // Poll for updates every 2 seconds
     const interval = setInterval(() => {
-      refresh();
+      setAuctionState(getAuctionState());
+      setTeamState(getTeamState());
+      setLastUpdate(Date.now());
     }, 2000);
 
     window.addEventListener('storage', handleStorageChange);
@@ -43,5 +42,5 @@ export function useAuctionSync() {
     };
   }, []);
 
-  return { auctionState, teamState, lastUpdate, refresh };
+  return { auctionState, teamState, lastUpdate };
 }

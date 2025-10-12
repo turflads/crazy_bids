@@ -14,7 +14,7 @@ import PlayerCard from "./PlayerCard";
 
 interface TeamData {
   team: string;
-  logo?: string;
+  flag?: string;
   playersCount: number;
   purseUsed: number;
   purseRemaining: number;
@@ -113,7 +113,7 @@ export default function OwnerDashboard({
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {team.logo && <img src={team.logo} alt={team.team} className="w-8 h-8 object-contain" />}
+                    {team.flag && <span className="text-2xl">{team.flag}</span>}
                     <span className="text-sm">{team.team}</span>
                   </div>
                   <Badge variant="outline" className="gap-1">
@@ -220,7 +220,7 @@ export default function OwnerDashboard({
             <>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-3 text-2xl">
-                  {selectedTeam.logo && <img src={selectedTeam.logo} alt={selectedTeam.team} className="w-12 h-12 object-contain" />}
+                  {selectedTeam.flag && <span className="text-3xl">{selectedTeam.flag}</span>}
                   <span>{selectedTeam.team} - Players</span>
                 </DialogTitle>
               </DialogHeader>

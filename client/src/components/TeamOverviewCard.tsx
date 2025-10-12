@@ -4,7 +4,7 @@ import { Users } from "lucide-react";
 
 interface TeamOverviewCardProps {
   teamName: string;
-  teamLogo?: string;
+  teamFlag?: string;
   playersCount: number;
   purseUsed: number;
   purseRemaining: number;
@@ -16,7 +16,7 @@ interface TeamOverviewCardProps {
 
 export default function TeamOverviewCard({
   teamName,
-  teamLogo,
+  teamFlag,
   playersCount,
   purseUsed,
   purseRemaining,
@@ -30,7 +30,7 @@ export default function TeamOverviewCard({
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2">
-            {teamLogo && <img src={teamLogo} alt={teamName} className="w-8 h-8 object-contain" />}
+            {teamFlag && <span className="text-2xl">{teamFlag}</span>}
             <span className="text-sm">{teamName}</span>
           </div>
           <Badge variant="outline" className="gap-1">

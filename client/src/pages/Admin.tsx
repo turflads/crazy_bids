@@ -4,11 +4,10 @@ import NavBar from "@/components/NavBar";
 import AdminDashboard from "@/components/AdminDashboard";
 import CelebrationPopup from "@/components/CelebrationPopup";
 import { getAuctionState, saveAuctionState, initializeAuctionState } from "@/lib/auctionState";
-import { initializeTeams, updateTeamAfterPurchase, clearTeamState } from "@/lib/teamState";
+import { initializeTeams, updateTeamAfterPurchase, clearTeamState, getTeamState } from "@/lib/teamState";
 import { loadPlayersFromExcel } from "@/lib/playerLoader";
 import { loadAuctionConfig, type Team } from "@/lib/auctionConfig";
 import { calculateMaxBidSync } from "@/lib/maxBidCalculator";
-import { useAuctionSync } from "@/hooks/useAuctionSync";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
@@ -17,7 +16,7 @@ export default function Admin() {
     open: boolean;
     playerName: string;
     teamName: string;
-    teamLogo: string;
+    teamFlag: string;
     soldPrice: number;
     grade: string;
   } | null>(null);
@@ -26,9 +25,6 @@ export default function Admin() {
   const [gradeIncrements, setGradeIncrements] = useState<Record<string, number>>({});
   const [gradeQuotas, setGradeQuotas] = useState<Record<string, number>>({});
   const [gradeBasePrices, setGradeBasePrices] = useState<Record<string, number>>({});
-
-  // Use synced team state
-  const { teamState, refresh } = useAuctionSync();
 
   // Initialize auction state
   const [players, setPlayers] = useState<any[]>([]);
@@ -124,11 +120,12 @@ export default function Admin() {
   }
 
   // Get team data with max bid calculations
+  const teamState = getTeamState();
   const currentPlayer = players[currentPlayerIndex];
   const teamData = teams.map(team => {
     const state = teamState[team.name] || {
       name: team.name,
-      logo: team.logo,
+      flag: team.flag,
       totalPurse: team.totalPurse,
       usedPurse: 0,
       players: [],
@@ -149,13 +146,12 @@ export default function Admin() {
 
     return {
       name: team.name,
-      logo: team.logo,
+      flag: team.flag,
       playersCount: state.players.length,
       purseUsed: state.usedPurse,
       purseRemaining: state.totalPurse - state.usedPurse,
       totalPurse: state.totalPurse,
       gradeCount: state.gradeCount,
-      players: state.players,
       maxBid,
     };
   });
@@ -264,10 +260,7 @@ export default function Admin() {
           // Update team state
           updateTeamAfterPurchase(soldTeam, currentPlayer, soldPrice);
           
-          // Immediately refresh synced state to show updated team data
-          refresh();
-          
-          // Find team logo
+          // Find team flag
           const team = teams.find(t => t.name === soldTeam);
           
           // Show celebration popup
@@ -275,7 +268,7 @@ export default function Admin() {
             open: true,
             playerName: `${currentPlayer.firstName} ${currentPlayer.lastName}`,
             teamName: soldTeam,
-            teamLogo: team?.logo || '/mumbai.png',
+            teamFlag: team?.flag || '🏆',
             soldPrice: soldPrice,
             grade: currentPlayer.grade,
           });
@@ -348,7 +341,7 @@ export default function Admin() {
           }}
           playerName={celebrationData.playerName}
           teamName={celebrationData.teamName}
-          teamLogo={celebrationData.teamLogo}
+          teamFlag={celebrationData.teamFlag}
           soldPrice={celebrationData.soldPrice}
           grade={celebrationData.grade}
         />

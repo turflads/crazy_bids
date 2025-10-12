@@ -1,7 +1,7 @@
 // Team state management for tracking purse and players across all teams
 interface TeamData {
   name: string;
-  logo?: string;
+  flag?: string;
   totalPurse: number;
   usedPurse: number;
   players: any[];
@@ -22,7 +22,7 @@ export const saveTeamState = (teams: Record<string, TeamData>) => {
   localStorage.setItem(TEAM_STATE_KEY, JSON.stringify(teams));
 };
 
-export const initializeTeams = (teamNames: { name: string; logo?: string; totalPurse?: number }[]) => {
+export const initializeTeams = (teamNames: { name: string; flag?: string; totalPurse?: number }[]) => {
   const existing = getTeamState();
   if (Object.keys(existing).length > 0) {
     return existing;
@@ -32,7 +32,7 @@ export const initializeTeams = (teamNames: { name: string; logo?: string; totalP
   teamNames.forEach(team => {
     teams[team.name] = {
       name: team.name,
-      logo: team.logo,
+      flag: team.flag,
       totalPurse: team.totalPurse || 100000000,
       usedPurse: 0,
       players: [],

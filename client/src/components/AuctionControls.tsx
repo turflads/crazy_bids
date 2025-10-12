@@ -15,7 +15,7 @@ import { Gavel, CheckCircle, XCircle, Flag, Undo2 } from "lucide-react";
 
 interface Team {
   name: string;
-  logo?: string;
+  flag?: string;
 }
 
 interface AuctionControlsProps {
@@ -119,12 +119,14 @@ export default function AuctionControls({
           </p>
         </div>
 
-        <div className="p-4 bg-muted rounded-lg">
-          <p className="text-sm text-muted-foreground mb-1">Next Increment</p>
-          <p className="text-lg font-semibold font-mono" data-testid="text-next-increment">
-            +₹{(gradeIncrements[currentPlayer.grade] || 500000).toLocaleString()}
-          </p>
-        </div>
+        {currentPlayer && (
+          <div className="p-4 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground mb-1">Next Increment</p>
+            <p className="text-lg font-semibold font-mono">
+              +₹{gradeIncrements[currentPlayer.grade]?.toLocaleString() || '0'}
+            </p>
+          </div>
+        )}
 
         {!isAuctionActive && (
           <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
@@ -146,8 +148,8 @@ export default function AuctionControls({
                 disabled={!isAuctionActive}
                 data-testid={`button-bid-${team.name.toLowerCase().replace(/\s+/g, '-')}`}
               >
-                {team.logo ? (
-                  <img src={team.logo} alt={team.name} className="w-12 h-12 object-contain" />
+                {team.flag ? (
+                  <div className="text-3xl">{team.flag}</div>
                 ) : (
                   <Flag className="w-8 h-8 text-primary" />
                 )}
@@ -182,7 +184,7 @@ export default function AuctionControls({
                 <SelectContent>
                   {teams.map((team) => (
                     <SelectItem key={team.name} value={team.name}>
-                      {team.name}
+                      {team.flag} {team.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

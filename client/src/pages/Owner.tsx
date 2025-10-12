@@ -41,7 +41,7 @@ export default function Owner() {
 
     return {
       team: team.name,
-      logo: team.logo,
+      flag: team.flag,
       playersCount: team.players.length,
       purseUsed: team.usedPurse,
       purseRemaining: team.totalPurse - team.usedPurse,
