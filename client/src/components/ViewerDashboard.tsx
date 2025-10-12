@@ -20,7 +20,7 @@ interface ViewerDashboardProps {
   allPlayers: any[];
   teamStandings: {
     team: string;
-    logo?: string;
+    flag?: string;
     playersCount: number;
     purseUsed: number;
     purseRemaining: number;
@@ -154,7 +154,7 @@ export default function ViewerDashboard({
             <>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-3 text-2xl">
-                  {selectedTeam.logo && <img src={selectedTeam.logo} alt={selectedTeam.team} className="w-10 h-10 max-w-[2.5rem] object-contain" />}
+                  {selectedTeam.flag && <span className="text-3xl">{selectedTeam.flag}</span>}
                   <span>{selectedTeam.team} - Players</span>
                 </DialogTitle>
               </DialogHeader>

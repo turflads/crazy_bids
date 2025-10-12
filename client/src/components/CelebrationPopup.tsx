@@ -13,7 +13,7 @@ interface CelebrationPopupProps {
   onOpenChange: (open: boolean) => void;
   playerName: string;
   teamName: string;
-  teamLogo?: string;
+  teamFlag: string;
   soldPrice: number;
   grade: string;
 }
@@ -23,20 +23,15 @@ export default function CelebrationPopup({
   onOpenChange,
   playerName,
   teamName,
-  teamLogo,
+  teamFlag,
   soldPrice,
   grade,
 }: CelebrationPopupProps) {
-  // Extract grade letter for color mapping (handles both "A" and "GOLD - C" formats)
-  const getGradeColor = (grade: string) => {
-    const gradeLetter = grade.trim().toUpperCase().slice(-1);
-    const colorMap: Record<string, string> = {
-      A: 'bg-grade-a',
-      B: 'bg-grade-b',
-      C: 'bg-grade-c',
-    };
-    return colorMap[gradeLetter] || 'bg-primary';
-  };
+  const gradeColor = {
+    A: 'bg-grade-a',
+    B: 'bg-grade-b',
+    C: 'bg-grade-c',
+  }[grade] || 'bg-primary';
 
   return (
     <>
@@ -53,8 +48,8 @@ export default function CelebrationPopup({
           <div className="space-y-6 py-6">
             <div className="text-center space-y-3">
               <div className="flex items-center justify-center gap-2">
-                <Badge className={`${getGradeColor(grade)} text-white text-lg px-3 py-1`}>
-                  {grade}
+                <Badge className={`${gradeColor} text-white text-lg px-3 py-1`}>
+                  Grade {grade}
                 </Badge>
               </div>
               <h3 className="text-3xl font-bold" data-testid="text-player-name">
@@ -62,7 +57,7 @@ export default function CelebrationPopup({
               </h3>
               <p className="text-muted-foreground text-lg">SOLD TO</p>
               <div className="flex items-center justify-center gap-3">
-                {teamLogo && <img src={teamLogo} alt={teamName} className="w-16 h-16 max-w-[4rem] object-contain" />}
+                <span className="text-4xl">{teamFlag}</span>
                 <h4 className="text-2xl font-bold text-primary" data-testid="text-team-name">
                   {teamName}
                 </h4>

@@ -20,15 +20,10 @@ interface PlayerCardProps {
 }
 
 export default function PlayerCard({ player, onViewDetails }: PlayerCardProps) {
-  // Extract grade letter for color mapping (handles both "A" and "GOLD - C" formats)
-  const getGradeColor = (grade: string) => {
-    const gradeLetter = grade.trim().toUpperCase().slice(-1);
-    const colorMap: Record<string, string> = {
-      A: 'bg-grade-a',
-      B: 'bg-grade-b',
-      C: 'bg-grade-c',
-    };
-    return colorMap[gradeLetter] || 'bg-primary';
+  const gradeColors: Record<string, string> = {
+    A: 'bg-grade-a',
+    B: 'bg-grade-b',
+    C: 'bg-grade-c',
   };
 
   const isSold = player.status === 'sold';
@@ -48,10 +43,10 @@ export default function PlayerCard({ player, onViewDetails }: PlayerCardProps) {
           </div>
         )}
         <Badge 
-          className={`absolute top-2 right-2 ${getGradeColor(player.grade)} text-white`}
+          className={`absolute top-2 right-2 ${gradeColors[player.grade] || 'bg-muted'} text-white`}
           data-testid={`badge-grade-${player.id}`}
         >
-          {player.grade}
+          Grade {player.grade}
         </Badge>
         {isSold && (
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">

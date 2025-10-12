@@ -16,7 +16,7 @@ export default function Admin() {
     open: boolean;
     playerName: string;
     teamName: string;
-    teamLogo?: string;
+    teamFlag: string;
     soldPrice: number;
     grade: string;
   } | null>(null);
@@ -128,7 +128,6 @@ export default function Admin() {
     const state = teamState[team.name] || {
       name: team.name,
       flag: team.flag,
-      logo: team.logo,
       totalPurse: team.totalPurse,
       usedPurse: 0,
       players: [],
@@ -150,14 +149,12 @@ export default function Admin() {
     return {
       name: team.name,
       flag: team.flag,
-      logo: team.logo,
       playersCount: state.players.length,
       purseUsed: state.usedPurse,
       purseRemaining: state.totalPurse - state.usedPurse,
       totalPurse: state.totalPurse,
       gradeCount: state.gradeCount,
       maxBid,
-      players: state.players,
     };
   });
 
@@ -266,7 +263,7 @@ export default function Admin() {
           updateTeamAfterPurchase(soldTeam, currentPlayer, soldPrice);
           setTeamStateVersion(v => v + 1); // Trigger re-render of team cards
           
-          // Find team logo
+          // Find team flag
           const team = teams.find(t => t.name === soldTeam);
           
           // Show celebration popup
@@ -274,7 +271,7 @@ export default function Admin() {
             open: true,
             playerName: `${currentPlayer.firstName} ${currentPlayer.lastName}`,
             teamName: soldTeam,
-            teamLogo: team?.logo,
+            teamFlag: team?.flag || '🏆',
             soldPrice: soldPrice,
             grade: currentPlayer.grade,
           });
@@ -348,7 +345,7 @@ export default function Admin() {
           }}
           playerName={celebrationData.playerName}
           teamName={celebrationData.teamName}
-          teamLogo={celebrationData.teamLogo}
+          teamFlag={celebrationData.teamFlag}
           soldPrice={celebrationData.soldPrice}
           grade={celebrationData.grade}
         />

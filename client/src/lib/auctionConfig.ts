@@ -1,7 +1,6 @@
 export interface Team {
   name: string;
   flag: string;
-  logo?: string;
   totalPurse: number;
 }
 
@@ -38,10 +37,10 @@ export async function loadAuctionConfig(): Promise<AuctionConfig> {
         C: 200000,
       },
       teams: [
-        { name: 'Mumbai Indians', flag: '🔵', logo: undefined, totalPurse: 100000000 },
-        { name: 'Chennai Super Kings', flag: '🟡', logo: undefined, totalPurse: 100000000 },
-        { name: 'Royal Challengers', flag: '🔴', logo: undefined, totalPurse: 100000000 },
-        { name: 'Delhi Capitals', flag: '🔷', logo: undefined, totalPurse: 100000000 },
+        { name: 'Mumbai Indians', flag: '🔵', totalPurse: 100000000 },
+        { name: 'Chennai Super Kings', flag: '🟡', totalPurse: 100000000 },
+        { name: 'Royal Challengers', flag: '🔴', totalPurse: 100000000 },
+        { name: 'Delhi Capitals', flag: '🔷', totalPurse: 100000000 },
       ],
       gradeQuotas: {
         A: 3,
