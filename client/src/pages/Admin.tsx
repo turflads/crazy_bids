@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import NavBar from "@/components/NavBar";
 import AdminDashboard from "@/components/AdminDashboard";
@@ -8,6 +8,7 @@ import { initializeTeams, updateTeamAfterPurchase, clearTeamState, getTeamState 
 import { loadPlayersFromExcel } from "@/lib/playerLoader";
 import { loadAuctionConfig, type Team } from "@/lib/auctionConfig";
 import { calculateMaxBidSync } from "@/lib/maxBidCalculator";
+import { useAuctionSync } from "@/hooks/useAuctionSync";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
@@ -25,6 +26,12 @@ export default function Admin() {
   const [gradeIncrements, setGradeIncrements] = useState<Record<string, number>>({});
   const [gradeQuotas, setGradeQuotas] = useState<Record<string, number>>({});
   const [gradeBasePrices, setGradeBasePrices] = useState<Record<string, number>>({});
+
+  // Use synced auction and team state
+  const { auctionState: syncedAuctionState, teamState: syncedTeamState } = useAuctionSync();
+
+  // Track when Admin makes changes to prevent sync from overwriting them
+  const lastAdminChangeRef = useRef<number>(0);
 
   // Initialize auction state
   const [players, setPlayers] = useState<any[]>([]);
@@ -77,6 +84,35 @@ export default function Admin() {
     }
   }, [teams]);
 
+  // Sync local state with synced auction state, but only if it's actually different
+  // This prevents the sync from overwriting local changes that haven't been saved yet
+  useEffect(() => {
+    if (syncedAuctionState && syncedAuctionState.players && syncedAuctionState.players.length > 0) {
+      // Don't sync if Admin made a change in the last 500ms to avoid race conditions
+      const timeSinceLastChange = Date.now() - lastAdminChangeRef.current;
+      if (timeSinceLastChange < 500) {
+        return;
+      }
+
+      // Only update if the synced state is different from our current state
+      // This prevents race conditions where sync overwrites unsaved local changes
+      const isDifferent = 
+        JSON.stringify(syncedAuctionState.players) !== JSON.stringify(players) ||
+        syncedAuctionState.currentPlayerIndex !== currentPlayerIndex ||
+        syncedAuctionState.currentBid !== currentBid ||
+        syncedAuctionState.isAuctionActive !== isAuctionActive;
+      
+      // Only sync if different AND we have already initialized (players.length > 0)
+      // This prevents overwriting during initial load
+      if (isDifferent && players.length > 0) {
+        setPlayers(syncedAuctionState.players);
+        setCurrentPlayerIndex(syncedAuctionState.currentPlayerIndex);
+        setCurrentBid(syncedAuctionState.currentBid);
+        setIsAuctionActive(syncedAuctionState.isAuctionActive);
+      }
+    }
+  }, [syncedAuctionState, players, currentPlayerIndex, currentBid, isAuctionActive]);
+
   // Save auction state whenever it changes
   useEffect(() => {
     saveAuctionState({
@@ -120,10 +156,9 @@ export default function Admin() {
   }
 
   // Get team data with max bid calculations
-  const teamState = getTeamState();
   const currentPlayer = players[currentPlayerIndex];
   const teamData = teams.map(team => {
-    const state = teamState[team.name] || {
+    const state = syncedTeamState[team.name] || {
       name: team.name,
       flag: team.flag,
       totalPurse: team.totalPurse,
@@ -175,17 +210,26 @@ export default function Admin() {
         isAuctionActive={isAuctionActive}
         hasBids={hasBids}
         teamData={teamData}
-        onNextPlayer={() => setCurrentPlayerIndex(Math.min(currentPlayerIndex + 1, players.length - 1))}
-        onPrevPlayer={() => setCurrentPlayerIndex(Math.max(currentPlayerIndex - 1, 0))}
+        onNextPlayer={() => {
+          lastAdminChangeRef.current = Date.now();
+          setCurrentPlayerIndex(Math.min(currentPlayerIndex + 1, players.length - 1));
+        }}
+        onPrevPlayer={() => {
+          lastAdminChangeRef.current = Date.now();
+          setCurrentPlayerIndex(Math.max(currentPlayerIndex - 1, 0));
+        }}
         onStartAuction={() => {
+          lastAdminChangeRef.current = Date.now();
           setIsAuctionActive(true);
           console.log('Auction started');
         }}
         onPauseAuction={() => {
+          lastAdminChangeRef.current = Date.now();
           setIsAuctionActive(false);
           console.log('Auction paused');
         }}
         onBid={(team, amount) => {
+          lastAdminChangeRef.current = Date.now();
           // Store current state in history
           const currentPlayer = players[currentPlayerIndex];
           
@@ -208,6 +252,7 @@ export default function Admin() {
           console.log(`${team} bid ₹${amount}`);
         }}
         onCancelBid={() => {
+          lastAdminChangeRef.current = Date.now();
           if (bidHistory.length === 0) {
             // No bids to cancel, reset to base price
             const currentPlayer = players[currentPlayerIndex];
@@ -243,6 +288,7 @@ export default function Admin() {
           console.log('Bid cancelled - restored previous bid');
         }}
         onSold={() => {
+          lastAdminChangeRef.current = Date.now();
           const currentPlayer = players[currentPlayerIndex];
           const soldTeam = currentPlayer.lastBidTeam || 'Unknown';
           const soldPrice = currentBid;
@@ -285,6 +331,7 @@ export default function Admin() {
           }, 500);
         }}
         onUnsold={() => {
+          lastAdminChangeRef.current = Date.now();
           const currentPlayer = players[currentPlayerIndex];
           
           // Re-queue the unsold player at the end with cleared bid data
@@ -318,6 +365,7 @@ export default function Admin() {
           setHasBids(false);
         }}
         onResetAuction={async () => {
+          lastAdminChangeRef.current = Date.now();
           clearTeamState();
           initializeTeams(teams);
           
