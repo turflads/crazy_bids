@@ -11,11 +11,6 @@
   },
   "teams": [
     {
-      "name": "Mumbai Indians",
-      "flag": "🔵",
-      "totalPurse": 100000000
-    },
-    {
       "name": "Chennai Super Kings",
       "flag": "🟡",
       "totalPurse": 100000000
