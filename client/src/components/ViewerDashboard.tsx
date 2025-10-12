@@ -1,8 +1,25 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Trophy, TrendingUp, Users } from "lucide-react";
 import PlayerCard from "./PlayerCard";
-import { Trophy, TrendingUp } from "lucide-react";
+
+interface TeamData {
+  team: string;
+  logo?: string;
+  playersCount: number;
+  purseUsed: number;
+  purseRemaining: number;
+  totalPurse: number;
+  gradeCount: Record<string, number>;
+  players: any[];
+}
 
 interface ViewerDashboardProps {
   currentAuction?: {
@@ -11,21 +28,16 @@ interface ViewerDashboardProps {
     leadingTeam: string;
   };
   recentSales: any[];
-  allPlayers: any[];
-  teamStandings: {
-    team: string;
-    playersCount: number;
-    purseUsed: number;
-    purseRemaining: number;
-  }[];
+  teamStandings: TeamData[];
 }
 
 export default function ViewerDashboard({
   currentAuction,
   recentSales,
-  allPlayers,
   teamStandings,
 }: ViewerDashboardProps) {
+  const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
+
   return (
     <div className="p-6 space-y-6">
       <h2 className="text-2xl font-bold">Auction Viewer</h2>
@@ -109,8 +121,9 @@ export default function ViewerDashboard({
               {teamStandings.map((team) => (
                 <div
                   key={team.team}
-                  className="p-3 bg-muted rounded-lg"
+                  className="p-3 bg-muted rounded-lg cursor-pointer hover-elevate active-elevate-2"
                   data-testid={`card-team-${team.team}`}
+                  onClick={() => setSelectedTeam(team)}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <p className="font-semibold">{team.team}</p>
@@ -135,47 +148,53 @@ export default function ViewerDashboard({
         </Card>
       </div>
 
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList>
-          <TabsTrigger value="all" data-testid="tab-all-players-viewer">
-            All Players ({allPlayers.length})
-          </TabsTrigger>
-          <TabsTrigger value="sold" data-testid="tab-sold-viewer">
-            Sold ({allPlayers.filter(p => p.status === 'sold').length})
-          </TabsTrigger>
-          <TabsTrigger value="unsold" data-testid="tab-unsold-viewer">
-            Unsold ({allPlayers.filter(p => p.status === 'unsold').length})
-          </TabsTrigger>
-        </TabsList>
+      <Dialog open={!!selectedTeam} onOpenChange={() => setSelectedTeam(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto" data-testid="dialog-team-players">
+          {selectedTeam && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3 text-2xl">
+                  {selectedTeam.logo && <img src={selectedTeam.logo} alt={selectedTeam.team} className="w-12 h-12 object-contain" />}
+                  <span>{selectedTeam.team} - Players</span>
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Players</p>
+                    <p className="text-2xl font-bold">{selectedTeam.playersCount}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Purse Used</p>
+                    <p className="text-2xl font-bold font-mono text-destructive">
+                      ₹{selectedTeam.purseUsed.toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Purse Remaining</p>
+                    <p className="text-2xl font-bold font-mono text-auction-sold">
+                      ₹{selectedTeam.purseRemaining.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
 
-        <TabsContent value="all" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {allPlayers.map((player) => (
-              <PlayerCard key={player.id} player={player} />
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="sold" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {allPlayers
-              .filter(p => p.status === 'sold')
-              .map((player) => (
-                <PlayerCard key={player.id} player={player} />
-              ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="unsold" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {allPlayers
-              .filter(p => p.status === 'unsold')
-              .map((player) => (
-                <PlayerCard key={player.id} player={player} />
-              ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+                {selectedTeam.players.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {selectedTeam.players.map((player: any) => (
+                      <PlayerCard key={player.id} player={player} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                    <p className="text-lg text-muted-foreground">No players purchased yet</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

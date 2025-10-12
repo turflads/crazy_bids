@@ -25,9 +25,13 @@ export default function Viewer() {
 
   const teamStandings = Object.values(teamState).map((team: any) => ({
     team: team.name,
+    logo: team.logo,
     playersCount: team.players.length,
     purseUsed: team.usedPurse,
     purseRemaining: team.totalPurse - team.usedPurse,
+    totalPurse: team.totalPurse,
+    gradeCount: team.gradeCount,
+    players: team.players,
   }));
 
   useEffect(() => {
@@ -61,7 +65,6 @@ export default function Viewer() {
       <ViewerDashboard
         currentAuction={currentAuction}
         recentSales={recentSales}
-        allPlayers={allPlayers}
         teamStandings={teamStandings}
       />
     </div>

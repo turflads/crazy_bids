@@ -12,22 +12,22 @@
   "teams": [
     {
       "name": "Mumbai Indians",
-      "flag": "🔵",
+      "logo": "/mumbai.png",
       "totalPurse": 100000000
     },
     {
       "name": "Chennai Super Kings",
-      "flag": "🟡",
+      "logo": "/chennai.png",
       "totalPurse": 100000000
     },
     {
-      "name": "Royal Challengers",
-      "flag": "🔴",
+      "name": "Stars",
+      "logo": "/Stars.png",
       "totalPurse": 100000000
     },
     {
-      "name": "Delhi Capitals",
-      "flag": "🔷",
+      "name": "Strikers",
+      "logo": "/Strikers.png",
       "totalPurse": 100000000
     }
   ],

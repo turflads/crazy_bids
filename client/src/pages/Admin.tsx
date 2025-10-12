@@ -16,7 +16,7 @@ export default function Admin() {
     open: boolean;
     playerName: string;
     teamName: string;
-    teamFlag: string;
+    teamLogo: string;
     soldPrice: number;
     grade: string;
   } | null>(null);
@@ -125,7 +125,7 @@ export default function Admin() {
   const teamData = teams.map(team => {
     const state = teamState[team.name] || {
       name: team.name,
-      flag: team.flag,
+      logo: team.logo,
       totalPurse: team.totalPurse,
       usedPurse: 0,
       players: [],
@@ -146,12 +146,13 @@ export default function Admin() {
 
     return {
       name: team.name,
-      flag: team.flag,
+      logo: team.logo,
       playersCount: state.players.length,
       purseUsed: state.usedPurse,
       purseRemaining: state.totalPurse - state.usedPurse,
       totalPurse: state.totalPurse,
       gradeCount: state.gradeCount,
+      players: state.players,
       maxBid,
     };
   });
@@ -268,7 +269,7 @@ export default function Admin() {
             open: true,
             playerName: `${currentPlayer.firstName} ${currentPlayer.lastName}`,
             teamName: soldTeam,
-            teamFlag: team?.flag || '🏆',
+            teamLogo: team?.logo || '/mumbai.png',
             soldPrice: soldPrice,
             grade: currentPlayer.grade,
           });
@@ -341,7 +342,7 @@ export default function Admin() {
           }}
           playerName={celebrationData.playerName}
           teamName={celebrationData.teamName}
-          teamFlag={celebrationData.teamFlag}
+          teamLogo={celebrationData.teamLogo}
           soldPrice={celebrationData.soldPrice}
           grade={celebrationData.grade}
         />

@@ -13,7 +13,7 @@ interface CelebrationPopupProps {
   onOpenChange: (open: boolean) => void;
   playerName: string;
   teamName: string;
-  teamFlag: string;
+  teamLogo: string;
   soldPrice: number;
   grade: string;
 }
@@ -23,7 +23,7 @@ export default function CelebrationPopup({
   onOpenChange,
   playerName,
   teamName,
-  teamFlag,
+  teamLogo,
   soldPrice,
   grade,
 }: CelebrationPopupProps) {
@@ -57,7 +57,7 @@ export default function CelebrationPopup({
               </h3>
               <p className="text-muted-foreground text-lg">SOLD TO</p>
               <div className="flex items-center justify-center gap-3">
-                <span className="text-4xl">{teamFlag}</span>
+                <img src={teamLogo} alt={teamName} className="w-16 h-16 object-contain" />
                 <h4 className="text-2xl font-bold text-primary" data-testid="text-team-name">
                   {teamName}
                 </h4>
