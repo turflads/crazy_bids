@@ -4,10 +4,11 @@ import NavBar from "@/components/NavBar";
 import AdminDashboard from "@/components/AdminDashboard";
 import CelebrationPopup from "@/components/CelebrationPopup";
 import { getAuctionState, saveAuctionState, initializeAuctionState } from "@/lib/auctionState";
-import { initializeTeams, updateTeamAfterPurchase, clearTeamState, getTeamState } from "@/lib/teamState";
+import { initializeTeams, updateTeamAfterPurchase, clearTeamState } from "@/lib/teamState";
 import { loadPlayersFromExcel } from "@/lib/playerLoader";
 import { loadAuctionConfig, type Team } from "@/lib/auctionConfig";
 import { calculateMaxBidSync } from "@/lib/maxBidCalculator";
+import { useAuctionSync } from "@/hooks/useAuctionSync";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
@@ -25,6 +26,9 @@ export default function Admin() {
   const [gradeIncrements, setGradeIncrements] = useState<Record<string, number>>({});
   const [gradeQuotas, setGradeQuotas] = useState<Record<string, number>>({});
   const [gradeBasePrices, setGradeBasePrices] = useState<Record<string, number>>({});
+
+  // Use synced team state
+  const { teamState, refresh } = useAuctionSync();
 
   // Initialize auction state
   const [players, setPlayers] = useState<any[]>([]);
@@ -120,7 +124,6 @@ export default function Admin() {
   }
 
   // Get team data with max bid calculations
-  const teamState = getTeamState();
   const currentPlayer = players[currentPlayerIndex];
   const teamData = teams.map(team => {
     const state = teamState[team.name] || {
@@ -261,7 +264,10 @@ export default function Admin() {
           // Update team state
           updateTeamAfterPurchase(soldTeam, currentPlayer, soldPrice);
           
-          // Find team flag
+          // Immediately refresh synced state to show updated team data
+          refresh();
+          
+          // Find team logo
           const team = teams.find(t => t.name === soldTeam);
           
           // Show celebration popup
