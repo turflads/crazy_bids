@@ -1,5 +1,12 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, RotateCcw } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Play, Pause, RotateCcw, Users } from "lucide-react";
 import AuctionControls from "./AuctionControls";
 import PlayerCard from "./PlayerCard";
 import TeamOverviewCard from "./TeamOverviewCard";
@@ -17,6 +24,7 @@ interface TeamData {
   purseRemaining: number;
   totalPurse: number;
   gradeCount: Record<string, number>;
+  players: any[];
   maxBid?: number;
 }
 
@@ -63,6 +71,7 @@ export default function AdminDashboard({
   onCancelBid,
   onResetAuction,
 }: AdminDashboardProps) {
+  const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
   const currentPlayer = players[currentPlayerIndex];
 
   return (
@@ -118,24 +127,73 @@ export default function AdminDashboard({
               <h3 className="text-lg font-semibold">Team Overview</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {teamData.map((team) => (
-                  <TeamOverviewCard
-                    key={team.name}
-                    teamName={team.name}
-                    teamFlag={team.flag}
-                    playersCount={team.playersCount}
-                    purseUsed={team.purseUsed}
-                    purseRemaining={team.purseRemaining}
-                    totalPurse={team.totalPurse}
-                    gradeCount={team.gradeCount}
-                    maxBid={team.maxBid}
-                    requiredGrades={gradeQuotas}
-                  />
+                  <div key={team.name} onClick={() => setSelectedTeam(team)} className="cursor-pointer">
+                    <TeamOverviewCard
+                      teamName={team.name}
+                      teamFlag={team.flag}
+                      playersCount={team.playersCount}
+                      purseUsed={team.purseUsed}
+                      purseRemaining={team.purseRemaining}
+                      totalPurse={team.totalPurse}
+                      gradeCount={team.gradeCount}
+                      maxBid={team.maxBid}
+                      requiredGrades={gradeQuotas}
+                    />
+                  </div>
                 ))}
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <Dialog open={!!selectedTeam} onOpenChange={() => setSelectedTeam(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto" data-testid="dialog-team-players-admin">
+          {selectedTeam && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3 text-2xl">
+                  {selectedTeam.flag && <span className="text-3xl">{selectedTeam.flag}</span>}
+                  <span>{selectedTeam.name} - Players</span>
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Players</p>
+                    <p className="text-2xl font-bold">{selectedTeam.playersCount}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Purse Used</p>
+                    <p className="text-2xl font-bold font-mono text-destructive">
+                      ₹{selectedTeam.purseUsed.toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Purse Remaining</p>
+                    <p className="text-2xl font-bold font-mono text-auction-sold">
+                      ₹{selectedTeam.purseRemaining.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+
+                {selectedTeam.players.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {selectedTeam.players.map((player: any) => (
+                      <PlayerCard key={player.id} player={player} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                    <p className="text-lg text-muted-foreground">No players purchased yet</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
