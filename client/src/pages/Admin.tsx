@@ -152,6 +152,7 @@ export default function Admin() {
       purseRemaining: state.totalPurse - state.usedPurse,
       totalPurse: state.totalPurse,
       gradeCount: state.gradeCount,
+      players: state.players,
       maxBid,
     };
   });
