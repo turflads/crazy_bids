@@ -1,6 +1,7 @@
 export interface Team {
   name: string;
   flag: string;
+  logo?: string;
   totalPurse: number;
 }
 

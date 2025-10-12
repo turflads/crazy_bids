@@ -14,7 +14,7 @@ import PlayerCard from "./PlayerCard";
 
 interface TeamData {
   team: string;
-  flag?: string;
+  logo?: string;
   playersCount: number;
   purseUsed: number;
   purseRemaining: number;
@@ -45,12 +45,17 @@ export default function OwnerDashboard({
 }: OwnerDashboardProps) {
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
 
-  const gradeColorMap: Record<string, string> = {
-    A: 'bg-grade-a',
-    B: 'bg-grade-b',
-    C: 'bg-grade-c',
+  // Extract grade letter for color mapping (handles both "A" and "GOLD - C" formats)
+  const getGradeColor = (grade: string) => {
+    const gradeLetter = grade.trim().toUpperCase().slice(-1);
+    const colorMap: Record<string, string> = {
+      A: 'bg-grade-a',
+      B: 'bg-grade-b',
+      C: 'bg-grade-c',
+    };
+    return colorMap[gradeLetter] || 'bg-primary';
   };
-  const gradeColor = currentPlayer ? (gradeColorMap[currentPlayer.grade] || 'bg-primary') : 'bg-primary';
+  const gradeColor = currentPlayer ? getGradeColor(currentPlayer.grade) : 'bg-primary';
 
   return (
     <div className="p-6 space-y-6">
@@ -71,7 +76,7 @@ export default function OwnerDashboard({
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Badge className={`${gradeColor} text-white`}>
-                    Grade {currentPlayer.grade}
+                    {currentPlayer.grade}
                   </Badge>
                 </div>
                 <h3 className="text-2xl font-bold" data-testid="text-current-player-name">
@@ -113,7 +118,7 @@ export default function OwnerDashboard({
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {team.flag && <span className="text-2xl">{team.flag}</span>}
+                    {team.logo && <img src={team.logo} alt={team.team} className="w-8 h-8 object-contain" />}
                     <span className="text-sm">{team.team}</span>
                   </div>
                   <Badge variant="outline" className="gap-1">
@@ -220,7 +225,7 @@ export default function OwnerDashboard({
             <>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-3 text-2xl">
-                  {selectedTeam.flag && <span className="text-3xl">{selectedTeam.flag}</span>}
+                  {selectedTeam.logo && <img src={selectedTeam.logo} alt={selectedTeam.team} className="w-10 h-10 object-contain" />}
                   <span>{selectedTeam.team} - Players</span>
                 </DialogTitle>
               </DialogHeader>
