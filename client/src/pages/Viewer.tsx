@@ -25,13 +25,9 @@ export default function Viewer() {
 
   const teamStandings = Object.values(teamState).map((team: any) => ({
     team: team.name,
-    flag: team.flag,
     playersCount: team.players.length,
     purseUsed: team.usedPurse,
     purseRemaining: team.totalPurse - team.usedPurse,
-    totalPurse: team.totalPurse,
-    gradeCount: team.gradeCount,
-    players: team.players,
   }));
 
   useEffect(() => {

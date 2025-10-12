@@ -1,11 +1,11 @@
 {
   "gradeBasePrices": {
-    " GOLD - C": 2000000,
+    "A": 2000000,
     "B": 1500000,
     "C": 1000000
   },
   "gradeIncrements": {
-    " GOLD - C": 500000,
+    "A": 500000,
     "B": 300000,
     "C": 200000
   },
@@ -13,30 +13,26 @@
     {
       "name": "Mumbai Indians",
       "flag": "🔵",
-      "logo": "/logos/mumbai.png",
       "totalPurse": 100000000
     },
     {
       "name": "Chennai Super Kings",
       "flag": "🟡",
-      "logo": "/logos/chennai.png",
       "totalPurse": 100000000
     },
     {
       "name": "Royal Challengers",
       "flag": "🔴",
-      "logo": "/logos/rcb.png",
       "totalPurse": 100000000
     },
     {
       "name": "Delhi Capitals",
       "flag": "🔷",
-      "logo": "/logos/delhi.png",
       "totalPurse": 100000000
     }
   ],
   "gradeQuotas": {
-    " GOLD - C": 3,
+    "A": 3,
     "B": 4,
     "C": 5
   }
