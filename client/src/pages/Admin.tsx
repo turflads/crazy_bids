@@ -33,6 +33,7 @@ export default function Admin() {
   const [isAuctionActive, setIsAuctionActive] = useState(false);
   const [bidHistory, setBidHistory] = useState<Array<{team: string, amount: number}>>([]);
   const [hasBids, setHasBids] = useState(false);
+  const [teamStateVersion, setTeamStateVersion] = useState(0); // Trigger re-render when team state changes
 
   // Load configuration and players
   useEffect(() => {
@@ -120,6 +121,7 @@ export default function Admin() {
   }
 
   // Get team data with max bid calculations
+  // teamStateVersion is used to trigger re-calculation when team state changes
   const teamState = getTeamState();
   const currentPlayer = players[currentPlayerIndex];
   const teamData = teams.map(team => {
@@ -259,6 +261,7 @@ export default function Admin() {
           
           // Update team state
           updateTeamAfterPurchase(soldTeam, currentPlayer, soldPrice);
+          setTeamStateVersion(v => v + 1); // Trigger re-render of team cards
           
           // Find team flag
           const team = teams.find(t => t.name === soldTeam);
@@ -329,6 +332,7 @@ export default function Admin() {
           setIsAuctionActive(false);
           setBidHistory([]);
           setHasBids(false);
+          setTeamStateVersion(v => v + 1); // Trigger re-render of team cards
         }}
       />
       {celebrationData && (

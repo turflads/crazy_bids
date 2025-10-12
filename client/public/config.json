@@ -13,21 +13,25 @@
     {
       "name": "Mumbai Indians",
       "flag": "🔵",
+      "logo": "/logos/mumbai.png",
       "totalPurse": 100000000
     },
     {
       "name": "Chennai Super Kings",
       "flag": "🟡",
+      "logo": "/logos/chennai.png",
       "totalPurse": 100000000
     },
     {
       "name": "Royal Challengers",
       "flag": "🔴",
+      "logo": "/logos/rcb.png",
       "totalPurse": 100000000
     },
     {
       "name": "Delhi Capitals",
       "flag": "🔷",
+      "logo": "/logos/delhi.png",
       "totalPurse": 100000000
     }
   ],
