@@ -92,13 +92,20 @@ Preferred communication style: Simple, everyday language.
 2. Storage event listeners for cross-tab communication
 3. Window focus event triggers state refresh
 4. 2-second polling interval as fallback
+5. Manual refresh capability for immediate updates
+
+**useAuctionSync Hook Implementation**
+- Centralized hook used by all pages (Admin, Owner, Viewer) for consistent state synchronization
+- Exposes `refresh()` function for manual state updates
+- Admin page calls `refresh()` immediately after player sales to eliminate lag
+- Ensures team dialogs show sold players instantly across all views
 
 **State Updates Flow**
-- Admin updates auction → saves to localStorage
-- Other tabs/windows receive storage event → refresh state
-- All viewers/owners see updates within 2 seconds max
+- Admin updates auction → saves to localStorage → calls `refresh()` → UI updates instantly
+- Other tabs/windows receive storage event → refresh state automatically
+- All viewers/owners see updates within 2 seconds max (or instantly via storage events)
 
-**Rationale**: This approach works reliably without requiring WebSocket infrastructure, making deployment simpler while maintaining acceptable real-time performance for auction use cases.
+**Rationale**: This approach works reliably without requiring WebSocket infrastructure, making deployment simpler while maintaining acceptable real-time performance for auction use cases. The manual refresh eliminates the 2-second polling lag for the active Admin user.
 
 ## External Dependencies
 
