@@ -154,6 +154,28 @@ Preferred communication style: Simple, everyday language.
   - Auction is reset
 - This ensures grade counts and purse information update immediately without manual refresh
 
+### Team Logo Implementation
+- **Complete Flag-to-Logo Migration**: Replaced all team flag emojis with dynamic logo images throughout the application
+  - Updated Team interface in `auctionConfig.ts` to include optional `logo` field
+  - Updated TeamData interface in `teamState.ts` to include `logo` field
+  - Modified `initializeTeams()` to preserve logo data from config
+  - Changed `CelebrationPopup` to display team logos instead of flags
+  - Updated all dashboards (Admin, Owner, Viewer) to show logos in team cards and dialogs
+- **Defensive Rendering**: All components check for logo existence before rendering img tags (`{teamLogo && <img .../>}`)
+- **Responsive Styling**: Logo images use consistent sizing with max-width constraints:
+  - Team cards: `w-8 h-8 max-w-[2rem]` for compact display
+  - Dialogs: `w-10 h-10 max-w-[2.5rem]` for larger visibility
+  - Celebration popup: `w-16 h-16 max-w-[4rem]` for emphasis
+  - All use `object-contain` to preserve aspect ratios
+
+### Flexible Grade Badge System
+- **Dynamic Color Mapping**: Grade badges extract color based on last character of grade name
+  - Supports any grade format (e.g., "A", "Gold - C", "SILVER - B")
+  - Color extraction: `grade.trim().toUpperCase().slice(-1)` maps to color
+  - Implemented in `PlayerCard`, `CelebrationPopup`, `OwnerDashboard`, and `ViewerDashboard`
+- **Color Scheme**: A=purple (`bg-grade-a`), B=blue (`bg-grade-b`), C=orange (`bg-grade-c`)
+
 ### Technical Implementation Details
 - **PlayerCard Enhancement**: Component automatically displays `soldPrice` when `player.status === 'sold'`, ensuring correct price display in team dialogs
 - **State Management**: Team state changes trigger re-calculation of `teamData` via `getTeamState()` calls, maintaining data consistency across all views
+- **Type Safety**: Logo field added to all Team-related interfaces and types across the codebase
