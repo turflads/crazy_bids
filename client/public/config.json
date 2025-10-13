@@ -24,6 +24,11 @@
       "name": "Delhi Capitals",
       "flag": "🔷",
       "totalPurse": 100000000
+    },
+    {
+      "name": "Delhi",
+      "flag": "🔷",
+      "totalPurse": 100000000
     }
   ],
   "gradeQuotas": {
