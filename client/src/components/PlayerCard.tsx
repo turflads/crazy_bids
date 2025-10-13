@@ -26,7 +26,7 @@ export default function PlayerCard({ player, onViewDetails }: PlayerCardProps) {
     C: 'bg-grade-c',
   };
 
-  const isSold = player.status === 'sold';
+  const isSold = player.status === 'sold' || !!player.soldPrice;
 
   return (
     <Card className={`overflow-hidden hover-elevate ${isSold ? 'border-l-4 border-l-auction-sold' : ''}`}>
