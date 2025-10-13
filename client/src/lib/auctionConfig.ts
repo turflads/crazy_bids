@@ -13,18 +13,23 @@ export interface AuctionConfig {
 
 let cachedConfig: AuctionConfig | null = null;
 
-export async function loadAuctionConfig(): Promise<AuctionConfig> {
-  if (cachedConfig) {
+export async function loadAuctionConfig(forceRefresh = false): Promise<AuctionConfig> {
+  if (cachedConfig && !forceRefresh) {
     return cachedConfig;
   }
 
   try {
-    const response = await fetch('/config.json');
+    const response = await fetch('/config.json?t=' + Date.now());
     const config = await response.json();
     cachedConfig = config;
     return config;
   } catch (error) {
     console.error('Error loading auction config:', error);
+    
+    if (cachedConfig) {
+      return cachedConfig;
+    }
+    
     return {
       gradeBasePrices: {
         A: 2000000,
@@ -49,4 +54,8 @@ export async function loadAuctionConfig(): Promise<AuctionConfig> {
       },
     };
   }
+}
+
+export function clearConfigCache() {
+  cachedConfig = null;
 }

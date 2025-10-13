@@ -68,19 +68,39 @@ export default function PlayerCard({ player, onViewDetails }: PlayerCardProps) {
           )}
         </div>
         
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-muted-foreground">
-              {isSold ? 'Sold Price' : 'Base Price'}
-            </p>
-            <p className="font-mono font-semibold" data-testid={`text-price-${player.id}`}>
-              ₹{isSold ? player.soldPrice?.toLocaleString() : player.basePrice?.toLocaleString()}
-            </p>
-          </div>
+        <div className="space-y-2">
+          {isSold ? (
+            <>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Base Price</p>
+                  <p className="font-mono font-semibold text-sm">
+                    ₹{player.basePrice?.toLocaleString()}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground">Sold Price</p>
+                  <p className="font-mono font-semibold text-auction-sold" data-testid={`text-price-${player.id}`}>
+                    ₹{player.soldPrice?.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">Base Price</p>
+                <p className="font-mono font-semibold" data-testid={`text-price-${player.id}`}>
+                  ₹{player.basePrice?.toLocaleString()}
+                </p>
+              </div>
+            </div>
+          )}
           {player.cricherosLink && (
             <Button
               variant="outline"
               size="sm"
+              className="w-full"
               onClick={() => window.open(player.cricherosLink, '_blank')}
               data-testid={`button-stats-${player.id}`}
             >

@@ -54,11 +54,15 @@ export default function Owner() {
 
   useEffect(() => {
     const loadConfig = async () => {
-      const config = await loadAuctionConfig();
+      const config = await loadAuctionConfig(true);
       setGradeQuotas(config.gradeQuotas);
       setGradeBasePrices(config.gradeBasePrices);
     };
+    
     loadConfig();
+    const interval = setInterval(loadConfig, 5000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {

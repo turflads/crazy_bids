@@ -24,20 +24,25 @@ export const saveTeamState = (teams: Record<string, TeamData>) => {
 
 export const initializeTeams = (teamNames: { name: string; flag?: string; totalPurse?: number }[]) => {
   const existing = getTeamState();
-  if (Object.keys(existing).length > 0) {
-    return existing;
-  }
-
   const teams: Record<string, TeamData> = {};
+  
   teamNames.forEach(team => {
-    teams[team.name] = {
-      name: team.name,
-      flag: team.flag,
-      totalPurse: team.totalPurse || 100000000,
-      usedPurse: 0,
-      players: [],
-      gradeCount: { A: 0, B: 0, C: 0 },
-    };
+    if (existing[team.name]) {
+      teams[team.name] = {
+        ...existing[team.name],
+        flag: team.flag,
+        totalPurse: team.totalPurse || 100000000,
+      };
+    } else {
+      teams[team.name] = {
+        name: team.name,
+        flag: team.flag,
+        totalPurse: team.totalPurse || 100000000,
+        usedPurse: 0,
+        players: [],
+        gradeCount: { A: 0, B: 0, C: 0 },
+      };
+    }
   });
 
   saveTeamState(teams);

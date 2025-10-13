@@ -77,6 +77,21 @@ export default function Admin() {
     }
   }, [teams]);
 
+  // Refresh config periodically to sync team changes from config.json
+  useEffect(() => {
+    const refreshConfig = async () => {
+      const config = await loadAuctionConfig(true);
+      setTeams(config.teams);
+      setGradeIncrements(config.gradeIncrements);
+      setGradeQuotas(config.gradeQuotas);
+      setGradeBasePrices(config.gradeBasePrices);
+    };
+    
+    const interval = setInterval(refreshConfig, 5000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   // Save auction state whenever it changes
   useEffect(() => {
     saveAuctionState({
