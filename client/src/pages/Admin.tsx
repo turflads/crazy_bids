@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import NavBar from "@/components/NavBar";
 import AdminDashboard from "@/components/AdminDashboard";
 import CelebrationPopup from "@/components/CelebrationPopup";
-import { getAuctionState, saveAuctionState, initializeAuctionState } from "@/lib/auctionState";
+import { getAuctionState, saveAuctionState, initializeAuctionState, clearAuctionState } from "@/lib/auctionState";
 import { initializeTeams, updateTeamAfterPurchase, clearTeamState, getTeamState } from "@/lib/teamState";
 import { loadPlayersFromExcel } from "@/lib/playerLoader";
 import { loadAuctionConfig, type Team } from "@/lib/auctionConfig";
@@ -335,6 +335,7 @@ export default function Admin() {
         }}
         onResetAuction={async () => {
           clearTeamState();
+          clearAuctionState();
           initializeTeams(teams);
           
           const loadedPlayers = await loadPlayersFromExcel();
