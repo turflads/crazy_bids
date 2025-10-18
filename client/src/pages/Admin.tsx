@@ -271,7 +271,16 @@ export default function Admin() {
             team: soldTeam,
             soldPrice: soldPrice,
           };
+          
+          // Calculate next index before state updates
+          const nextIndex = Math.min(currentPlayerIndex + 1, updatedPlayers.length - 1);
+          
+          // Update all state together to ensure consistency
           setPlayers(updatedPlayers);
+          setCurrentPlayerIndex(nextIndex);
+          setCurrentBid(updatedPlayers[nextIndex]?.basePrice || 0);
+          setBidHistory([]);
+          setHasBids(false);
           
           // Update team state
           updateTeamAfterPurchase(soldTeam, currentPlayer, soldPrice);
@@ -290,15 +299,6 @@ export default function Admin() {
           });
           
           console.log('Player sold to', soldTeam, 'for ₹', soldPrice);
-          
-          // Move to next player after a short delay using updated players array
-          setTimeout(() => {
-            const nextIndex = Math.min(currentPlayerIndex + 1, updatedPlayers.length - 1);
-            setCurrentPlayerIndex(nextIndex);
-            setCurrentBid(updatedPlayers[nextIndex]?.basePrice || 0);
-            setBidHistory([]);
-            setHasBids(false);
-          }, 500);
         }}
         onUnsold={() => {
           const currentPlayer = players[currentPlayerIndex];
