@@ -18,12 +18,6 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     onLogin(username, password);
   };
 
-  const quickLogin = (user: string, pass: string) => {
-    setUsername(user);
-    setPassword(pass);
-    onLogin(user, pass);
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
@@ -36,7 +30,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           <CardTitle className="text-3xl font-bold">Cricket Auction</CardTitle>
           <CardDescription>Login to access the auction platform</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
@@ -70,36 +64,6 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
               Login
             </Button>
           </form>
-
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground text-center">Quick login as:</p>
-            <div className="grid grid-cols-3 gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => quickLogin("admin", "admin123")}
-                data-testid="button-quick-admin"
-              >
-                Admin
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => quickLogin("owner", "owner123")}
-                data-testid="button-quick-owner"
-              >
-                Owner
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => quickLogin("viewer", "viewer123")}
-                data-testid="button-quick-viewer"
-              >
-                Viewer
-              </Button>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>
