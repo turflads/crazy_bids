@@ -1,6 +1,36 @@
 import * as XLSX from 'xlsx';
 import { loadAuctionConfig } from './auctionConfig';
 
+// ============================================================================
+// EXCEL COLUMN CONFIGURATION - CHANGE THESE TO MATCH YOUR EXCEL FILE
+// ============================================================================
+// Update these column names to match your Excel file exactly.
+// The system will look for these exact column names (case-sensitive).
+// 
+// Example: If your Excel has "runs_scored" instead of "runs", change:
+//   RUNS_COLUMN: 'runs_scored'
+// ============================================================================
+
+const EXCEL_COLUMNS = {
+  // Required columns
+  NAME_COLUMN: 'name',        // Player's full name
+  GRADE_COLUMN: 'grade',      // Player grade (A, B, C)
+  PHOTO_COLUMN: 'photo',      // Player photo filename
+  
+  // Optional stat columns (leave empty '' if you don't have this column)
+  BATTING_STYLE_COLUMN: 'bat',           // e.g., "Right-hand bat"
+  BOWLING_STYLE_COLUMN: 'bowl',          // e.g., "Right-arm medium"
+  RUNS_COLUMN: 'runs',                   // Total runs scored
+  WICKETS_COLUMN: 'wickets',             // Total wickets taken
+  STRIKE_RATE_COLUMN: 'strike_rate',     // Batting strike rate
+  BOWLING_AVG_COLUMN: 'bowling_avg',     // Bowling average
+  CRICHEROES_LINK_COLUMN: 'cricheroes_link', // CricHeroes profile URL
+};
+
+// ============================================================================
+// END OF CONFIGURATION - DO NOT MODIFY CODE BELOW THIS LINE
+// ============================================================================
+
 export interface PlayerData {
   id: string;
   firstName: string;
@@ -29,32 +59,22 @@ export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
     const data = XLSX.utils.sheet_to_json(firstSheet) as any[];
 
     const players: PlayerData[] = data.map((row, index) => {
-      const name = row.name || row.Name || '';
+      // Read data using configured column names
+      const name = row[EXCEL_COLUMNS.NAME_COLUMN] || '';
       const nameParts = name.trim().split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
-      const grade = (row.grade || row.Grade || 'C').toString().toUpperCase();
-      const photo = row.photo || row.Photo || '';
+      const grade = (row[EXCEL_COLUMNS.GRADE_COLUMN] || 'C').toString().toUpperCase();
+      const photo = row[EXCEL_COLUMNS.PHOTO_COLUMN] || '';
 
-      // ==========================================
-      // SOLUTION A: READ STATS FROM EXCEL COLUMNS
-      // ==========================================
-      // Excel column names for stats (case-insensitive):
-      // - bat, Bat, or batting_style
-      // - bowl, Bowl, or bowling_style  
-      // - runs, Runs
-      // - wickets, Wickets
-      // - strike_rate, strikeRate, or SR
-      // - bowling_avg, bowlingAvg, or bowling_average
-      // - cricheroes_link, cricherosLink, or profile_link
-      
-      const battingStyle = row.bat || row.Bat || row.batting_style || row.battingStyle;
-      const bowlingStyle = row.bowl || row.Bowl || row.bowling_style || row.bowlingStyle;
-      const runs = row.runs || row.Runs;
-      const wickets = row.wickets || row.Wickets;
-      const strikeRate = row.strike_rate || row.strikeRate || row.SR || row.sr;
-      const bowlingAverage = row.bowling_avg || row.bowlingAvg || row.bowling_average || row.bowlingAverage;
-      const cricherosLink = row.cricheroes_link || row.cricherosLink || row.profile_link || row.profileLink;
+      // Read stats using configured column names (will be undefined if column is empty or doesn't exist)
+      const battingStyle = EXCEL_COLUMNS.BATTING_STYLE_COLUMN ? row[EXCEL_COLUMNS.BATTING_STYLE_COLUMN] : undefined;
+      const bowlingStyle = EXCEL_COLUMNS.BOWLING_STYLE_COLUMN ? row[EXCEL_COLUMNS.BOWLING_STYLE_COLUMN] : undefined;
+      const runs = EXCEL_COLUMNS.RUNS_COLUMN ? row[EXCEL_COLUMNS.RUNS_COLUMN] : undefined;
+      const wickets = EXCEL_COLUMNS.WICKETS_COLUMN ? row[EXCEL_COLUMNS.WICKETS_COLUMN] : undefined;
+      const strikeRate = EXCEL_COLUMNS.STRIKE_RATE_COLUMN ? row[EXCEL_COLUMNS.STRIKE_RATE_COLUMN] : undefined;
+      const bowlingAverage = EXCEL_COLUMNS.BOWLING_AVG_COLUMN ? row[EXCEL_COLUMNS.BOWLING_AVG_COLUMN] : undefined;
+      const cricherosLink = EXCEL_COLUMNS.CRICHEROES_LINK_COLUMN ? row[EXCEL_COLUMNS.CRICHEROES_LINK_COLUMN] : undefined;
 
       return {
         id: (index + 1).toString(),
@@ -64,7 +84,7 @@ export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
         basePrice: config.gradeBasePrices[grade] || 1000000,
         status: 'unsold' as const,
         image: photo ? `/player_images/${photo}` : undefined,
-        // Stats fields - will be undefined if columns don't exist
+        // Stats fields - will be undefined if columns don't exist or are empty
         battingStyle: battingStyle ? String(battingStyle) : undefined,
         bowlingStyle: bowlingStyle ? String(bowlingStyle) : undefined,
         runs: runs ? Number(runs) : undefined,
@@ -73,13 +93,6 @@ export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
         bowlingAverage: bowlingAverage ? Number(bowlingAverage) : undefined,
         cricherosLink: cricherosLink ? String(cricherosLink) : undefined,
       };
-
-      // ==========================================
-      // SOLUTION B: ONLY CRICHEROES LINK
-      // ==========================================
-      // If you only want to store CricHeroes link and show a button,
-      // comment out all the stats fields above EXCEPT cricherosLink
-      // The PlayerCard will show a "View Stats" button instead
     });
 
     return players;
