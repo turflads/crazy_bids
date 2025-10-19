@@ -52,16 +52,22 @@ export default function Admin() {
         const existingState = getAuctionState();
         
         if (existingState && existingState.players.length > 0) {
+          // Restore complete auction state from localStorage
           setPlayers(existingState.players);
           setCurrentPlayerIndex(existingState.currentPlayerIndex);
           setCurrentBid(existingState.currentBid);
           setIsAuctionActive(existingState.isAuctionActive);
+          setBidHistory(existingState.bidHistory || []);
+          setHasBids(existingState.hasBids || false);
         } else {
+          // Initialize fresh auction state
           const auctionState = initializeAuctionState(loadedPlayers);
           setPlayers(auctionState.players);
           setCurrentPlayerIndex(auctionState.currentPlayerIndex);
           setCurrentBid(auctionState.currentBid);
           setIsAuctionActive(auctionState.isAuctionActive);
+          setBidHistory(auctionState.bidHistory);
+          setHasBids(auctionState.hasBids);
         }
       }
       
@@ -95,14 +101,18 @@ export default function Admin() {
 
   // Save auction state whenever it changes
   useEffect(() => {
-    saveAuctionState({
-      currentPlayerIndex,
-      currentBid,
-      isAuctionActive,
-      players,
-      lastBidTeam: '',
-    });
-  }, [currentPlayerIndex, currentBid, isAuctionActive, players]);
+    if (players.length > 0) {
+      saveAuctionState({
+        currentPlayerIndex,
+        currentBid,
+        isAuctionActive,
+        players,
+        lastBidTeam: '',
+        bidHistory,
+        hasBids,
+      });
+    }
+  }, [currentPlayerIndex, currentBid, isAuctionActive, players, bidHistory, hasBids]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");

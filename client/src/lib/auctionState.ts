@@ -5,6 +5,8 @@ interface AuctionState {
   isAuctionActive: boolean;
   players: any[];
   lastBidTeam: string;
+  bidHistory: Array<{team: string, amount: number}>;
+  hasBids: boolean;
 }
 
 const AUCTION_STATE_KEY = 'cricket_auction_state';
@@ -27,8 +29,14 @@ export const clearAuctionState = () => {
 
 export const initializeAuctionState = (players: any[]): AuctionState => {
   const existing = getAuctionState();
-  if (existing && existing.players.length > 0) {
-    return existing;
+  // Only use existing state if it has valid data
+  if (existing && existing.players && existing.players.length > 0) {
+    // Ensure all required fields exist (for backward compatibility)
+    return {
+      ...existing,
+      bidHistory: existing.bidHistory || [],
+      hasBids: existing.hasBids || false,
+    };
   }
   
   const initialState: AuctionState = {
@@ -37,6 +45,8 @@ export const initializeAuctionState = (players: any[]): AuctionState => {
     isAuctionActive: false,
     players: players,
     lastBidTeam: '',
+    bidHistory: [],
+    hasBids: false,
   };
   
   saveAuctionState(initialState);
