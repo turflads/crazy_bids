@@ -4,6 +4,23 @@
 
 This is a real-time cricket player auction platform that enables live bidding on players across multiple teams. The application features role-based access control (Admin, Owner, Viewer), grade-based player acquisition with quota tracking, and synchronized auction state management. Built with React, Express, and PostgreSQL, it provides a sports-themed interface inspired by platforms like ESPN and FanDuel.
 
+## Recent Changes (October 19, 2025)
+
+**Team Logo System Implementation**
+- Replaced all emoji flags with actual team logo images throughout the application
+- Created TeamLogo component with automatic fallback to emoji if image fails to load
+- Updated all dashboards (Admin, Owner, Viewer) to display team logos
+- Team logos stored in `client/public/images/` and configured in `config.json`
+- Logos appear in: team cards, bid buttons, celebration popup, team dialogs, and dropdowns
+
+**Auction State Persistence Fixes**
+- Fixed critical bug where page refresh would restart auction from first player
+- Fixed critical bug where logout/login would reset auction state
+- Enhanced auction state to include bidHistory and hasBids for complete state restoration
+- Auction now correctly persists across page refreshes and login/logout cycles
+- Only the "Reset" button now clears and restarts the auction
+- All auction state stored in localStorage ('cricket_auction_state' key)
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
