@@ -1,10 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
+import TeamLogo from "./TeamLogo";
 
 interface TeamOverviewCardProps {
   teamName: string;
   teamFlag?: string;
+  teamLogo?: string;
   playersCount: number;
   purseUsed: number;
   purseRemaining: number;
@@ -17,6 +19,7 @@ interface TeamOverviewCardProps {
 export default function TeamOverviewCard({
   teamName,
   teamFlag,
+  teamLogo,
   playersCount,
   purseUsed,
   purseRemaining,
@@ -30,7 +33,12 @@ export default function TeamOverviewCard({
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2">
-            {teamFlag && <span className="text-2xl">{teamFlag}</span>}
+            <TeamLogo 
+              logo={teamLogo} 
+              flag={teamFlag} 
+              name={teamName}
+              className="w-8 h-8"
+            />
             <span className="text-sm">{teamName}</span>
           </div>
           <Badge variant="outline" className="gap-1">

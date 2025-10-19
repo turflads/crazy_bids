@@ -163,6 +163,7 @@ export default function Admin() {
     return {
       name: team.name,
       flag: team.flag,
+      logo: team.logo,
       playersCount: state.players.length,
       purseUsed: state.usedPurse,
       purseRemaining: state.totalPurse - state.usedPurse,

@@ -42,25 +42,26 @@ const credentials: Record<string, { password: string; role: string }> = {
 
 ---
 
-## 🖼️ Adding Team Logos
+## 🖼️ Team Logos (Already Set Up!)
 
-### Step 1: Upload Logo Images
+### Current Setup
 
-1. Create a folder named `images` in the `client/public/` directory (already created)
-2. Upload your team logo images to `client/public/images/`
-3. Supported formats: PNG, JPG, JPEG, SVG
-4. Recommended size: 256x256 pixels or larger (square images work best)
+Your application already has sample team logos in place! The logos are stored in `client/public/images/`:
+- ✅ chennai-super-kings.png
+- ✅ royal-challengers.png  
+- ✅ delhi-capitals.png
+- ✅ delhi.png
 
-### Example Directory Structure
-```
-client/
-└── public/
-    └── images/
-        ├── chennai-super-kings.png
-        ├── royal-challengers.png
-        ├── delhi-capitals.png
-        └── mumbai-indians.png
-```
+These are **sample placeholder logos**. You can replace them with your own team logos.
+
+### How to Replace Logos
+
+1. Navigate to `client/public/images/`
+2. Replace the existing PNG files with your own logo images
+3. Keep the same file names (e.g., `chennai-super-kings.png`)
+4. OR upload new logo images and update the `logo` paths in `config.json`
+5. Supported formats: PNG, JPG, JPEG, SVG
+6. Recommended size: 256x256 pixels or larger (square images work best)
 
 ### Step 2: Configure Team Logos in config.json
 

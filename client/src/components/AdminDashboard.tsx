@@ -134,6 +134,7 @@ export default function AdminDashboard({
                     <TeamOverviewCard
                       teamName={team.name}
                       teamFlag={team.flag}
+                      teamLogo={team.logo}
                       playersCount={team.playersCount}
                       purseUsed={team.purseUsed}
                       purseRemaining={team.purseRemaining}

@@ -10,7 +10,7 @@ export default function Login() {
     // ============================================================================
     // To add a new user or change credentials, edit the credentials object below.
     // Format: username: { password: "your_password", role: "admin" | "owner" | "viewer" }
-    // 
+    //
     // Example to change admin password:
     //   admin: { password: "newSecurePassword123", role: "admin" }
     //
@@ -25,7 +25,10 @@ export default function Login() {
 
     const user = credentials[username];
     if (user && user.password === password) {
-      localStorage.setItem("user", JSON.stringify({ username, role: user.role }));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ username, role: user.role }),
+      );
       setLocation(`/${user.role}`);
     } else {
       alert("Invalid credentials");
