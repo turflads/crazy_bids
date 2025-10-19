@@ -29,6 +29,17 @@ This is a real-time cricket player auction platform that enables live bidding on
 - Works seamlessly when multiple tabs are open on the same browser
 - Note: For celebrations to sync across different devices/browsers, users would need to be viewing the same browser instance (different tabs)
 
+**Player Statistics Feature**
+- Player cards now support displaying comprehensive player statistics
+- Two implementation scenarios:
+  - **Scenario A (Excel Stats)**: Read stats directly from Excel columns (bat, bowl, runs, wickets, strike_rate, bowling_avg)
+  - **Scenario B (CricHeroes Link)**: Store CricHeroes profile link and show "View Profile" button
+  - **Mixed Approach**: Use both Excel stats AND CricHeroes link together
+- Stats display automatically when data is available in Excel
+- Column names are case-insensitive (bat/Bat, runs/Runs, etc.)
+- Stats section appears with batting/bowling styles and performance metrics (runs, wickets, strike rate, bowling average)
+- Detailed setup instructions in `PLAYER_STATS_GUIDE.md`
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
