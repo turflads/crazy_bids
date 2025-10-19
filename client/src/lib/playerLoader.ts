@@ -18,9 +18,9 @@ const EXCEL_COLUMNS = {
   PHOTO_COLUMN: 'photo',      // Player photo filename
   
   // Optional stat columns (leave empty '' if you don't have this column)
-  BATTING_STYLE_COLUMN: 'bat',           // e.g., "Right-hand bat"
+  BATTING_STYLE_COLUMN: 'Matches',           // e.g., "Right-hand bat"
   BOWLING_STYLE_COLUMN: 'bowl',          // e.g., "Right-arm medium"
-  RUNS_COLUMN: 'runs',                   // Total runs scored
+  RUNS_COLUMN: 'Runs_Scored',                   // Total runs scored
   WICKETS_COLUMN: 'wickets',             // Total wickets taken
   STRIKE_RATE_COLUMN: 'strike_rate',     // Batting strike rate
   BOWLING_AVG_COLUMN: 'bowling_avg',     // Bowling average
