@@ -148,6 +148,29 @@ Here's a complete example of `client/public/config.json`:
 2. **Team Logos**: The app checks config.json every 5 seconds, so changes will appear automatically
 3. **No server restart needed** for either change!
 
+## 📍 Where Team Logos Appear
+
+Your team logos are now displayed throughout the entire application:
+
+✅ **Admin Dashboard**
+- Team Overview cards
+- Auction Control bid buttons (Click team to place bid)
+- Custom bid team selector dropdown
+- Team player list dialog
+- Celebration popup when player is sold
+
+✅ **Owner Dashboard**
+- Team Overview cards
+- Team player list dialog
+- All Teams section
+
+✅ **Viewer Dashboard**
+- Team standings cards
+- Team player list dialog
+- Recent sales display
+
+No more emoji flags anywhere in the application!
+
 ---
 
 ## ❓ Troubleshooting

@@ -12,10 +12,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Gavel, CheckCircle, XCircle, Flag, Undo2 } from "lucide-react";
+import TeamLogo from "./TeamLogo";
 
 interface Team {
   name: string;
   flag?: string;
+  logo?: string;
 }
 
 interface AuctionControlsProps {
@@ -148,11 +150,12 @@ export default function AuctionControls({
                 disabled={!isAuctionActive}
                 data-testid={`button-bid-${team.name.toLowerCase().replace(/\s+/g, '-')}`}
               >
-                {team.flag ? (
-                  <div className="text-3xl">{team.flag}</div>
-                ) : (
-                  <Flag className="w-8 h-8 text-primary" />
-                )}
+                <TeamLogo 
+                  logo={team.logo} 
+                  flag={team.flag} 
+                  name={team.name}
+                  className="w-12 h-12"
+                />
                 <span className="text-sm font-medium text-center leading-tight">
                   {team.name}
                 </span>
@@ -184,7 +187,15 @@ export default function AuctionControls({
                 <SelectContent>
                   {teams.map((team) => (
                     <SelectItem key={team.name} value={team.name}>
-                      {team.flag} {team.name}
+                      <div className="flex items-center gap-2">
+                        <TeamLogo 
+                          logo={team.logo} 
+                          flag={team.flag} 
+                          name={team.name}
+                          className="w-5 h-5"
+                        />
+                        <span>{team.name}</span>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
