@@ -21,6 +21,14 @@ This is a real-time cricket player auction platform that enables live bidding on
 - Only the "Reset" button now clears and restarts the auction
 - All auction state stored in localStorage ('cricket_auction_state' key)
 
+**Celebration Fireworks Enhancement**
+- Celebration popup with fireworks animation now appears on ALL pages (Admin, Owner, Viewer)
+- Auto-dismisses after 5 seconds
+- Shows player name, team logo, team name, and final sold price
+- Next player automatically appears after celebration closes
+- Works seamlessly when multiple tabs are open on the same browser
+- Note: For celebrations to sync across different devices/browsers, users would need to be viewing the same browser instance (different tabs)
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

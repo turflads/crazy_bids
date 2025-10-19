@@ -1,15 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import NavBar from "@/components/NavBar";
 import ViewerDashboard from "@/components/ViewerDashboard";
+import CelebrationPopup from "@/components/CelebrationPopup";
 import { useAuctionSync } from "@/hooks/useAuctionSync";
 
 export default function Viewer() {
   const [, setLocation] = useLocation();
   const [user, setUser] = useState<{ username: string; role: string } | null>(null);
+  const [celebrationData, setCelebrationData] = useState<{
+    open: boolean;
+    playerName: string;
+    teamName: string;
+    teamFlag: string;
+    teamLogo?: string;
+    soldPrice: number;
+    grade: string;
+  } | null>(null);
   
   // Use synced auction and team state
   const { auctionState, teamState } = useAuctionSync();
+  
+  // Track previous players to detect new sales
+  const previousPlayersRef = useRef<any[]>([]);
   
   const allPlayers = auctionState?.players || [];
   const currentPlayerIndex = auctionState?.currentPlayerIndex || 0;
@@ -34,6 +47,45 @@ export default function Viewer() {
     gradeCount: team.gradeCount,
     players: team.players,
   }));
+
+  // Detect new sales and show celebration
+  useEffect(() => {
+    if (!allPlayers.length) return;
+    
+    // Find newly sold players
+    const previousPlayers = previousPlayersRef.current;
+    if (previousPlayers.length > 0) {
+      for (const player of allPlayers) {
+        const prevPlayer = previousPlayers.find((p: any) => p.id === player.id);
+        
+        // If player was unsold before and is now sold, show celebration
+        if (prevPlayer && prevPlayer.status === 'unsold' && player.status === 'sold') {
+          const soldTeam = player.team;
+          const teamData = Object.values(teamState).find((t: any) => t.name === soldTeam);
+          
+          setCelebrationData({
+            open: true,
+            playerName: `${player.firstName} ${player.lastName}`,
+            teamName: soldTeam,
+            teamFlag: teamData?.flag || '🏆',
+            teamLogo: teamData?.logo,
+            soldPrice: player.soldPrice,
+            grade: player.grade,
+          });
+          
+          // Auto-dismiss after 5 seconds
+          setTimeout(() => {
+            setCelebrationData(null);
+          }, 5000);
+          
+          break; // Only show one celebration at a time
+        }
+      }
+    }
+    
+    // Update reference
+    previousPlayersRef.current = allPlayers;
+  }, [allPlayers, teamState]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -69,6 +121,22 @@ export default function Viewer() {
         allPlayers={allPlayers}
         teamStandings={teamStandings}
       />
+      {celebrationData && (
+        <CelebrationPopup
+          open={celebrationData.open}
+          onOpenChange={(open) => {
+            if (!open) {
+              setCelebrationData(null);
+            }
+          }}
+          playerName={celebrationData.playerName}
+          teamName={celebrationData.teamName}
+          teamFlag={celebrationData.teamFlag}
+          teamLogo={celebrationData.teamLogo}
+          soldPrice={celebrationData.soldPrice}
+          grade={celebrationData.grade}
+        />
+      )}
     </div>
   );
 }

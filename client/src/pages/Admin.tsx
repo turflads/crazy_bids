@@ -311,6 +311,11 @@ export default function Admin() {
             grade: currentPlayer.grade,
           });
           
+          // Auto-dismiss after 5 seconds
+          setTimeout(() => {
+            setCelebrationData(null);
+          }, 5000);
+          
           console.log('Player sold to', soldTeam, 'for ₹', soldPrice);
         }}
         onUnsold={() => {
