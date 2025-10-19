@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Search, Trophy, Users, Gavel } from "lucide-react";
+import { Search, Trophy, Users, Gavel, User } from "lucide-react";
 import PlayerCard from "./PlayerCard";
 import TeamLogo from "./TeamLogo";
 
@@ -69,21 +69,102 @@ export default function OwnerDashboard({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Badge className={`${gradeColor} text-white`}>
+            <div className="flex gap-6">
+              {/* Player Image */}
+              <div className="flex-shrink-0">
+                <div className="w-32 h-32 rounded-lg overflow-hidden bg-muted relative">
+                  {currentPlayer.image ? (
+                    <img 
+                      src={currentPlayer.image} 
+                      alt={`${currentPlayer.firstName} ${currentPlayer.lastName}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <User className="w-12 h-12 text-muted-foreground" />
+                    </div>
+                  )}
+                  <Badge className={`absolute top-2 right-2 ${gradeColor} text-white`}>
                     Grade {currentPlayer.grade}
                   </Badge>
                 </div>
-                <h3 className="text-2xl font-bold" data-testid="text-current-player-name">
-                  {currentPlayer.firstName} {currentPlayer.lastName}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Base Price: ₹{currentPlayer.basePrice?.toLocaleString()}
-                </p>
               </div>
-              <div className="text-right">
+
+              {/* Player Info and Stats */}
+              <div className="flex-1 space-y-3">
+                <div>
+                  <h3 className="text-2xl font-bold" data-testid="text-current-player-name">
+                    {currentPlayer.firstName} {currentPlayer.lastName}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Base Price: ₹{currentPlayer.basePrice?.toLocaleString()}
+                  </p>
+                </div>
+
+                {/* Player Statistics */}
+                {(currentPlayer.battingStyle || currentPlayer.bowlingStyle || currentPlayer.runs !== undefined || currentPlayer.wickets !== undefined) && (
+                  <div className="space-y-2 pt-2 border-t">
+                    <p className="text-xs font-medium text-muted-foreground">Player Stats</p>
+                    
+                    {/* Batting/Bowling Styles */}
+                    {(currentPlayer.battingStyle || currentPlayer.bowlingStyle) && (
+                      <div className="flex gap-4">
+                        {currentPlayer.battingStyle && (
+                          <p className="text-xs" data-testid="text-batting-current">
+                            <span className="text-muted-foreground">Bat:</span>{' '}
+                            <span className="font-medium">{currentPlayer.battingStyle}</span>
+                          </p>
+                        )}
+                        {currentPlayer.bowlingStyle && (
+                          <p className="text-xs" data-testid="text-bowling-current">
+                            <span className="text-muted-foreground">Bowl:</span>{' '}
+                            <span className="font-medium">{currentPlayer.bowlingStyle}</span>
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Performance Stats */}
+                    <div className="grid grid-cols-4 gap-2">
+                      {currentPlayer.runs !== undefined && (
+                        <div className="bg-muted/50 rounded p-2">
+                          <p className="text-xs text-muted-foreground">Runs</p>
+                          <p className="font-mono font-semibold text-sm" data-testid="text-runs-current">
+                            {currentPlayer.runs.toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                      {currentPlayer.wickets !== undefined && (
+                        <div className="bg-muted/50 rounded p-2">
+                          <p className="text-xs text-muted-foreground">Wickets</p>
+                          <p className="font-mono font-semibold text-sm" data-testid="text-wickets-current">
+                            {currentPlayer.wickets}
+                          </p>
+                        </div>
+                      )}
+                      {currentPlayer.strikeRate !== undefined && (
+                        <div className="bg-muted/50 rounded p-2">
+                          <p className="text-xs text-muted-foreground">S/R</p>
+                          <p className="font-mono font-semibold text-sm" data-testid="text-sr-current">
+                            {currentPlayer.strikeRate.toFixed(1)}
+                          </p>
+                        </div>
+                      )}
+                      {currentPlayer.bowlingAverage !== undefined && (
+                        <div className="bg-muted/50 rounded p-2">
+                          <p className="text-xs text-muted-foreground">Economy</p>
+                          <p className="font-mono font-semibold text-sm" data-testid="text-economy-current">
+                            {currentPlayer.bowlingAverage.toFixed(2)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Current Bid Info */}
+              <div className="text-right flex-shrink-0">
                 <p className="text-sm text-muted-foreground mb-1">Current Bid</p>
                 <p className="text-3xl font-bold font-mono text-primary" data-testid="text-current-bid">
                   ₹{currentBid?.toLocaleString()}
@@ -198,7 +279,7 @@ export default function OwnerDashboard({
           <TabsContent value="all" className="mt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {allPlayers.map((player: any) => (
-                <PlayerCard key={player.id} player={player} />
+                <PlayerCard key={player.id} player={player} showStats={false} />
               ))}
             </div>
           </TabsContent>
@@ -206,7 +287,7 @@ export default function OwnerDashboard({
           <TabsContent value="sold" className="mt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {soldPlayers.map((player: any) => (
-                <PlayerCard key={player.id} player={player} />
+                <PlayerCard key={player.id} player={player} showStats={false} />
               ))}
             </div>
           </TabsContent>
@@ -214,7 +295,7 @@ export default function OwnerDashboard({
           <TabsContent value="unsold" className="mt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {unsoldPlayers.map((player: any) => (
-                <PlayerCard key={player.id} player={player} />
+                <PlayerCard key={player.id} player={player} showStats={false} />
               ))}
             </div>
           </TabsContent>
@@ -259,7 +340,7 @@ export default function OwnerDashboard({
                 {selectedTeam.players.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {selectedTeam.players.map((player: any) => (
-                      <PlayerCard key={player.id} player={player} />
+                      <PlayerCard key={player.id} player={player} showStats={false} />
                     ))}
                   </div>
                 ) : (

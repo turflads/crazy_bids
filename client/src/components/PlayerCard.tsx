@@ -24,9 +24,10 @@ interface PlayerCardProps {
     bowlingAverage?: number;
   };
   onViewDetails?: () => void;
+  showStats?: boolean; // Control whether to show stats section
 }
 
-export default function PlayerCard({ player, onViewDetails }: PlayerCardProps) {
+export default function PlayerCard({ player, onViewDetails, showStats = true }: PlayerCardProps) {
   const gradeColors: Record<string, string> = {
     A: 'bg-grade-a',
     B: 'bg-grade-b',
@@ -105,7 +106,7 @@ export default function PlayerCard({ player, onViewDetails }: PlayerCardProps) {
           )}
 
           {/* Player Statistics Section */}
-          {(player.battingStyle || player.bowlingStyle || player.runs !== undefined || player.wickets !== undefined) && (
+          {showStats && (player.battingStyle || player.bowlingStyle || player.runs !== undefined || player.wickets !== undefined) && (
             <div className="pt-2 border-t space-y-2">
               <p className="text-xs font-medium text-muted-foreground">Player Stats</p>
               
