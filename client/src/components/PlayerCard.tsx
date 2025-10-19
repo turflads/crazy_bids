@@ -15,6 +15,13 @@ interface PlayerCardProps {
     status?: 'unsold' | 'sold';
     soldPrice?: number;
     team?: string;
+    // Player statistics
+    battingStyle?: string;
+    bowlingStyle?: string;
+    runs?: number;
+    wickets?: number;
+    strikeRate?: number;
+    bowlingAverage?: number;
   };
   onViewDetails?: () => void;
 }
@@ -96,6 +103,69 @@ export default function PlayerCard({ player, onViewDetails }: PlayerCardProps) {
               </div>
             </div>
           )}
+
+          {/* Player Statistics Section */}
+          {(player.battingStyle || player.bowlingStyle || player.runs !== undefined || player.wickets !== undefined) && (
+            <div className="pt-2 border-t space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Player Stats</p>
+              
+              {/* Batting/Bowling Styles */}
+              {(player.battingStyle || player.bowlingStyle) && (
+                <div className="space-y-1">
+                  {player.battingStyle && (
+                    <p className="text-xs" data-testid={`text-batting-${player.id}`}>
+                      <span className="text-muted-foreground">Bat:</span>{' '}
+                      <span className="font-medium">{player.battingStyle}</span>
+                    </p>
+                  )}
+                  {player.bowlingStyle && (
+                    <p className="text-xs" data-testid={`text-bowling-${player.id}`}>
+                      <span className="text-muted-foreground">Bowl:</span>{' '}
+                      <span className="font-medium">{player.bowlingStyle}</span>
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Performance Stats */}
+              <div className="grid grid-cols-2 gap-2">
+                {player.runs !== undefined && (
+                  <div className="bg-muted/50 rounded p-2">
+                    <p className="text-xs text-muted-foreground">Runs</p>
+                    <p className="font-mono font-semibold text-sm" data-testid={`text-runs-${player.id}`}>
+                      {player.runs.toLocaleString()}
+                    </p>
+                  </div>
+                )}
+                {player.wickets !== undefined && (
+                  <div className="bg-muted/50 rounded p-2">
+                    <p className="text-xs text-muted-foreground">Wickets</p>
+                    <p className="font-mono font-semibold text-sm" data-testid={`text-wickets-${player.id}`}>
+                      {player.wickets}
+                    </p>
+                  </div>
+                )}
+                {player.strikeRate !== undefined && (
+                  <div className="bg-muted/50 rounded p-2">
+                    <p className="text-xs text-muted-foreground">Strike Rate</p>
+                    <p className="font-mono font-semibold text-sm" data-testid={`text-sr-${player.id}`}>
+                      {player.strikeRate.toFixed(1)}
+                    </p>
+                  </div>
+                )}
+                {player.bowlingAverage !== undefined && (
+                  <div className="bg-muted/50 rounded p-2">
+                    <p className="text-xs text-muted-foreground">Bowl Avg</p>
+                    <p className="font-mono font-semibold text-sm" data-testid={`text-bowlavg-${player.id}`}>
+                      {player.bowlingAverage.toFixed(2)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* CricHeroes Link Button */}
           {player.cricherosLink && (
             <Button
               variant="outline"
@@ -105,7 +175,7 @@ export default function PlayerCard({ player, onViewDetails }: PlayerCardProps) {
               data-testid={`button-stats-${player.id}`}
             >
               <ExternalLink className="w-4 h-4 mr-1" />
-              Stats
+              View CricHeroes Profile
             </Button>
           )}
         </div>
