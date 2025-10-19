@@ -18,13 +18,13 @@ const EXCEL_COLUMNS = {
   PHOTO_COLUMN: "photo", // Player photo filename
 
   // Optional stat columns (leave empty '' if you don't have this column)
-  BATTING_STYLE_COLUMN: "Matches", // e.g., "Right-hand bat"
-  // BOWLING_STYLE_COLUMN: '',          // e.g., "Right-arm medium"
-  RUNS_COLUMN: "Runs_Scored", // Total runs scored
-  WICKETS_COLUMN: "Wickets_Taken", // Total wickets taken
-  STRIKE_RATE_COLUMN: "BatAvg", // Batting strike rate
-  BOWLING_AVG_COLUMN: "Economy", // Bowling average
-  // CRICHEROES_LINK_COLUMN: 'cricheroes_link', // CricHeroes profile URL
+  // BATTING_STYLE_COLUMN: "Matches", // e.g., "Right-hand bat"
+  //  BOWLING_STYLE_COLUMN: '',          // e.g., "Right-arm medium"
+  // RUNS_COLUMN: "Runs_Scored", // Total runs scored
+  // WICKETS_COLUMN: "Wickets_Taken", // Total wickets taken
+  // STRIKE_RATE_COLUMN: "BatAvg", // Batting strike rate
+  // BOWLING_AVG_COLUMN: "Economy", // Bowling average
+  CRICHEROES_LINK_COLUMN: 'CricheroesLink', // CricHeroes profile URL
 };
 
 // ============================================================================
@@ -40,13 +40,13 @@ export interface PlayerData {
   status: "unsold" | "sold";
   image?: string;
   // Player statistics
-  battingStyle?: number; // e.g., "Right-hand bat"
+  // battingStyle?: number; // e.g., "Right-hand bat"
   // bowlingStyle?: string; // e.g., "Right-arm medium"
-  runs?: number; // Total runs scored
-  wickets?: number; // Total wickets taken
-  strikeRate?: number; // Batting strike rate
-  bowlingAverage?: number; // Bowling average
-  // cricherosLink?: string; // Link to CricHeroes profile
+  // runs?: number; // Total runs scored
+  // wickets?: number; // Total wickets taken
+  // strikeRate?: number; // Batting strike rate
+  // bowlingAverage?: number; // Bowling average
+  cricherosLink?: string; // Link to CricHeroes profile
 }
 
 export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
@@ -70,27 +70,27 @@ export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
       const photo = row[EXCEL_COLUMNS.PHOTO_COLUMN] || "";
 
       // Read stats using configured column names (will be undefined if column is empty or doesn't exist)
-      const battingStyle = EXCEL_COLUMNS.BATTING_STYLE_COLUMN
-        ? row[EXCEL_COLUMNS.BATTING_STYLE_COLUMN]
-        : undefined;
-      // const bowlingStyle = EXCEL_COLUMNS.BOWLING_STYLE_COLUMN
-      //   ? row[EXCEL_COLUMNS.BOWLING_STYLE_COLUMN]
+      // const battingStyle = EXCEL_COLUMNS.BATTING_STYLE_COLUMN
+      //   ? row[EXCEL_COLUMNS.BATTING_STYLE_COLUMN]
       //   : undefined;
-      const runs = EXCEL_COLUMNS.RUNS_COLUMN
-        ? row[EXCEL_COLUMNS.RUNS_COLUMN]
-        : undefined;
-      const wickets = EXCEL_COLUMNS.WICKETS_COLUMN
-        ? row[EXCEL_COLUMNS.WICKETS_COLUMN]
-        : undefined;
-      const strikeRate = EXCEL_COLUMNS.STRIKE_RATE_COLUMN
-        ? row[EXCEL_COLUMNS.STRIKE_RATE_COLUMN]
-        : undefined;
-      const bowlingAverage = EXCEL_COLUMNS.BOWLING_AVG_COLUMN
-        ? row[EXCEL_COLUMNS.BOWLING_AVG_COLUMN]
-        : undefined;
-      // const cricherosLink = EXCEL_COLUMNS.CRICHEROES_LINK_COLUMN
-      //   ? row[EXCEL_COLUMNS.CRICHEROES_LINK_COLUMN]
+      // // const bowlingStyle = EXCEL_COLUMNS.BOWLING_STYLE_COLUMN
+      // //   ? row[EXCEL_COLUMNS.BOWLING_STYLE_COLUMN]
+      // //   : undefined;
+      // const runs = EXCEL_COLUMNS.RUNS_COLUMN
+      //   ? row[EXCEL_COLUMNS.RUNS_COLUMN]
       //   : undefined;
+      // const wickets = EXCEL_COLUMNS.WICKETS_COLUMN
+      //   ? row[EXCEL_COLUMNS.WICKETS_COLUMN]
+      //   : undefined;
+      // const strikeRate = EXCEL_COLUMNS.STRIKE_RATE_COLUMN
+      //   ? row[EXCEL_COLUMNS.STRIKE_RATE_COLUMN]
+      //   : undefined;
+      // const bowlingAverage = EXCEL_COLUMNS.BOWLING_AVG_COLUMN
+      //   ? row[EXCEL_COLUMNS.BOWLING_AVG_COLUMN]
+      //   : undefined;
+      const  = EXCEL_COLUMNS.CRICHEROES_LINK_COLUMN
+        ? row[EXCEL_COLUMNS.CRICHEROES_LINK_COLUMN]
+        : undefined;
 
       return {
         id: (index + 1).toString(),
