@@ -13,21 +13,25 @@
     {
       "name": "Chennai Super Kings",
       "flag": "🟡",
+      "logo": "/images/chennai-super-kings.png",
       "totalPurse": 100000000
     },
     {
       "name": "Royal Challengers",
       "flag": "🔴",
+      "logo": "/images/royal-challengers.png",
       "totalPurse": 100000000
     },
     {
       "name": "Delhi Capitals",
       "flag": "🔷",
+      "logo": "/images/delhi-capitals.png",
       "totalPurse": 100000000
     },
     {
       "name": "Delhi",
       "flag": "🔷",
+      "logo": "/images/delhi.png",
       "totalPurse": 100000000
     }
   ],

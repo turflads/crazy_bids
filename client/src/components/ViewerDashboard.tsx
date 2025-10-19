@@ -8,11 +8,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import PlayerCard from "./PlayerCard";
+import TeamLogo from "./TeamLogo";
 import { Trophy, TrendingUp, Users } from "lucide-react";
 
 interface TeamData {
   team: string;
   flag?: string;
+  logo?: string;
   playersCount: number;
   purseUsed: number;
   purseRemaining: number;
@@ -129,7 +131,12 @@ export default function ViewerDashboard({
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      {team.flag && <span className="text-xl">{team.flag}</span>}
+                      <TeamLogo 
+                        logo={team.logo} 
+                        flag={team.flag} 
+                        name={team.team}
+                        className="w-8 h-8"
+                      />
                       <p className="font-semibold">{team.team}</p>
                     </div>
                     <Badge variant="outline">{team.playersCount} Players</Badge>
@@ -159,7 +166,12 @@ export default function ViewerDashboard({
             <>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-3 text-2xl">
-                  {selectedTeam.flag && <span className="text-3xl">{selectedTeam.flag}</span>}
+                  <TeamLogo 
+                    logo={selectedTeam.logo} 
+                    flag={selectedTeam.flag} 
+                    name={selectedTeam.team}
+                    className="w-10 h-10"
+                  />
                   <span>{selectedTeam.team} - Players</span>
                 </DialogTitle>
               </DialogHeader>

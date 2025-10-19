@@ -7,6 +7,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Sparkles } from "lucide-react";
 import Fireworks from "./Fireworks";
+import TeamLogo from "./TeamLogo";
 
 interface CelebrationPopupProps {
   open: boolean;
@@ -14,6 +15,7 @@ interface CelebrationPopupProps {
   playerName: string;
   teamName: string;
   teamFlag: string;
+  teamLogo?: string;
   soldPrice: number;
   grade: string;
 }
@@ -24,6 +26,7 @@ export default function CelebrationPopup({
   playerName,
   teamName,
   teamFlag,
+  teamLogo,
   soldPrice,
   grade,
 }: CelebrationPopupProps) {
@@ -57,7 +60,12 @@ export default function CelebrationPopup({
               </h3>
               <p className="text-muted-foreground text-lg">SOLD TO</p>
               <div className="flex items-center justify-center gap-3">
-                <span className="text-4xl">{teamFlag}</span>
+                <TeamLogo 
+                  logo={teamLogo} 
+                  flag={teamFlag} 
+                  name={teamName}
+                  className="w-16 h-16"
+                />
                 <h4 className="text-2xl font-bold text-primary" data-testid="text-team-name">
                   {teamName}
                 </h4>

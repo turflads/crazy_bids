@@ -11,10 +11,12 @@ import {
 } from "@/components/ui/dialog";
 import { Search, Trophy, Users, Gavel } from "lucide-react";
 import PlayerCard from "./PlayerCard";
+import TeamLogo from "./TeamLogo";
 
 interface TeamData {
   team: string;
   flag?: string;
+  logo?: string;
   playersCount: number;
   purseUsed: number;
   purseRemaining: number;
@@ -113,7 +115,12 @@ export default function OwnerDashboard({
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {team.flag && <span className="text-2xl">{team.flag}</span>}
+                    <TeamLogo 
+                      logo={team.logo} 
+                      flag={team.flag} 
+                      name={team.team}
+                      className="w-8 h-8"
+                    />
                     <span className="text-sm">{team.team}</span>
                   </div>
                   <Badge variant="outline" className="gap-1">
@@ -220,7 +227,12 @@ export default function OwnerDashboard({
             <>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-3 text-2xl">
-                  {selectedTeam.flag && <span className="text-3xl">{selectedTeam.flag}</span>}
+                  <TeamLogo 
+                    logo={selectedTeam.logo} 
+                    flag={selectedTeam.flag} 
+                    name={selectedTeam.team}
+                    className="w-10 h-10"
+                  />
                   <span>{selectedTeam.team} - Players</span>
                 </DialogTitle>
               </DialogHeader>

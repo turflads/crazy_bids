@@ -10,15 +10,18 @@ import { Play, Pause, RotateCcw, Users } from "lucide-react";
 import AuctionControls from "./AuctionControls";
 import PlayerCard from "./PlayerCard";
 import TeamOverviewCard from "./TeamOverviewCard";
+import TeamLogo from "./TeamLogo";
 
 interface Team {
   name: string;
   flag?: string;
+  logo?: string;
 }
 
 interface TeamData {
   name: string;
   flag?: string;
+  logo?: string;
   playersCount: number;
   purseUsed: number;
   purseRemaining: number;
@@ -153,7 +156,12 @@ export default function AdminDashboard({
             <>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-3 text-2xl">
-                  {selectedTeam.flag && <span className="text-3xl">{selectedTeam.flag}</span>}
+                  <TeamLogo 
+                    logo={selectedTeam.logo} 
+                    flag={selectedTeam.flag} 
+                    name={selectedTeam.name}
+                    className="w-10 h-10"
+                  />
                   <span>{selectedTeam.name} - Players</span>
                 </DialogTitle>
               </DialogHeader>

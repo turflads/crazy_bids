@@ -17,6 +17,7 @@ export default function Admin() {
     playerName: string;
     teamName: string;
     teamFlag: string;
+    teamLogo?: string;
     soldPrice: number;
     grade: string;
   } | null>(null);
@@ -285,7 +286,7 @@ export default function Admin() {
           // Update team state
           updateTeamAfterPurchase(soldTeam, currentPlayer, soldPrice);
           
-          // Find team flag
+          // Find team data
           const team = teams.find(t => t.name === soldTeam);
           
           // Show celebration popup
@@ -294,6 +295,7 @@ export default function Admin() {
             playerName: `${currentPlayer.firstName} ${currentPlayer.lastName}`,
             teamName: soldTeam,
             teamFlag: team?.flag || '🏆',
+            teamLogo: team?.logo,
             soldPrice: soldPrice,
             grade: currentPlayer.grade,
           });
@@ -359,6 +361,7 @@ export default function Admin() {
           playerName={celebrationData.playerName}
           teamName={celebrationData.teamName}
           teamFlag={celebrationData.teamFlag}
+          teamLogo={celebrationData.teamLogo}
           soldPrice={celebrationData.soldPrice}
           grade={celebrationData.grade}
         />
