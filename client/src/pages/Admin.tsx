@@ -3,8 +3,9 @@ import { useLocation } from "wouter";
 import NavBar from "@/components/NavBar";
 import AdminDashboard from "@/components/AdminDashboard";
 import CelebrationPopup from "@/components/CelebrationPopup";
-import { getAuctionState, saveAuctionState, initializeAuctionState, clearAuctionState } from "@/lib/auctionState";
+import { getAuctionState, initializeAuctionState, clearAuctionState } from "@/lib/auctionState";
 import { initializeTeams, updateTeamAfterPurchase, clearTeamState, getTeamState } from "@/lib/teamState";
+import { saveAuctionStateWithBroadcast } from "@/lib/webSocketState";
 import { loadPlayersFromExcel } from "@/lib/playerLoader";
 import { loadAuctionConfig, type Team } from "@/lib/auctionConfig";
 import { calculateMaxBidSync } from "@/lib/maxBidCalculator";
@@ -99,10 +100,10 @@ export default function Admin() {
     return () => clearInterval(interval);
   }, []);
 
-  // Save auction state whenever it changes
+  // Save auction state whenever it changes and broadcast via WebSocket
   useEffect(() => {
     if (players.length > 0) {
-      saveAuctionState({
+      saveAuctionStateWithBroadcast({
         currentPlayerIndex,
         currentBid,
         isAuctionActive,
