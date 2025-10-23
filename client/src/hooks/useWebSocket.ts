@@ -24,6 +24,32 @@ export function useWebSocket() {
       ws.onopen = () => {
         console.log('WebSocket connected');
         setIsConnected(true);
+        
+        // On reconnect, push current state to server to repopulate cache
+        // This handles server restarts where cache is empty
+        if (reconnectTimeoutRef.current) {
+          // This was a reconnection (not initial connection)
+          import('../lib/auctionState').then(auctionModule => {
+            import('../lib/teamState').then(teamModule => {
+              const currentAuctionState = auctionModule.getAuctionState();
+              const currentTeamState = teamModule.getTeamState();
+              
+              // Push to server to repopulate cache after restart
+              Promise.all([
+                fetch('/api/auction-state', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(currentAuctionState),
+                }).catch(() => {}),
+                fetch('/api/team-state', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(currentTeamState),
+                }).catch(() => {}),
+              ]);
+            });
+          });
+        }
       };
 
       ws.onmessage = (event) => {
