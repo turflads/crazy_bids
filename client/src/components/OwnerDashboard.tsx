@@ -69,9 +69,9 @@ export default function OwnerDashboard({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex gap-6">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
               {/* Player Image */}
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 mx-auto sm:mx-0">
                 <div className="w-32 h-32 rounded-lg overflow-hidden bg-muted relative">
                   {currentPlayer.image ? (
                     <img 
@@ -91,9 +91,9 @@ export default function OwnerDashboard({
               </div>
 
               {/* Player Info and Stats */}
-              <div className="flex-1 space-y-3">
+              <div className="flex-1 space-y-3 min-w-0">
                 <div>
-                  <h3 className="text-2xl font-bold" data-testid="text-current-player-name">
+                  <h3 className="text-xl sm:text-2xl font-bold break-words" data-testid="text-current-player-name">
                     {currentPlayer.firstName} {currentPlayer.lastName}
                   </h3>
                   <p className="text-sm text-muted-foreground">
@@ -125,7 +125,7 @@ export default function OwnerDashboard({
                     )}
 
                     {/* Performance Stats */}
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       {currentPlayer.runs !== undefined && (
                         <div className="bg-muted/50 rounded p-2">
                           <p className="text-xs text-muted-foreground">Runs</p>
@@ -164,13 +164,13 @@ export default function OwnerDashboard({
               </div>
 
               {/* Current Bid Info */}
-              <div className="text-right flex-shrink-0">
+              <div className="text-center sm:text-right flex-shrink-0">
                 <p className="text-sm text-muted-foreground mb-1">Current Bid</p>
-                <p className="text-3xl font-bold font-mono text-primary" data-testid="text-current-bid">
+                <p className="text-2xl sm:text-3xl font-bold font-mono text-primary break-all" data-testid="text-current-bid">
                   ₹{currentBid?.toLocaleString()}
                 </p>
                 {currentPlayer.lastBidTeam && (
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm text-muted-foreground mt-1 truncate">
                     by {currentPlayer.lastBidTeam}
                   </p>
                 )}
@@ -194,17 +194,17 @@ export default function OwnerDashboard({
               onClick={() => setSelectedTeam(team)}
             >
               <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                <CardTitle className="text-base flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
                     <TeamLogo 
                       logo={team.logo} 
                       flag={team.flag} 
                       name={team.team}
-                      className="w-8 h-8"
+                      className="w-8 h-8 flex-shrink-0"
                     />
-                    <span className="text-sm">{team.team}</span>
+                    <span className="text-sm truncate">{team.team}</span>
                   </div>
-                  <Badge variant="outline" className="gap-1">
+                  <Badge variant="outline" className="gap-1 flex-shrink-0">
                     <Users className="w-3 h-3" />
                     {team.playersCount}
                   </Badge>
@@ -254,14 +254,15 @@ export default function OwnerDashboard({
       </div>
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-lg">
-          <TabsTrigger value="all" data-testid="tab-all-players">
-            All Players ({allPlayers.length})
+        <TabsList className="grid w-full grid-cols-3 max-w-2xl">
+          <TabsTrigger value="all" data-testid="tab-all-players" className="text-xs sm:text-sm">
+            <span className="hidden sm:inline">All Players</span>
+            <span className="sm:hidden">All</span> ({allPlayers.length})
           </TabsTrigger>
-          <TabsTrigger value="sold" data-testid="tab-sold">
+          <TabsTrigger value="sold" data-testid="tab-sold" className="text-xs sm:text-sm">
             Sold ({soldPlayers.length})
           </TabsTrigger>
-          <TabsTrigger value="unsold" data-testid="tab-unsold">
+          <TabsTrigger value="unsold" data-testid="tab-unsold" className="text-xs sm:text-sm">
             Unsold ({unsoldPlayers.length})
           </TabsTrigger>
         </TabsList>
