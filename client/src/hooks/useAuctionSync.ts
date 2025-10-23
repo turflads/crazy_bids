@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import { getAuctionState } from '@/lib/auctionState';
-import { getTeamState } from '@/lib/teamState';
-import { useWebSocket } from './useWebSocket';
+import { getAuctionState, saveAuctionState } from '@/lib/auctionState';
+import { getTeamState, saveTeamState } from '@/lib/teamState';
+import { useWebSocketContext } from '@/contexts/WebSocketContext';
 
 // Custom hook to sync auction state across all pages using WebSocket
 export function useAuctionSync() {
   const [auctionState, setAuctionState] = useState(getAuctionState());
   const [teamState, setTeamState] = useState(getTeamState());
   const [lastUpdate, setLastUpdate] = useState(Date.now());
-  const { lastMessage, isConnected } = useWebSocket();
+  
+  // Use shared WebSocket context instead of creating duplicate connections
+  const { lastMessage, isConnected } = useWebSocketContext();
 
   useEffect(() => {
     // Sync on storage events (when another tab/window updates localStorage directly)
@@ -36,16 +38,36 @@ export function useAuctionSync() {
     };
   }, []);
 
-  // Listen for WebSocket messages and update state
+  // Listen for WebSocket messages and update state from payload
   useEffect(() => {
-    if (lastMessage) {
-      if (lastMessage.type === 'auction_update' || lastMessage.type === 'team_update') {
-        setAuctionState(getAuctionState());
-        setTeamState(getTeamState());
+    if (lastMessage && lastMessage.data) {
+      if (lastMessage.type === 'auction_update') {
+        // Save the received auction state to localStorage
+        saveAuctionState(lastMessage.data);
+        setAuctionState(lastMessage.data);
+        setLastUpdate(Date.now());
+      } else if (lastMessage.type === 'team_update') {
+        // Save the received team state to localStorage
+        saveTeamState(lastMessage.data);
+        setTeamState(lastMessage.data);
         setLastUpdate(Date.now());
       }
     }
   }, [lastMessage]);
+
+  // Fallback polling when WebSocket is disconnected
+  useEffect(() => {
+    if (!isConnected) {
+      // Poll every 5 seconds when WebSocket is disconnected
+      const interval = setInterval(() => {
+        setAuctionState(getAuctionState());
+        setTeamState(getTeamState());
+        setLastUpdate(Date.now());
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isConnected]);
 
   return { auctionState, teamState, lastUpdate, isConnected };
 }

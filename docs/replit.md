@@ -6,6 +6,16 @@ This is a real-time cricket player auction platform that enables live bidding on
 
 ## Recent Changes (October 23, 2025)
 
+**WebSocket Real-Time Communication** ✅
+- Implemented WebSocket support for instant auction updates across all users
+- Replaced 2-second polling with true real-time WebSocket broadcasting
+- WebSocket server runs on `/ws` path alongside HTTP server
+- All auction state and team changes broadcast instantly to connected clients
+- Automatic reconnection with 3-second retry on connection loss
+- Falls back to localStorage sync for cross-tab communication
+- WebSocketProvider wraps the entire app for global WebSocket access
+- Backward compatible: keeps localStorage as source of truth
+
 **League Branding Configuration** ✅
 - Created centralized league configuration file at `client/src/config/leagueConfig.ts`
 - Changed default league name from "Cricket Auction" to "TLPL S4"
@@ -108,21 +118,26 @@ Preferred communication style: Simple, everyday language.
 
 **State Management Strategy**
 - TanStack Query (React Query) for server state and caching
-- LocalStorage-based state synchronization for cross-tab/window updates
-- Custom hooks (`useAuctionSync`) for polling and real-time state updates
+- **WebSocket-based real-time synchronization** for instant auction updates across all connected clients
+- LocalStorage as source of truth with WebSocket broadcasting for cross-device sync
+- Custom hooks (`useAuctionSync`) using WebSocket messages instead of polling
+- `useWebSocket` hook manages WebSocket connection with auto-reconnect
 - Separate state modules: `auctionState.ts` for auction flow, `teamState.ts` for team purses/players
+- Broadcast wrapper functions (`saveAuctionStateWithBroadcast`, `saveTeamStateWithBroadcast`) automatically notify all clients
 
-**Rationale**: LocalStorage with polling was chosen over WebSockets for simplicity and compatibility with serverless deployments. The 2-second polling interval balances real-time updates with performance.
+**Architecture**: WebSocket broadcasts state changes instantly to all connected users while localStorage ensures persistence and cross-tab compatibility. The WebSocket connection auto-reconnects after failures and gracefully falls back to storage events when WebSocket is unavailable.
 
 ### Backend Architecture
 
 **Server Framework**
 - Express.js for HTTP server and API routing
+- **WebSocket Server** on `/ws` path for real-time bidirectional communication
 - TypeScript with ES modules for modern JavaScript features
 - Custom middleware for request logging and error handling
+- WebSocket message broadcasting to all connected clients except sender
 
 **Development vs Production**
-- Vite dev middleware in development for HMR and SSR
+- Vite dev middleware in development for HMR and SSR (uses separate WebSocket path)
 - Static file serving in production from compiled assets
 - Environment-based configuration via NODE_ENV
 

@@ -4,26 +4,29 @@ import { setWebSocketBroadcaster } from '@/lib/webSocketState';
 
 interface WebSocketContextType {
   isConnected: boolean;
-  broadcastAuctionUpdate: () => void;
-  broadcastTeamUpdate: () => void;
+  lastMessage: any;
+  broadcastAuctionUpdate: (data: any) => void;
+  broadcastTeamUpdate: (data: any) => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
 export function WebSocketProvider({ children }: { children: ReactNode }) {
-  const { isConnected, sendMessage } = useWebSocket();
+  const { isConnected, lastMessage, sendMessage } = useWebSocket();
 
-  const broadcastAuctionUpdate = () => {
+  const broadcastAuctionUpdate = (data: any) => {
     sendMessage({
       type: 'auction_update',
       timestamp: Date.now(),
+      data, // Include full auction state payload
     });
   };
 
-  const broadcastTeamUpdate = () => {
+  const broadcastTeamUpdate = (data: any) => {
     sendMessage({
       type: 'team_update',
       timestamp: Date.now(),
+      data, // Include full team state payload
     });
   };
 
@@ -36,7 +39,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <WebSocketContext.Provider value={{ isConnected, broadcastAuctionUpdate, broadcastTeamUpdate }}>
+    <WebSocketContext.Provider value={{ isConnected, lastMessage, broadcastAuctionUpdate, broadcastTeamUpdate }}>
       {children}
     </WebSocketContext.Provider>
   );

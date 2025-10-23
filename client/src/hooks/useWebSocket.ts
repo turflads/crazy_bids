@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 interface WebSocketMessage {
   type: 'auction_update' | 'team_update';
   timestamp: number;
+  data?: any; // Full state payload
 }
 
 export function useWebSocket() {
@@ -27,8 +28,8 @@ export function useWebSocket() {
 
       ws.onmessage = (event) => {
         try {
-          const data = JSON.parse(event.data);
-          setLastMessage(data);
+          const message = JSON.parse(event.data);
+          setLastMessage(message);
         } catch (error) {
           console.error('Failed to parse WebSocket message:', error);
         }
