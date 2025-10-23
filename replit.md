@@ -6,6 +6,19 @@ This is a real-time cricket player auction platform that enables live bidding on
 
 ## Recent Changes (October 23, 2025)
 
+**UI/UX Design Improvements** ✅
+- Fixed button text overflow issues across all components
+- Improved mobile responsiveness for all dashboards (Admin, Owner, Viewer)
+- Enhanced NavBar with responsive layout and mobile-optimized controls
+- Fixed team name truncation in cards to prevent text overflow
+- Improved auction control buttons with proper sizing and responsive grids
+- Enhanced dialog layouts with responsive grid columns for mobile devices
+- Added proper text wrapping and truncation for long team names
+- Improved tab layouts with mobile-friendly text sizing
+- Fixed stat display grids to be responsive (2 columns on mobile, 4 on desktop)
+- All interactive elements now properly sized with flex-shrink controls
+- Consistent spacing and alignment across all components
+
 **Bidding Validation System** ✅
 - Implemented comprehensive bid validation to prevent invalid bids
 - Teams cannot bid more than their remaining purse
