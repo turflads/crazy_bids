@@ -214,9 +214,53 @@ export default function Admin() {
           console.log('Auction paused');
         }}
         onBid={(team, amount) => {
-          // Store current state in history
           const currentPlayer = players[currentPlayerIndex];
           
+          // Validate bid
+          const teamStateData = teamState[team];
+          if (!teamStateData) {
+            alert(`Team "${team}" not found!`);
+            return;
+          }
+
+          // Check if team has already fulfilled their grade quota (BEFORE other checks)
+          const currentGradeCount = teamStateData.gradeCount[currentPlayer.grade] || 0;
+          const requiredGradeCount = gradeQuotas[currentPlayer.grade] || 0;
+          
+          if (requiredGradeCount > 0 && currentGradeCount >= requiredGradeCount) {
+            alert(`${team} has already fulfilled their Grade ${currentPlayer.grade} quota (${currentGradeCount}/${requiredGradeCount})!`);
+            return;
+          }
+
+          // Get team's current data
+          const remainingPurse = teamStateData.totalPurse - teamStateData.usedPurse;
+          
+          // Check if team has enough purse
+          if (amount > remainingPurse) {
+            alert(`${team} doesn't have enough purse!\nBid: ₹${amount.toLocaleString()}\nRemaining Purse: ₹${remainingPurse.toLocaleString()}`);
+            return;
+          }
+
+          // Calculate max bid for this team
+          const maxBid = calculateMaxBidSync(
+            {
+              totalPurse: teamStateData.totalPurse,
+              usedPurse: teamStateData.usedPurse,
+              gradeCount: teamStateData.gradeCount,
+              quotas: gradeQuotas,
+            },
+            currentPlayer.grade,
+            gradeBasePrices,
+            gradeQuotas
+          );
+
+          // Check if bid exceeds max allowed (considering reserve for remaining quotas)
+          if (amount > maxBid) {
+            alert(`${team} cannot bid this amount!\nMax Bid: ₹${maxBid.toLocaleString()}\nThis ensures you can fill all remaining grade quota requirements.`);
+            return;
+          }
+          
+          // Store current state in history
           if (hasBids) {
             setBidHistory([...bidHistory, {
               team: currentPlayer.lastBidTeam || '',

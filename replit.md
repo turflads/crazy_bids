@@ -4,7 +4,27 @@
 
 This is a real-time cricket player auction platform that enables live bidding on players across multiple teams. The application features role-based access control (Admin, Owner, Viewer), grade-based player acquisition with quota tracking, and synchronized auction state management. Built with React, Express, and PostgreSQL, it provides a sports-themed interface inspired by platforms like ESPN and FanDuel.
 
-## Recent Changes (October 19, 2025)
+## Recent Changes (October 23, 2025)
+
+**Bidding Validation System** ✅
+- Implemented comprehensive bid validation to prevent invalid bids
+- Teams cannot bid more than their remaining purse
+- Teams cannot bid more than their calculated max bid (which reserves funds for unfulfilled grade quotas)
+- Teams cannot bid if they've already fulfilled their grade quota for that player's grade
+- Clear error messages explain why bids are rejected:
+  - "Doesn't have enough purse!" with bid amount vs remaining purse
+  - "Cannot bid this amount! Max Bid: ₹X" when exceeding calculated max
+  - "Already fulfilled Grade X quota" when quota is met
+- Validation occurs in real-time before bid is accepted
+- Invalid bids do not change auction state
+
+**Player Stats Display Optimization** ✅
+- Owner page now shows player stats ONLY in Current Auction section
+- Player list cards (All Players, Sold, Unsold tabs) no longer show stats to reduce clutter
+- PlayerCard component has `showStats` prop for conditional stats rendering
+- Admin and Viewer pages continue to show stats in player cards
+
+## Previous Changes (October 19, 2025)
 
 **Team Logo System Implementation**
 - Replaced all emoji flags with actual team logo images throughout the application
