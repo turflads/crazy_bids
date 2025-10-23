@@ -85,6 +85,34 @@ export default function Admin() {
     }
   }, [teams]);
 
+  // Push current state to server on mount to populate server-side cache
+  useEffect(() => {
+    const syncStateToServer = async () => {
+      const currentAuctionState = getAuctionState();
+      const currentTeamState = getTeamState();
+      
+      try {
+        await Promise.all([
+          fetch('/api/auction-state', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentAuctionState),
+          }),
+          fetch('/api/team-state', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentTeamState),
+          }),
+        ]);
+      } catch (err) {
+        console.error('Failed to sync state to server:', err);
+      }
+    };
+    
+    // Sync after a short delay to ensure state is initialized
+    setTimeout(syncStateToServer, 1000);
+  }, []);
+
   // Refresh config periodically to sync team changes from config.json
   useEffect(() => {
     const refreshConfig = async () => {

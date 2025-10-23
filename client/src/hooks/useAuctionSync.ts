@@ -14,15 +14,23 @@ async function fetchServerState() {
     const auctionData = await auctionRes.json();
     const teamData = await teamRes.json();
     
-    // Update localStorage with server state
-    if (auctionData && Object.keys(auctionData).length > 0) {
+    // Guard: Only update localStorage with server state if it's not empty
+    // This prevents overwriting existing local state when server cache is empty
+    const hasAuctionData = auctionData && Object.keys(auctionData).length > 0 && auctionData.players;
+    const hasTeamData = teamData && Object.keys(teamData).length > 0;
+    
+    if (hasAuctionData) {
       saveAuctionState(auctionData);
     }
-    if (teamData && Object.keys(teamData).length > 0) {
+    if (hasTeamData) {
       saveTeamState(teamData);
     }
     
-    return { auctionData, teamData };
+    // Return current state (from localStorage if server was empty)
+    return {
+      auctionData: hasAuctionData ? auctionData : getAuctionState(),
+      teamData: hasTeamData ? teamData : getTeamState(),
+    };
   } catch (error) {
     console.error('Failed to fetch state from server:', error);
     return null;
