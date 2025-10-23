@@ -11,6 +11,7 @@ export function useWebSocket() {
   const [lastMessage, setLastMessage] = useState<WebSocketMessage | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasConnectedOnceRef = useRef(false);
 
   const connect = () => {
     try {
@@ -25,31 +26,44 @@ export function useWebSocket() {
         console.log('WebSocket connected');
         setIsConnected(true);
         
-        // On reconnect, push current state to server to repopulate cache
-        // This handles server restarts where cache is empty
-        if (reconnectTimeoutRef.current) {
+        // On reconnect, only ADMIN pushes current state to server
+        // This prevents stale clients from overwriting fresh server state
+        if (hasConnectedOnceRef.current) {
           // This was a reconnection (not initial connection)
-          import('../lib/auctionState').then(auctionModule => {
-            import('../lib/teamState').then(teamModule => {
-              const currentAuctionState = auctionModule.getAuctionState();
-              const currentTeamState = teamModule.getTeamState();
-              
-              // Push to server to repopulate cache after restart
-              Promise.all([
-                fetch('/api/auction-state', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(currentAuctionState),
-                }).catch(() => {}),
-                fetch('/api/team-state', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(currentTeamState),
-                }).catch(() => {}),
-              ]);
-            });
-          });
+          // Only admin is authoritative source for repopulating server cache
+          const storedUser = localStorage.getItem("user");
+          if (storedUser) {
+            try {
+              const userData = JSON.parse(storedUser);
+              if (userData.role === "admin") {
+                console.log('WebSocket reconnected (Admin) - pushing state to server');
+                import('../lib/auctionState').then(auctionModule => {
+                  import('../lib/teamState').then(teamModule => {
+                    const currentAuctionState = auctionModule.getAuctionState();
+                    const currentTeamState = teamModule.getTeamState();
+                    
+                    // Push to server to repopulate cache after restart
+                    Promise.all([
+                      fetch('/api/auction-state', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(currentAuctionState),
+                      }).catch(() => {}),
+                      fetch('/api/team-state', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(currentTeamState),
+                      }).catch(() => {}),
+                    ]);
+                  });
+                });
+              }
+            } catch (e) {
+              console.error('Error parsing user data:', e);
+            }
+          }
         }
+        hasConnectedOnceRef.current = true;
       };
 
       ws.onmessage = (event) => {
