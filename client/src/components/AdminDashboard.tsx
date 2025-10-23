@@ -81,24 +81,24 @@ export default function AdminDashboard({
     <div className="p-6 space-y-6">
       <div className="space-y-6">
         <div className="flex items-center justify-between gap-4 flex-wrap">
-          <h2 className="text-2xl font-bold">Auction Control Panel</h2>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
+          <h2 className="text-xl sm:text-2xl font-bold">Auction Control Panel</h2>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
               Player {currentPlayerIndex + 1} of {players.length}
             </span>
-            <Button onClick={onResetAuction} variant="outline" data-testid="button-reset-auction">
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Reset
+            <Button onClick={onResetAuction} variant="outline" size="sm" data-testid="button-reset-auction">
+              <RotateCcw className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Reset</span>
             </Button>
             {isAuctionActive ? (
-              <Button onClick={onPauseAuction} variant="outline" data-testid="button-pause-auction">
-                <Pause className="w-4 h-4 mr-2" />
-                Pause
+              <Button onClick={onPauseAuction} variant="outline" size="sm" data-testid="button-pause-auction">
+                <Pause className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Pause</span>
               </Button>
             ) : (
-              <Button onClick={onStartAuction} data-testid="button-start-auction">
-                <Play className="w-4 h-4 mr-2" />
-                Start
+              <Button onClick={onStartAuction} size="sm" data-testid="button-start-auction">
+                <Play className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Start</span>
               </Button>
             )}
           </div>
@@ -156,31 +156,31 @@ export default function AdminDashboard({
           {selectedTeam && (
             <>
               <DialogHeader>
-                <DialogTitle className="flex items-center gap-3 text-2xl">
+                <DialogTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-2xl">
                   <TeamLogo 
                     logo={selectedTeam.logo} 
                     flag={selectedTeam.flag} 
                     name={selectedTeam.name}
-                    className="w-10 h-10"
+                    className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0"
                   />
-                  <span>{selectedTeam.name} - Players</span>
+                  <span className="truncate">{selectedTeam.name} - Players</span>
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
                   <div>
                     <p className="text-sm text-muted-foreground">Total Players</p>
-                    <p className="text-2xl font-bold">{selectedTeam.playersCount}</p>
+                    <p className="text-xl sm:text-2xl font-bold">{selectedTeam.playersCount}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Purse Used</p>
-                    <p className="text-2xl font-bold font-mono text-destructive">
+                    <p className="text-xl sm:text-2xl font-bold font-mono text-destructive break-all">
                       ₹{selectedTeam.purseUsed.toLocaleString()}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Purse Remaining</p>
-                    <p className="text-2xl font-bold font-mono text-auction-sold">
+                    <p className="text-xl sm:text-2xl font-bold font-mono text-auction-sold break-all">
                       ₹{selectedTeam.purseRemaining.toLocaleString()}
                     </p>
                   </div>
