@@ -1,64 +1,8 @@
-# Cricket Player Auction Web Application
+# Cricket Player Auction Platform
 
 ## Overview
 
-This is a real-time cricket player auction platform that enables live bidding on players across multiple teams. The application features role-based access control (Admin, Owner, Viewer), grade-based player acquisition with quota tracking, and synchronized auction state management. Built with React, Express, and PostgreSQL, it provides a sports-themed interface inspired by platforms like ESPN and FanDuel.
-
-## Recent Changes (October 23, 2025)
-
-**Bidding Validation System** ✅
-- Implemented comprehensive bid validation to prevent invalid bids
-- Teams cannot bid more than their remaining purse
-- Teams cannot bid more than their calculated max bid (which reserves funds for unfulfilled grade quotas)
-- Teams cannot bid if they've already fulfilled their grade quota for that player's grade
-- Clear error messages explain why bids are rejected:
-  - "Doesn't have enough purse!" with bid amount vs remaining purse
-  - "Cannot bid this amount! Max Bid: ₹X" when exceeding calculated max
-  - "Already fulfilled Grade X quota" when quota is met
-- Validation occurs in real-time before bid is accepted
-- Invalid bids do not change auction state
-
-**Player Stats Display Optimization** ✅
-- Owner page now shows player stats ONLY in Current Auction section
-- Player list cards (All Players, Sold, Unsold tabs) no longer show stats to reduce clutter
-- PlayerCard component has `showStats` prop for conditional stats rendering
-- Admin and Viewer pages continue to show stats in player cards
-
-## Previous Changes (October 19, 2025)
-
-**Team Logo System Implementation**
-- Replaced all emoji flags with actual team logo images throughout the application
-- Created TeamLogo component with automatic fallback to emoji if image fails to load
-- Updated all dashboards (Admin, Owner, Viewer) to display team logos
-- Team logos stored in `client/public/images/` and configured in `config.json`
-- Logos appear in: team cards, bid buttons, celebration popup, team dialogs, and dropdowns
-
-**Auction State Persistence Fixes**
-- Fixed critical bug where page refresh would restart auction from first player
-- Fixed critical bug where logout/login would reset auction state
-- Enhanced auction state to include bidHistory and hasBids for complete state restoration
-- Auction now correctly persists across page refreshes and login/logout cycles
-- Only the "Reset" button now clears and restarts the auction
-- All auction state stored in localStorage ('cricket_auction_state' key)
-
-**Celebration Fireworks Enhancement**
-- Celebration popup with fireworks animation now appears on ALL pages (Admin, Owner, Viewer)
-- Auto-dismisses after 5 seconds
-- Shows player name, team logo, team name, and final sold price
-- Next player automatically appears after celebration closes
-- Works seamlessly when multiple tabs are open on the same browser
-- Note: For celebrations to sync across different devices/browsers, users would need to be viewing the same browser instance (different tabs)
-
-**Player Statistics Feature**
-- Player cards now support displaying comprehensive player statistics
-- Two implementation scenarios:
-  - **Scenario A (Excel Stats)**: Read stats directly from Excel columns (bat, bowl, runs, wickets, strike_rate, bowling_avg)
-  - **Scenario B (CricHeroes Link)**: Store CricHeroes profile link and show "View Profile" button
-  - **Mixed Approach**: Use both Excel stats AND CricHeroes link together
-- Stats display automatically when data is available in Excel
-- Column names are case-insensitive (bat/Bat, runs/Runs, etc.)
-- Stats section appears with batting/bowling styles and performance metrics (runs, wickets, strike rate, bowling average)
-- Detailed setup instructions in `PLAYER_STATS_GUIDE.md`
+This is a real-time cricket player auction web application that enables live bidding on players across multiple teams. The platform features role-based access control (Admin, Owner, Viewer), grade-based player categorization (A, B, C), and comprehensive team management with purse tracking and quota enforcement. Built with React, TypeScript, Express, and configured for PostgreSQL with Drizzle ORM, the system supports Excel-based player data import and provides real-time auction state synchronization across multiple browser tabs.
 
 ## User Preferences
 
@@ -68,124 +12,108 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 
-**Framework & Routing**
+**Technology Stack:**
 - React 18 with TypeScript for type-safe component development
-- Wouter for client-side routing (lightweight alternative to React Router)
 - Vite as the build tool and development server
+- Wouter for client-side routing (lightweight alternative to React Router)
+- TanStack Query for server state management
+- shadcn/ui component library with Radix UI primitives
+- Tailwind CSS for styling with custom design system
 
-**UI Component System**
-- Radix UI primitives for accessible, unstyled components
-- Shadcn/ui design system with customized "new-york" style variant
-- Tailwind CSS for utility-first styling with dark mode support
-- Custom color system with grade-specific colors (A: purple, B: blue, C: orange)
-- Typography: Inter for UI/headings, JetBrains Mono for numeric data
+**Design System:**
+- Dark mode primary with sports platform aesthetic
+- Custom color palette for grades (A: purple, B: blue, C: orange)
+- Typography using Inter for UI and JetBrains Mono for numeric data
+- Consistent spacing and elevation system through Tailwind utilities
 
-**State Management Strategy**
-- TanStack Query (React Query) for server state and caching
-- LocalStorage-based state synchronization for cross-tab/window updates
-- Custom hooks (`useAuctionSync`) for polling and real-time state updates
-- Separate state modules: `auctionState.ts` for auction flow, `teamState.ts` for team purses/players
+**State Management Strategy:**
+- LocalStorage-based persistence for auction state and team data
+- Custom hooks (`useAuctionSync`) for cross-tab synchronization
+- Polling mechanism (2-second intervals) plus storage event listeners
+- Separate state modules: `auctionState.ts` for auction flow, `teamState.ts` for team data
 
-**Rationale**: LocalStorage with polling was chosen over WebSockets for simplicity and compatibility with serverless deployments. The 2-second polling interval balances real-time updates with performance.
+**Role-Based Pages:**
+- Admin: Full auction control, bidding interface, player management
+- Owner: View-only dashboard with team standings and auction status
+- Viewer: Public-facing view of current auction and recent sales
+
+**Key UI Patterns:**
+- Celebration popup with fireworks animation on player sale
+- Real-time bid validation with clear error messaging
+- Excel drag-and-drop upload for player data
+- Grade-based quota tracking with visual progress indicators
 
 ### Backend Architecture
 
-**Server Framework**
-- Express.js for HTTP server and API routing
-- TypeScript with ES modules for modern JavaScript features
-- Custom middleware for request logging and error handling
+**Server Framework:**
+- Express.js with TypeScript
+- Minimal API surface (currently using in-memory storage)
+- Session management ready via `connect-pg-simple` (PostgreSQL session store)
+- Vite middleware integration for development HMR
 
-**Development vs Production**
-- Vite dev middleware in development for HMR and SSR
-- Static file serving in production from compiled assets
-- Environment-based configuration via NODE_ENV
+**Database Design:**
+- Drizzle ORM configured for PostgreSQL dialect
+- Schema location: `shared/schema.ts` for isomorphic access
+- Migration output: `./migrations` directory
+- Currently implements basic user table with UUID primary keys
 
-**Storage Layer**
-- In-memory storage implementation (`MemStorage`) as default
-- Interface-based design (`IStorage`) allows swapping to database persistence
-- Currently implements basic user CRUD operations
+**Authentication Approach:**
+- Client-side credential validation (hardcoded in `Login.tsx`)
+- LocalStorage-based session persistence
+- Role stored with user session: admin, owner, viewer
+- Ready for server-side session migration
 
-**Rationale**: The in-memory storage provides a simple starting point. The interface abstraction means you can later swap to PostgreSQL/Drizzle without changing route logic.
+**Data Flow:**
+- Players loaded from Excel file using XLSX library
+- Configuration loaded from `client/public/config.json`
+- Auction state synchronized via LocalStorage across clients
+- No current API endpoints (storage interface defined but unused)
 
-### Database Architecture
+### External Dependencies
 
-**ORM & Schema**
-- Drizzle ORM configured for PostgreSQL
-- Schema definition in `shared/schema.ts` for code sharing between client/server
-- Zod integration for runtime validation via `drizzle-zod`
-- Migration support through `drizzle-kit`
+**Core Libraries:**
+- `@neondatabase/serverless`: PostgreSQL driver for Neon database
+- `drizzle-orm` + `drizzle-kit`: TypeScript ORM and schema management
+- `xlsx`: Excel file parsing for player data import
+- `express`: Node.js web server framework
 
-**Current Schema**
-- Users table with UUID primary keys, username/password fields
-- Schema uses `gen_random_uuid()` for automatic ID generation
+**UI Component Dependencies:**
+- `@radix-ui/*`: Headless UI primitives (dialog, dropdown, accordion, etc.)
+- `@tanstack/react-query`: Async state management
+- `@hookform/resolvers` + `zod`: Form validation
+- `class-variance-authority` + `clsx`: Dynamic className generation
 
-**Planned Extensions**
-- Players table (firstName, lastName, grade, basePrice, status, soldPrice, team)
-- Teams table (name, flag, totalPurse, usedPurse)
-- Auction history/events table for audit trail
+**Development Tools:**
+- `tsx`: TypeScript execution for development
+- `esbuild`: Production bundling
+- `vite`: Frontend build tool and dev server
+- `@replit/*` plugins: Runtime error overlay, cartographer, dev banner
 
-**Rationale**: Drizzle was selected for type-safe SQL queries and excellent TypeScript integration. The shared schema approach ensures consistent types across frontend and backend.
+**Asset Management:**
+- Team logos stored in `client/public/images/`
+- Player photos referenced by filename in Excel
+- Configuration via JSON file (`client/public/config.json`)
 
-### Authentication & Authorization
+**Key Configuration Files:**
+- `config.json`: Grade prices, increments, teams, quotas
+- `playerLoader.ts`: Excel column mapping configuration
+- `leagueConfig.ts`: League name customization
+- `auctionConfig.ts`: Runtime config loading and caching
 
-**Current Implementation**
-- Mock credential-based authentication in localStorage
-- Role-based routing: `/admin`, `/owner`, `/viewer`
-- Client-side role verification on page load
+**Third-Party Integrations:**
+- Optional CricHeroes profile links (external website)
+- Google Fonts: Inter and JetBrains Mono
+- No external APIs for auction functionality (fully self-contained)
 
-**Production Requirements**
-- Session-based authentication with `connect-pg-simple` (already installed)
-- Password hashing (bcrypt/argon2)
-- Secure session cookies with HTTP-only flag
-- CSRF protection for state-changing operations
+**Bidding Validation System:**
+- Client-side validation preventing invalid bids
+- Max bid calculation considers remaining purse and unfulfilled quotas
+- Grade quota enforcement (teams cannot bid if quota fulfilled)
+- Reserve fund calculation for required grade slots
+- Validation located in `maxBidCalculator.ts` and auction pages
 
-**Rationale**: Mock authentication provides rapid prototyping. The installed session middleware indicates planned server-side session management.
-
-### Real-Time Synchronization
-
-**Multi-Tab Sync Strategy**
-1. LocalStorage as shared state store
-2. Storage event listeners for cross-tab communication
-3. Window focus event triggers state refresh
-4. 2-second polling interval as fallback
-
-**State Updates Flow**
-- Admin updates auction → saves to localStorage
-- Other tabs/windows receive storage event → refresh state
-- All viewers/owners see updates within 2 seconds max
-
-**Rationale**: This approach works reliably without requiring WebSocket infrastructure, making deployment simpler while maintaining acceptable real-time performance for auction use cases.
-
-## External Dependencies
-
-### Core Libraries
-- **@tanstack/react-query** (v5.60.5) - Server state management and caching
-- **drizzle-orm** (v0.39.1) - Type-safe SQL ORM
-- **@neondatabase/serverless** (v0.10.4) - Neon PostgreSQL driver for serverless environments
-- **wouter** - Lightweight React routing
-- **zod** - Runtime type validation
-
-### UI Component Libraries
-- **@radix-ui/** packages - Accessible component primitives (dialog, dropdown, popover, etc.)
-- **class-variance-authority** - CSS variant management
-- **tailwindcss** - Utility-first CSS framework
-- **lucide-react** - Icon library
-
-### Forms & Validation
-- **react-hook-form** - Form state management
-- **@hookform/resolvers** - Validation resolver integration
-- **drizzle-zod** - Drizzle-to-Zod schema conversion
-
-### Development Tools
-- **vite** - Build tool and dev server
-- **typescript** - Type system
-- **tsx** - TypeScript execution for Node.js
-- **esbuild** - Production server bundling
-
-### Database & Sessions
-- **connect-pg-simple** - PostgreSQL session store for Express
-- **pg** - PostgreSQL client (peer dependency)
-
-### Fonts & Assets
-- **Google Fonts**: Inter (400, 500, 600, 700), JetBrains Mono (500, 600)
-- Custom CSS for fireworks celebration animation
+**State Persistence Strategy:**
+- Auction state persists across page refreshes and login/logout
+- Only "Reset" button clears auction state
+- Cross-tab synchronization via storage events and polling
+- Celebration state triggers across all open tabs in same browser

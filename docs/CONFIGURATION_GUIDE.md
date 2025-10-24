@@ -1,4 +1,4 @@
-# Cricket Auction - Configuration Guide
+# TLPL S4 - Configuration Guide
 
 This guide shows you how to configure user credentials and team logos for the auction system.
 
