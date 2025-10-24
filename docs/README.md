@@ -7,22 +7,22 @@ This folder contains all documentation files for the Cricket Player Auction appl
 ## 🚀 **[START HERE](START_HERE.md)** ← CONFUSED? CLICK THIS!
 
 **Not sure which guide to use?** The START_HERE guide will direct you to the right documentation based on:
-- Where you're deploying (Bolt.new, Azure, Other)
-- What you need to do (Deploy, Configure, Customize)
 - Your experience level (Beginner, Advanced)
+- What you need to do (Deploy, Configure, Customize)
+- Specific deployment scenario (First time, CI/CD, Custom domain)
 
 ---
 
 ## 📖 Documentation Categories
 
-### 1️⃣ Deployment Guides
+### 1️⃣ Azure Deployment Guides
 
 **Choose based on your needs:**
 
 | Document | Use When | Time |
 |----------|----------|------|
 | **[START_HERE.md](START_HERE.md)** | You're confused about where to start | 2 min |
-| **[QUICK_START_AZURE.md](QUICK_START_AZURE.md)** | First time deploying to Azure | 10 min |
+| **[QUICK_START_AZURE.md](QUICK_START_AZURE.md)** | First time deploying or want fast deployment | 10 min |
 | **[AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md)** | Need detailed Azure deployment guide | 30 min |
 | **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** | Pre-deployment verification | 5 min |
 
@@ -73,14 +73,15 @@ This folder contains all documentation files for the Cricket Player Auction appl
 
 ## 🎯 Recommended Reading Order
 
-### For First-Time Setup
-1. [START_HERE.md](START_HERE.md) - Figure out your deployment path
-2. [QUICK_START_AZURE.md](QUICK_START_AZURE.md) or Bolt.new deploy
-3. [HOW_TO_CHANGE_LEAGUE_NAME.md](HOW_TO_CHANGE_LEAGUE_NAME.md) - Customize branding
-4. [CONFIGURATION_GUIDE.md](CONFIGURATION_GUIDE.md) - Set up teams
-5. [EXCEL_COLUMN_CONFIG.md](EXCEL_COLUMN_CONFIG.md) - Import players
+### For First-Time Azure Deployment
+1. [START_HERE.md](START_HERE.md) - Choose your deployment path
+2. [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) - Verify readiness
+3. [QUICK_START_AZURE.md](QUICK_START_AZURE.md) - Deploy to Azure
+4. [HOW_TO_CHANGE_LEAGUE_NAME.md](HOW_TO_CHANGE_LEAGUE_NAME.md) - Customize branding
+5. [CONFIGURATION_GUIDE.md](CONFIGURATION_GUIDE.md) - Set up teams
+6. [EXCEL_COLUMN_CONFIG.md](EXCEL_COLUMN_CONFIG.md) - Import players
 
-### For Advanced Users
+### For Advanced Azure Deployment
 1. [AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md) - Full deployment options
 2. [replit.md](replit.md) - Understand the architecture
 3. [design_guidelines.md](design_guidelines.md) - Customize UI/UX
@@ -99,4 +100,4 @@ This folder contains all documentation files for the Cricket Player Auction appl
 
 ---
 
-**Ready to get started? Open [START_HERE.md](START_HERE.md) now! 🚀**
+**Ready to deploy to Azure? Open [START_HERE.md](START_HERE.md) now! 🚀**

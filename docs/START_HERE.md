@@ -1,163 +1,171 @@
-# 🚀 START HERE - Deployment Guide
+# 🚀 START HERE - Azure Deployment Guide
 
-**Confused about which deployment guide to use? This page will help!**
-
----
-
-## 📍 Where Are You Deploying?
-
-### ✅ Deploying to **Bolt.new**
-You're currently on **bolt.new** and want to deploy from there.
-
-**Follow this order:**
-
-1. **Option 1: Quick Deploy (Fastest)**
-   - Click "Deploy" button in bolt.new interface
-   - Get instant `.bolt.host` URL
-   - Good for: Testing, demos
-
-2. **Option 2: Netlify (Recommended for Production)**
-   - In bolt.new, click "Integrations"
-   - Connect to Netlify
-   - Click "Deploy to Netlify"
-   - Good for: Production with custom domain
-
-3. **Option 3: Download & Deploy Later**
-   - Download ZIP from bolt.new
-   - Follow Azure guide below
-   - Good for: Full control
-
-**What you need to know:**
-- ✅ No need to remove any files
-- ✅ App works as-is
-- ✅ WebSocket + polling fallback already built-in
+**Confused about which Azure deployment guide to use? This page will help!**
 
 ---
 
-### ✅ Deploying to **Azure**
-You want to deploy to Microsoft Azure App Service.
+## 📍 Deploying to Microsoft Azure
 
-**Follow this path:**
+Choose the guide that matches your needs:
 
-#### If you're new to Azure or want FAST deployment (10 minutes)
-📄 **Use: `QUICK_START_AZURE.md`**
-- Simple step-by-step guide
-- One command deployment
-- Custom domain setup included
+### ⚡ Quick Start (Recommended for Most Users)
 
-#### If you want DETAILED explanations and advanced options
-📄 **Use: `AZURE_DEPLOYMENT.md`**
-- Complete deployment guide
-- Multiple deployment methods
-- Troubleshooting section
-- GitHub Actions CI/CD setup
+**📄 Use: `QUICK_START_AZURE.md`**
 
-#### Before deploying to Azure
-📄 **Check: `DEPLOYMENT_CHECKLIST.md`**
-- Pre-deployment checklist
-- What to verify before going live
+**Perfect if you:**
+- Want to get your app live FAST (10 minutes)
+- Are deploying to Azure for the first time
+- Want simple, step-by-step instructions
+- Just need the essential commands
+
+**What's included:**
+- One-command deployment
+- Custom domain setup
+- SSL certificate configuration
+- Basic troubleshooting
 
 ---
 
-### ✅ Deploying to **Other Platforms** (Vercel, Render, Heroku, etc.)
-You want to deploy somewhere else.
+### 📚 Complete Guide (For Advanced Users)
 
-**General Steps:**
-1. Build the app: `npm run build`
-2. Deploy `dist/` folder to your platform
-3. Set startup command: `node dist/index.js`
-4. Set environment: `NODE_ENV=production`
+**📄 Use: `AZURE_DEPLOYMENT.md`**
 
-**Platform-Specific Notes:**
-- **Vercel**: Use `vercel.json` config (similar to Azure)
-- **Render**: Use `render.yaml` config
-- **Heroku**: Use `Procfile` with `web: node dist/index.js`
+**Perfect if you:**
+- Want detailed explanations of each step
+- Need multiple deployment methods
+- Want to set up GitHub Actions CI/CD
+- Need advanced troubleshooting options
+
+**What's included:**
+- Multiple deployment approaches
+- Detailed architecture explanation
+- GitHub Actions workflow setup
+- Comprehensive troubleshooting
+- Advanced configuration options
 
 ---
 
-## 🎯 Quick Decision Tree
+### ✅ Pre-Deployment Checklist
+
+**📄 Use: `DEPLOYMENT_CHECKLIST.md`**
+
+**Use this before deploying to verify:**
+- All configuration is correct
+- Login credentials are changed
+- Team logos are uploaded
+- Players are imported
+- Everything is ready for production
+
+---
+
+## 🎯 Quick Decision Guide
 
 ```
-Where are you deploying?
-│
-├─ Bolt.new → Click "Deploy" or use Netlify integration
-│
-├─ Azure (First time) → QUICK_START_AZURE.md
-│
-├─ Azure (Advanced) → AZURE_DEPLOYMENT.md
-│
-└─ Other Platform → Build locally, deploy dist/ folder
+┌─────────────────────────────────────┐
+│  Which guide should I use?          │
+└─────────────────────────────────────┘
+           │
+           ├─ First time deploying?
+           │  └─→ QUICK_START_AZURE.md
+           │
+           ├─ Want it done fast?
+           │  └─→ QUICK_START_AZURE.md
+           │
+           ├─ Need detailed explanations?
+           │  └─→ AZURE_DEPLOYMENT.md
+           │
+           ├─ Setting up CI/CD?
+           │  └─→ AZURE_DEPLOYMENT.md
+           │
+           └─ Ready to deploy?
+              └─→ DEPLOYMENT_CHECKLIST.md first,
+                  then QUICK_START_AZURE.md
 ```
 
 ---
 
-## 📋 Configuration Guides (After Deployment)
+## 📋 After Deployment: Configuration Guides
 
-**After your app is live**, customize it for your league:
+**Once your app is live on Azure**, customize it for your league:
 
-1. **Change League Name**
-   - 📄 See: `HOW_TO_CHANGE_LEAGUE_NAME.md`
-   - File: `client/src/config/leagueConfig.ts`
+### 1. Change League Name
+- 📄 **Guide**: `HOW_TO_CHANGE_LEAGUE_NAME.md`
+- 📁 **File**: `client/src/config/leagueConfig.ts`
+- 🎯 **Change**: "TLPL S4" → Your league name
 
-2. **Configure Teams, Quotas, Prices**
-   - 📄 See: `CONFIGURATION_GUIDE.md`
-   - File: `client/public/config.json`
+### 2. Configure Teams, Quotas, Prices
+- 📄 **Guide**: `CONFIGURATION_GUIDE.md`
+- 📁 **File**: `client/public/config.json`
+- 🎯 **Configure**: Teams, purse, grade quotas, base prices
 
-3. **Import Players from Excel**
-   - 📄 See: `EXCEL_COLUMN_CONFIG.md`
-   - File: `players.xlsx`
+### 3. Import Players from Excel
+- 📄 **Guide**: `EXCEL_COLUMN_CONFIG.md`
+- 📁 **File**: `players.xlsx`
+- 🎯 **Setup**: Column mapping, player data import
 
-4. **Add Player Statistics**
-   - 📄 See: `PLAYER_STATS_GUIDE.md`
-
----
-
-## ❓ Still Confused?
-
-### For Deployment
-- **Just want it live ASAP?** → `QUICK_START_AZURE.md` or Bolt.new deploy button
-- **Want to understand everything?** → `AZURE_DEPLOYMENT.md`
-- **Need a checklist?** → `DEPLOYMENT_CHECKLIST.md`
-
-### For Configuration
-- **Change league name?** → `HOW_TO_CHANGE_LEAGUE_NAME.md`
-- **Change teams/settings?** → `CONFIGURATION_GUIDE.md`
-- **Import players?** → `EXCEL_COLUMN_CONFIG.md`
+### 4. Add Player Statistics
+- 📄 **Guide**: `PLAYER_STATS_GUIDE.md`
+- 🎯 **Add**: Batting/bowling stats, strike rates, averages
 
 ---
 
-## 🎯 Recommended Path for Beginners
+## 🚀 Recommended Path for First-Time Deployment
+
+Follow this order for smooth deployment:
 
 ```
-1. Deploy first (Quick Start)
-   ↓
-2. Test with sample data
-   ↓
-3. Customize league name
-   ↓
-4. Configure teams
-   ↓
+1. Read DEPLOYMENT_CHECKLIST.md
+   └─ Verify everything is ready
+   
+2. Follow QUICK_START_AZURE.md
+   └─ Deploy your app (10 minutes)
+   
+3. Change league name
+   └─ HOW_TO_CHANGE_LEAGUE_NAME.md
+   
+4. Configure teams & settings
+   └─ CONFIGURATION_GUIDE.md
+   
 5. Import your players
-   ↓
-6. Go live!
+   └─ EXCEL_COLUMN_CONFIG.md
+   
+6. Test the auction
+   └─ Run a test auction with sample data
+   
+7. Go live!
+   └─ Ready for your actual auction
 ```
 
 ---
 
 ## 🆘 Common Questions
 
-**Q: Do I need to remove .replit or other files before deploying?**
-A: No! Deployment processes ignore Replit-specific files automatically.
+**Q: Do I need to remove .replit files before deploying to Azure?**
+**A:** No! Azure deployment ignores Replit-specific files automatically.
 
-**Q: Will my WebSocket real-time updates work on other platforms?**
-A: Yes! The app has built-in fallback mechanisms (polling) if WebSocket fails.
+**Q: Will WebSocket real-time updates work on Azure?**
+**A:** Yes! Azure App Service supports WebSockets. The app also has built-in polling fallback.
 
-**Q: Can I use this for multiple leagues?**
-A: Yes! Just change the configuration and deploy to different domains.
+**Q: Can I deploy this for multiple leagues?**
+**A:** Yes! Deploy to different Azure App Services with different configurations.
 
-**Q: How do I change passwords for production?**
-A: Edit `client/src/pages/Login.tsx` and change the default credentials before deploying.
+**Q: How do I change default passwords for production?**
+**A:** Edit `client/src/pages/Login.tsx` before deploying. See DEPLOYMENT_CHECKLIST.md.
+
+**Q: What if I get stuck during deployment?**
+**A:** Check the troubleshooting section in AZURE_DEPLOYMENT.md or QUICK_START_AZURE.md.
+
+**Q: Can I use a custom domain?**
+**A:** Yes! Both guides include custom domain setup instructions.
 
 ---
 
-**Ready to deploy? Pick your platform above and follow the guide! 🚀**
+## 📞 Need Help?
+
+1. **Start with**: `QUICK_START_AZURE.md` (covers 90% of use cases)
+2. **Still stuck?**: Check `AZURE_DEPLOYMENT.md` troubleshooting section
+3. **Before deploying**: Review `DEPLOYMENT_CHECKLIST.md`
+
+---
+
+**Ready to deploy to Azure? Open `QUICK_START_AZURE.md` now! 🚀**
