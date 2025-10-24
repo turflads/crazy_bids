@@ -31,17 +31,17 @@ export default function TeamOverviewCard({
   return (
     <Card data-testid={`card-team-${teamName.toLowerCase().replace(/\s+/g, '-')}`}>
       <CardHeader className="pb-3">
-        <CardTitle className="text-base flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
+        <CardTitle className="text-base flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
             <TeamLogo 
               logo={teamLogo} 
               flag={teamFlag} 
               name={teamName}
-              className="w-8 h-8 flex-shrink-0"
+              className="w-8 h-8"
             />
-            <span className="text-sm truncate">{teamName}</span>
+            <span className="text-sm">{teamName}</span>
           </div>
-          <Badge variant="outline" className="gap-1 flex-shrink-0">
+          <Badge variant="outline" className="gap-1">
             <Users className="w-3 h-3" />
             {playersCount}
           </Badge>
