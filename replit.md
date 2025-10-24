@@ -1,8 +1,8 @@
-# Cricket Player Auction Platform
+# Cricket Player Auction - Real-Time Bidding Platform
 
 ## Overview
 
-This is a real-time cricket player auction web application that enables live bidding on players across multiple teams. The platform features role-based access control (Admin, Owner, Viewer), grade-based player categorization (A, B, C), and comprehensive team management with purse tracking and quota enforcement. Built with React, TypeScript, Express, and configured for PostgreSQL with Drizzle ORM, the system supports Excel-based player data import and provides real-time auction state synchronization across multiple browser tabs.
+A comprehensive web application for conducting live cricket player auctions with real-time bidding, team management, and grade-based player acquisition. The platform supports role-based access control (Admin, Owner, Viewer) and features grade quotas, purse tracking, and celebration animations for sold players. Built with React (Vite), Express, and localStorage for state management.
 
 ## User Preferences
 
@@ -12,108 +12,146 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 
-**Technology Stack:**
-- React 18 with TypeScript for type-safe component development
-- Vite as the build tool and development server
-- Wouter for client-side routing (lightweight alternative to React Router)
-- TanStack Query for server state management
-- shadcn/ui component library with Radix UI primitives
-- Tailwind CSS for styling with custom design system
+**Framework & Build Tool**
+- **React 18** with TypeScript for type-safe component development
+- **Vite** as the build tool and development server for fast HMR and optimized production builds
+- **Wouter** for lightweight client-side routing instead of React Router
 
-**Design System:**
-- Dark mode primary with sports platform aesthetic
-- Custom color palette for grades (A: purple, B: blue, C: orange)
-- Typography using Inter for UI and JetBrains Mono for numeric data
-- Consistent spacing and elevation system through Tailwind utilities
+**Design System**
+- **shadcn/ui** component library (New York style) with Radix UI primitives for accessible, customizable components
+- **Tailwind CSS** with custom design tokens for consistent spacing, colors, and typography
+- Custom color system supporting light/dark modes with grade-specific colors (A=purple, B=blue, C=orange)
+- **Inter** font for UI, **JetBrains Mono** for numeric data display
 
-**State Management Strategy:**
-- LocalStorage-based persistence for auction state and team data
-- Custom hooks (`useAuctionSync`) for cross-tab synchronization
-- Polling mechanism (2-second intervals) plus storage event listeners
-- Separate state modules: `auctionState.ts` for auction flow, `teamState.ts` for team data
+**State Management**
+- **localStorage-based state persistence** for auction and team data (no backend database)
+- Custom hooks (`useAuctionSync`) for cross-tab synchronization via storage events and polling
+- Centralized state modules: `auctionState.ts` and `teamState.ts` for predictable state updates
+- **TanStack Query (React Query)** for future API integration capabilities
 
-**Role-Based Pages:**
-- Admin: Full auction control, bidding interface, player management
-- Owner: View-only dashboard with team standings and auction status
-- Viewer: Public-facing view of current auction and recent sales
-
-**Key UI Patterns:**
-- Celebration popup with fireworks animation on player sale
-- Real-time bid validation with clear error messaging
-- Excel drag-and-drop upload for player data
-- Grade-based quota tracking with visual progress indicators
+**Key Components**
+- **Role-based dashboards**: AdminDashboard, OwnerDashboard, ViewerDashboard with distinct feature sets
+- **Real-time auction controls**: Bidding interface with grade-based increments and validation
+- **Player management**: Excel import via XLSX library, configurable column mapping
+- **Celebration system**: CSS animations and fireworks effect for sold players
 
 ### Backend Architecture
 
-**Server Framework:**
-- Express.js with TypeScript
-- Minimal API surface (currently using in-memory storage)
-- Session management ready via `connect-pg-simple` (PostgreSQL session store)
-- Vite middleware integration for development HMR
+**Server Framework**
+- **Express.js** with TypeScript for API endpoints (currently minimal, designed for future expansion)
+- **Vite SSR middleware** in development for seamless hot module replacement
+- Static file serving for production builds from `dist/public`
 
-**Database Design:**
-- Drizzle ORM configured for PostgreSQL dialect
-- Schema location: `shared/schema.ts` for isomorphic access
-- Migration output: `./migrations` directory
-- Currently implements basic user table with UUID primary keys
+**Storage Interface**
+- Abstract `IStorage` interface with in-memory implementation (`MemStorage`)
+- Designed for easy migration to PostgreSQL with Drizzle ORM (configuration ready)
+- Current implementation uses localStorage on frontend for all auction data
 
-**Authentication Approach:**
-- Client-side credential validation (hardcoded in `Login.tsx`)
-- LocalStorage-based session persistence
-- Role stored with user session: admin, owner, viewer
-- Ready for server-side session migration
+**Build & Deployment**
+- **esbuild** for fast server bundling with ESM output
+- Production build outputs to `dist/` with separate client (`dist/public`) and server (`dist/index.js`) bundles
+- Asset copying handled via npm scripts for config files, Excel data, and images
 
-**Data Flow:**
-- Players loaded from Excel file using XLSX library
-- Configuration loaded from `client/public/config.json`
-- Auction state synchronized via LocalStorage across clients
-- No current API endpoints (storage interface defined but unused)
+### Data Model
 
-### External Dependencies
+**Player Schema**
+- Core fields: firstName, lastName, grade (A/B/C), basePrice, status (sold/unsold)
+- Optional statistics: battingStyle, bowlingStyle, runs, wickets, strikeRate, bowlingAverage
+- CricHeroes profile link support for external player data
+- Image storage via photo filename references in `attached_assets/`
 
-**Core Libraries:**
-- `@neondatabase/serverless`: PostgreSQL driver for Neon database
-- `drizzle-orm` + `drizzle-kit`: TypeScript ORM and schema management
-- `xlsx`: Excel file parsing for player data import
-- `express`: Node.js web server framework
+**Team Schema**
+- Team metadata: name, flag emoji, logo image path, totalPurse
+- Dynamic calculations: usedPurse, purseRemaining, playersCount, gradeCount
+- Max bid calculator considering remaining grade quotas and purse constraints
 
-**UI Component Dependencies:**
-- `@radix-ui/*`: Headless UI primitives (dialog, dropdown, accordion, etc.)
-- `@tanstack/react-query`: Async state management
-- `@hookform/resolvers` + `zod`: Form validation
-- `class-variance-authority` + `clsx`: Dynamic className generation
+**Auction State**
+- Linear player progression with currentPlayerIndex
+- Bid tracking: currentBid, lastBidTeam, bidHistory array
+- Status flags: isAuctionActive, hasBids
 
-**Development Tools:**
-- `tsx`: TypeScript execution for development
-- `esbuild`: Production bundling
-- `vite`: Frontend build tool and dev server
-- `@replit/*` plugins: Runtime error overlay, cartographer, dev banner
+**Configuration**
+- JSON-based config (`config.json`) for grade base prices, increments, teams, and quotas
+- Hot-reloadable without code changes for auction customization
+- Separate league branding config in `leagueConfig.ts`
 
-**Asset Management:**
-- Team logos stored in `client/public/images/`
-- Player photos referenced by filename in Excel
-- Configuration via JSON file (`client/public/config.json`)
+### Business Logic
 
-**Key Configuration Files:**
-- `config.json`: Grade prices, increments, teams, quotas
-- `playerLoader.ts`: Excel column mapping configuration
-- `leagueConfig.ts`: League name customization
-- `auctionConfig.ts`: Runtime config loading and caching
+**Bidding Validation System**
+- Three-tier validation: purse sufficiency, max bid calculation, grade quota fulfillment
+- Max bid formula: `remainingPurse - reserveForUnfilledQuotas`
+- Real-time feedback with descriptive error messages
 
-**Third-Party Integrations:**
-- Optional CricHeroes profile links (external website)
-- Google Fonts: Inter and JetBrains Mono
-- No external APIs for auction functionality (fully self-contained)
+**Grade Quota Management**
+- Configurable quotas per grade (default: A=3, B=4, C=5)
+- Progress tracking with visual indicators (completion badges)
+- Quota enforcement prevents bidding when team quota is fulfilled
 
-**Bidding Validation System:**
-- Client-side validation preventing invalid bids
-- Max bid calculation considers remaining purse and unfulfilled quotas
-- Grade quota enforcement (teams cannot bid if quota fulfilled)
-- Reserve fund calculation for required grade slots
-- Validation located in `maxBidCalculator.ts` and auction pages
+**Auction Flow**
+- Admin-controlled start/pause/reset with navigation controls
+- Unsold marking with optional re-entry into auction pool
+- Celebration popup on successful sale with team logo display
 
-**State Persistence Strategy:**
-- Auction state persists across page refreshes and login/logout
-- Only "Reset" button clears auction state
-- Cross-tab synchronization via storage events and polling
-- Celebration state triggers across all open tabs in same browser
+**Excel Import System**
+- Configurable column mapping in `playerLoader.ts`
+- Support for multiple column name variations (e.g., "runs", "Runs", "runs_scored")
+- Automatic base price assignment from grade configuration
+- Image path resolution for player photos
+
+### Authentication & Authorization
+
+**Simple Credentials System**
+- Hardcoded username/password pairs in `Login.tsx` (lines 22-26)
+- Three roles with distinct capabilities:
+  - **Admin**: Full auction control, player management, team oversight
+  - **Owner**: View-only access to teams, players, and live auction
+  - **Viewer**: Public dashboard with current auction and standings
+- Session persistence via localStorage with username and role
+
+### Cross-Tab Synchronization
+
+**Real-time Updates**
+- Storage events listener for same-origin tab communication
+- 2-second polling interval as fallback for state freshness
+- Window focus event handler for immediate sync on tab switch
+- Ensures all connected clients see consistent auction state
+
+## External Dependencies
+
+### Third-Party UI Libraries
+- **Radix UI**: 20+ accessible component primitives (Dialog, Dropdown, Tabs, etc.)
+- **Lucide React**: Icon library for consistent iconography
+- **class-variance-authority**: Type-safe component variant management
+- **cmdk**: Command palette component (available for future features)
+
+### Data Processing
+- **XLSX (SheetJS)**: Excel file parsing for player import
+- **date-fns**: Date formatting utilities
+- **Zod**: Runtime validation (via drizzle-zod)
+
+### Database (Configured, Not Used)
+- **Drizzle ORM** with PostgreSQL dialect configured
+- **@neondatabase/serverless**: Neon serverless Postgres driver ready
+- **connect-pg-simple**: Session store for PostgreSQL (for future auth)
+- Schema defined in `shared/schema.ts` with users table
+
+### Development Tools
+- **tsx**: TypeScript execution for development server
+- **@replit/vite-plugin-runtime-error-modal**: Enhanced error overlay
+- **@replit/vite-plugin-cartographer**: Code navigation (Replit-specific)
+- **@replit/vite-plugin-dev-banner**: Development environment indicator
+
+### Build & Deployment
+- **esbuild**: Server bundling
+- **Vite**: Client bundling and asset optimization
+- **PostCSS** with **Autoprefixer**: CSS processing
+- Azure deployment configuration with custom domain support (documented in `/docs`)
+
+### Form Management
+- **react-hook-form**: Form state management (available for future forms)
+- **@hookform/resolvers**: Zod integration for form validation
+
+### Asset Management
+- Team logos stored in `client/public/images/` with fallback to emoji flags
+- Player photos stored in `attached_assets/` directory
+- Configuration file (`config.json`) in `client/public/` for runtime access

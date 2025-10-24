@@ -1,47 +1,104 @@
-# TLPL S4 Auction System Documentation
+# 📚 Documentation Directory
 
-Welcome to the TLPL Season 4 auction system documentation. This folder contains all the guides and documentation for the application.
+This folder contains all documentation files for the Cricket Player Auction application.
 
-## 📚 Documentation Files
+---
 
-### Configuration & Setup
-- **[replit.md](./replit.md)** - Main project documentation with architecture, recent changes, and system overview
-- **[CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md)** - Complete configuration guide for teams, grades, quotas, and pricing
-- **[HOW_TO_CONFIGURE_AUCTION.txt](./HOW_TO_CONFIGURE_AUCTION.txt)** - Quick reference for auction configuration
+## 🚀 **[START HERE](START_HERE.md)** ← CONFUSED? CLICK THIS!
 
-### Player Management
-- **[PLAYER_STATS_GUIDE.md](./PLAYER_STATS_GUIDE.md)** - Guide for adding player statistics from Excel or CricHeroes
-- **[EXCEL_COLUMN_CONFIG.md](./EXCEL_COLUMN_CONFIG.md)** - Excel column mapping configuration
+**Not sure which guide to use?** The START_HERE guide will direct you to the right documentation based on:
+- Your experience level (Beginner, Advanced)
+- What you need to do (Deploy, Configure, Customize)
+- Specific deployment scenario (First time, CI/CD, Custom domain)
 
-### Design & Development
-- **[design_guidelines.md](./design_guidelines.md)** - UI/UX design guidelines and patterns
+---
 
-## 🎯 Quick Start
+## 📖 Documentation Categories
 
-1. Read [replit.md](./replit.md) for project overview and recent changes
-2. Follow [CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md) to set up teams and auction rules
-3. Use [PLAYER_STATS_GUIDE.md](./PLAYER_STATS_GUIDE.md) to add player data
+### 1️⃣ Azure Deployment Guides
 
-## 🔧 Changing the League Name
+**Choose based on your needs:**
 
-To change "TLPL S4" to your league name:
+| Document | Use When | Time |
+|----------|----------|------|
+| **[START_HERE.md](START_HERE.md)** | You're confused about where to start | 2 min |
+| **[QUICK_START_AZURE.md](QUICK_START_AZURE.md)** | First time deploying or want fast deployment | 10 min |
+| **[AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md)** | Need detailed Azure deployment guide | 30 min |
+| **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** | Pre-deployment verification | 5 min |
+| **[AZURE_404_FIX.md](AZURE_404_FIX.md)** | Getting 404 error on Azure domain | 15 min |
 
-**File:** `client/src/lib/leagueConfig.ts`
+### 2️⃣ Configuration Guides
 
-```typescript
-export const LEAGUE_CONFIG = {
-  name: "YOUR LEAGUE NAME",     // Short name shown in header
-  fullName: "Your League Full Name",  // Full name for future use
-};
-```
+**Customize the auction for your league:**
 
-This will automatically update:
-- Login page title
-- Navigation bar header
-- All pages throughout the application
+| Document | Purpose |
+|----------|---------|
+| **[CONFIGURATION_GUIDE.md](CONFIGURATION_GUIDE.md)** | Configure teams, quotas, grades, purse |
+| **[HOW_TO_CHANGE_LEAGUE_NAME.md](HOW_TO_CHANGE_LEAGUE_NAME.md)** | Change "TLPL S4" to your league name |
+| **[EXCEL_COLUMN_CONFIG.md](EXCEL_COLUMN_CONFIG.md)** | Configure Excel import column mapping |
+| **[PLAYER_STATS_GUIDE.md](PLAYER_STATS_GUIDE.md)** | Add batting/bowling stats to players |
+| **[HOW_TO_CONFIGURE_AUCTION.txt](HOW_TO_CONFIGURE_AUCTION.txt)** | Quick configuration reference |
 
-## 📝 Notes
+### 3️⃣ Technical Documentation
 
-- All markdown files use standard Markdown syntax
-- Configuration files are in JSON or TypeScript format
-- Keep this README updated when adding new documentation
+**For developers and advanced users:**
+
+| Document | Purpose |
+|----------|---------|
+| **[replit.md](replit.md)** | System architecture & recent changes |
+| **[design_guidelines.md](design_guidelines.md)** | UI/UX design system & component usage |
+| **[PACKAGE_JSON_UPDATES.md](PACKAGE_JSON_UPDATES.md)** | Dependency updates & package info |
+
+---
+
+## ⚡ Quick Reference
+
+### Common Tasks
+
+**Deploying for the first time?**
+→ [START_HERE.md](START_HERE.md) then [QUICK_START_AZURE.md](QUICK_START_AZURE.md)
+
+**Changing league name?**
+→ [HOW_TO_CHANGE_LEAGUE_NAME.md](HOW_TO_CHANGE_LEAGUE_NAME.md)
+
+**Adding/changing teams?**
+→ [CONFIGURATION_GUIDE.md](CONFIGURATION_GUIDE.md)
+
+**Importing players from Excel?**
+→ [EXCEL_COLUMN_CONFIG.md](EXCEL_COLUMN_CONFIG.md)
+
+**Adding player statistics?**
+→ [PLAYER_STATS_GUIDE.md](PLAYER_STATS_GUIDE.md)
+
+---
+
+## 🎯 Recommended Reading Order
+
+### For First-Time Azure Deployment
+1. [START_HERE.md](START_HERE.md) - Choose your deployment path
+2. [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) - Verify readiness
+3. [QUICK_START_AZURE.md](QUICK_START_AZURE.md) - Deploy to Azure
+4. [HOW_TO_CHANGE_LEAGUE_NAME.md](HOW_TO_CHANGE_LEAGUE_NAME.md) - Customize branding
+5. [CONFIGURATION_GUIDE.md](CONFIGURATION_GUIDE.md) - Set up teams
+6. [EXCEL_COLUMN_CONFIG.md](EXCEL_COLUMN_CONFIG.md) - Import players
+
+### For Advanced Azure Deployment
+1. [AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md) - Full deployment options
+2. [replit.md](replit.md) - Understand the architecture
+3. [design_guidelines.md](design_guidelines.md) - Customize UI/UX
+
+---
+
+## 📞 Need Help?
+
+**Can't find what you're looking for?**
+
+1. Check [START_HERE.md](START_HERE.md) first
+2. Use the table above to find the right guide
+3. Search for keywords in the relevant document
+
+**Still stuck?** Most guides have a troubleshooting section at the end.
+
+---
+
+**Ready to deploy to Azure? Open [START_HERE.md](START_HERE.md) now! 🚀**

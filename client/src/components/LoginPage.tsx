@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trophy } from "lucide-react";
-import { LEAGUE_CONFIG } from "@/lib/leagueConfig";
+import { LEAGUE_NAME } from "@/config/leagueConfig";
 
 interface LoginPageProps {
   onLogin: (username: string, password: string) => void;
@@ -28,7 +28,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
               <Trophy className="w-12 h-12 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-bold">{LEAGUE_CONFIG.name}</CardTitle>
+          <CardTitle className="text-3xl font-bold">{LEAGUE_NAME}</CardTitle>
           <CardDescription>Login to access the auction platform</CardDescription>
         </CardHeader>
         <CardContent>

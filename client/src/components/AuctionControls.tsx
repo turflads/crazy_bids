@@ -145,7 +145,7 @@ export default function AuctionControls({
               <Button
                 key={team.name}
                 variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2 hover-elevate"
+                className="h-auto min-h-[100px] py-3 px-2 flex flex-col items-center justify-center gap-2 hover-elevate"
                 onClick={() => handleTeamBid(team.name)}
                 disabled={!isAuctionActive}
                 data-testid={`button-bid-${team.name.toLowerCase().replace(/\s+/g, '-')}`}
@@ -154,9 +154,9 @@ export default function AuctionControls({
                   logo={team.logo} 
                   flag={team.flag} 
                   name={team.name}
-                  className="w-12 h-12"
+                  className="w-10 h-10 flex-shrink-0"
                 />
-                <span className="text-sm font-medium text-center leading-tight">
+                <span className="text-xs font-medium text-center leading-tight line-clamp-2 break-words w-full">
                   {team.name}
                 </span>
               </Button>
@@ -213,34 +213,36 @@ export default function AuctionControls({
           </Button>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 pt-4 border-t">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t">
           <Button
             variant="outline"
+            className="w-full"
             onClick={onCancelBid}
             disabled={!isAuctionActive || !hasBids}
             data-testid="button-cancel-bid"
           >
-            <Undo2 className="w-4 h-4 mr-2" />
-            Cancel Bid
+            <Undo2 className="w-4 h-4 mr-1.5 flex-shrink-0" />
+            <span className="truncate">Cancel</span>
           </Button>
           <Button
             variant="default"
-            className="bg-auction-sold hover:bg-auction-sold/90"
+            className="bg-auction-sold hover:bg-auction-sold/90 w-full"
             onClick={onSold}
             disabled={!isAuctionActive || !hasBids}
             data-testid="button-sold"
           >
-            <CheckCircle className="w-4 h-4 mr-2" />
-            Sold
+            <CheckCircle className="w-4 h-4 mr-1.5 flex-shrink-0" />
+            <span className="truncate">Sold</span>
           </Button>
           <Button
             variant="destructive"
+            className="w-full"
             onClick={onUnsold}
             disabled={!isAuctionActive}
             data-testid="button-unsold"
           >
-            <XCircle className="w-4 h-4 mr-2" />
-            Unsold
+            <XCircle className="w-4 h-4 mr-1.5 flex-shrink-0" />
+            <span className="truncate">Unsold</span>
           </Button>
         </div>
       </CardContent>

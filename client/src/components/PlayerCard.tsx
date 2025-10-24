@@ -66,11 +66,11 @@ export default function PlayerCard({ player, onViewDetails, showStats = true }: 
       </div>
       <CardContent className="p-4 space-y-3">
         <div>
-          <h3 className="font-semibold text-lg" data-testid={`text-player-name-${player.id}`}>
+          <h3 className="font-semibold text-lg break-words" data-testid={`text-player-name-${player.id}`}>
             {player.firstName} {player.lastName}
           </h3>
           {player.team && (
-            <p className="text-sm text-muted-foreground" data-testid={`text-team-${player.id}`}>
+            <p className="text-sm text-muted-foreground truncate" data-testid={`text-team-${player.id}`}>
               {player.team}
             </p>
           )}

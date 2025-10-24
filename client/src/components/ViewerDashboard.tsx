@@ -61,15 +61,15 @@ export default function ViewerDashboard({
                 <PlayerCard player={currentAuction.player} />
               </div>
               <div className="space-y-4">
-                <div className="p-6 bg-primary/10 rounded-lg">
+                <div className="p-4 sm:p-6 bg-primary/10 rounded-lg">
                   <p className="text-sm text-muted-foreground mb-2">Current Bid</p>
-                  <p className="text-4xl font-bold font-mono text-primary" data-testid="text-viewer-current-bid">
+                  <p className="text-3xl sm:text-4xl font-bold font-mono text-primary break-all" data-testid="text-viewer-current-bid">
                     ₹{currentAuction.currentBid.toLocaleString()}
                   </p>
                 </div>
                 <div className="p-4 bg-muted rounded-lg">
                   <p className="text-sm text-muted-foreground mb-1">Leading Team</p>
-                  <p className="text-xl font-semibold" data-testid="text-leading-team">
+                  <p className="text-lg sm:text-xl font-semibold truncate" data-testid="text-leading-team">
                     {currentAuction.leadingTeam}
                   </p>
                 </div>
@@ -129,17 +129,17 @@ export default function ViewerDashboard({
                   data-testid={`card-team-${team.team}`}
                   onClick={() => setSelectedTeam(team)}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
                       <TeamLogo 
                         logo={team.logo} 
                         flag={team.flag} 
                         name={team.team}
-                        className="w-8 h-8"
+                        className="w-8 h-8 flex-shrink-0"
                       />
-                      <p className="font-semibold">{team.team}</p>
+                      <p className="font-semibold truncate">{team.team}</p>
                     </div>
-                    <Badge variant="outline">{team.playersCount} Players</Badge>
+                    <Badge variant="outline" className="flex-shrink-0 text-xs">{team.playersCount} <span className="hidden sm:inline">Players</span></Badge>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
@@ -165,31 +165,31 @@ export default function ViewerDashboard({
           {selectedTeam && (
             <>
               <DialogHeader>
-                <DialogTitle className="flex items-center gap-3 text-2xl">
+                <DialogTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-2xl">
                   <TeamLogo 
                     logo={selectedTeam.logo} 
                     flag={selectedTeam.flag} 
                     name={selectedTeam.team}
-                    className="w-10 h-10"
+                    className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0"
                   />
-                  <span>{selectedTeam.team} - Players</span>
+                  <span className="truncate">{selectedTeam.team} - Players</span>
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
                   <div>
                     <p className="text-sm text-muted-foreground">Total Players</p>
-                    <p className="text-2xl font-bold">{selectedTeam.playersCount}</p>
+                    <p className="text-xl sm:text-2xl font-bold">{selectedTeam.playersCount}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Purse Used</p>
-                    <p className="text-2xl font-bold font-mono text-destructive">
+                    <p className="text-xl sm:text-2xl font-bold font-mono text-destructive break-all">
                       ₹{selectedTeam.purseUsed.toLocaleString()}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Purse Remaining</p>
-                    <p className="text-2xl font-bold font-mono text-auction-sold">
+                    <p className="text-xl sm:text-2xl font-bold font-mono text-auction-sold break-all">
                       ₹{selectedTeam.purseRemaining.toLocaleString()}
                     </p>
                   </div>

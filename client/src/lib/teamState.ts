@@ -23,6 +23,12 @@ export const saveTeamState = (teams: Record<string, TeamData>) => {
   localStorage.setItem(TEAM_STATE_KEY, JSON.stringify(teams));
 };
 
+// Import WebSocket broadcast wrapper - dynamic import to avoid circular dependencies
+let saveTeamStateWithBroadcast: any = null;
+import('./webSocketState').then(module => {
+  saveTeamStateWithBroadcast = module.saveTeamStateWithBroadcast;
+});
+
 export const initializeTeams = (teamNames: { name: string; flag?: string; logo?: string; totalPurse?: number }[]) => {
   const existing = getTeamState();
   const teams: Record<string, TeamData> = {};
@@ -48,7 +54,12 @@ export const initializeTeams = (teamNames: { name: string; flag?: string; logo?:
     }
   });
 
-  saveTeamState(teams);
+  // Use WebSocket-aware save if available, otherwise fall back to local save
+  if (saveTeamStateWithBroadcast) {
+    saveTeamStateWithBroadcast(teams);
+  } else {
+    saveTeamState(teams);
+  }
   return teams;
 };
 
@@ -58,7 +69,13 @@ export const updateTeamAfterPurchase = (teamName: string, player: any, price: nu
     teams[teamName].usedPurse += price;
     teams[teamName].players.push({ ...player, soldPrice: price });
     teams[teamName].gradeCount[player.grade] = (teams[teamName].gradeCount[player.grade] || 0) + 1;
-    saveTeamState(teams);
+    
+    // Use WebSocket-aware save if available, otherwise fall back to local save
+    if (saveTeamStateWithBroadcast) {
+      saveTeamStateWithBroadcast(teams);
+    } else {
+      saveTeamState(teams);
+    }
   }
   return teams;
 };
