@@ -8,15 +8,32 @@
 
 Choose the guide that matches your needs:
 
-### ⚡ Quick Start (Recommended for Most Users)
+### 📤 Manual Upload (No CLI - Easiest)
+
+**📄 Use: `AZURE_MANUAL_UPLOAD.md`**
+
+**Perfect if you:**
+- Upload files through Azure Portal
+- Don't want to use command line
+- Have Azure already set up
+- Just drag & drop your files
+
+**What's included:**
+- How to build your app locally
+- Where to upload files in Azure Portal
+- Portal configuration settings
+- Custom domain setup via Portal
+
+---
+
+### ⚡ Quick Start with CLI
 
 **📄 Use: `QUICK_START_AZURE.md`**
 
 **Perfect if you:**
-- Want to get your app live FAST (10 minutes)
-- Are deploying to Azure for the first time
-- Want simple, step-by-step instructions
-- Just need the essential commands
+- Want to use Azure CLI commands
+- Comfortable with terminal/command line
+- Want automated deployment
 
 **What's included:**
 - One-command deployment
@@ -65,21 +82,20 @@ Choose the guide that matches your needs:
 │  Which guide should I use?          │
 └─────────────────────────────────────┘
            │
-           ├─ First time deploying?
+           ├─ Upload files manually?
+           │  └─→ AZURE_MANUAL_UPLOAD.md
+           │
+           ├─ Use command line?
            │  └─→ QUICK_START_AZURE.md
            │
-           ├─ Want it done fast?
-           │  └─→ QUICK_START_AZURE.md
+           ├─ Getting 404 error?
+           │  └─→ AZURE_404_FIX.md
            │
            ├─ Need detailed explanations?
            │  └─→ AZURE_DEPLOYMENT.md
            │
-           ├─ Setting up CI/CD?
-           │  └─→ AZURE_DEPLOYMENT.md
-           │
-           └─ Ready to deploy?
-              └─→ DEPLOYMENT_CHECKLIST.md first,
-                  then QUICK_START_AZURE.md
+           └─ Setting up CI/CD?
+              └─→ AZURE_DEPLOYMENT.md
 ```
 
 ---
