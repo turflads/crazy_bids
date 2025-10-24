@@ -25,6 +25,7 @@ This folder contains all documentation files for the Cricket Player Auction appl
 | **[QUICK_START_AZURE.md](QUICK_START_AZURE.md)** | First time deploying or want fast deployment | 10 min |
 | **[AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md)** | Need detailed Azure deployment guide | 30 min |
 | **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** | Pre-deployment verification | 5 min |
+| **[AZURE_404_FIX.md](AZURE_404_FIX.md)** | Getting 404 error on Azure domain | 15 min |
 
 ### 2️⃣ Configuration Guides
 

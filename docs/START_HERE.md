@@ -140,6 +140,9 @@ Follow this order for smooth deployment:
 
 ## 🆘 Common Questions
 
+**Q: Getting 404 error on Azure?**
+**A:** See `AZURE_404_FIX.md` for step-by-step troubleshooting.
+
 **Q: Do I need to remove .replit files before deploying to Azure?**
 **A:** No! Azure deployment ignores Replit-specific files automatically.
 
