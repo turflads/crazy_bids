@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist/index.js",
+      "src": "api/index.js",
       "use": "@vercel/node"
     },
     {
@@ -15,22 +15,32 @@
   ],
   "routes": [
     {
-      "src": "/ws",
-      "dest": "/dist/index.js"
-    },
-    {
       "src": "/api/(.*)",
-      "dest": "/dist/index.js"
+      "dest": "/api/index.js"
     },
     {
-      "handle": "filesystem"
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/config.json",
+      "dest": "/config.json"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "/images/$1"
+    },
+    {
+      "src": "/player_images/(.*)",
+      "dest": "/player_images/$1"
+    },
+    {
+      "src": "/players.xlsx",
+      "dest": "/players.xlsx"
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/public/index.html"
+      "dest": "/index.html"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
