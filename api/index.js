@@ -1,20 +1,10 @@
 import express from "express";
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import fs from 'fs';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Serve static files from dist/public
-const publicPath = join(__dirname, '..', 'dist', 'public');
-app.use(express.static(publicPath));
-
-// In-memory state storage
+// In-memory state storage (Note: This resets on each serverless invocation)
 let serverAuctionState = null;
 let serverTeamState = null;
 
@@ -37,14 +27,5 @@ app.post("/api/team-state", (req, res) => {
   res.json({ success: true });
 });
 
-// Catch-all route for SPA
-app.get('*', (req, res) => {
-  const indexPath = join(publicPath, 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.status(404).send('Not Found');
-  }
-});
-
+// Export for Vercel
 export default app;
