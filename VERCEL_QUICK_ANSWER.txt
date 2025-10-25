@@ -1,0 +1,49 @@
+=======================================================
+  VERCEL DEPLOYMENT - QUICK ANSWER
+=======================================================
+
+FRAMEWORK PRESET:
+-----------------
+Select: "Other"
+
+(Not "Vite" because you have a custom build process)
+
+
+ROOT DIRECTORY:
+---------------
+Leave blank (or use ".")
+
+
+BUILD SETTINGS:
+---------------
+Build Command:       npm run build
+Output Directory:    dist/public
+Install Command:     npm install
+
+
+AFTER DEPLOYMENT:
+-----------------
+1. Add environment variable:
+   NODE_ENV = production
+
+2. Your app will work, but:
+   ⚠️  WebSockets won't work on Vercel free tier
+   ✅  Fallback polling will work (5-second updates)
+
+
+BETTER ALTERNATIVE:
+-------------------
+Use Railway instead of Vercel:
+- Free tier supports WebSockets
+- Real-time updates work instantly
+- Just connect GitHub and deploy
+
+Railway: https://railway.app
+
+
+FILES CREATED:
+--------------
+✅ vercel.json - Deployment configuration
+✅ VERCEL_DEPLOYMENT_GUIDE.md - Complete guide
+
+=======================================================
