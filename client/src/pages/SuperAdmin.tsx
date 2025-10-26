@@ -158,10 +158,36 @@ export default function SuperAdmin() {
     }
 
     // Save updated auction state
-    const auctionState = getAuctionState();
+    const auctionState = getAuctionState() || {
+      currentPlayerIndex: 0,
+      currentBid: 0,
+      isAuctionActive: false,
+      players: updatedPlayers,
+      bidHistory: [],
+      hasBids: false,
+    };
+    let newCurrentPlayerIndex = auctionState.currentPlayerIndex || 0;
+
+    // If we just sold the current player, advance to next unsold player
+    if (index === currentPlayerIndex && oldPlayer.status !== 'sold' && editValues.status === 'sold') {
+      // Find next unsold player
+      let nextIndex = currentPlayerIndex + 1;
+      while (nextIndex < updatedPlayers.length && updatedPlayers[nextIndex].status === 'sold') {
+        nextIndex++;
+      }
+      if (nextIndex < updatedPlayers.length) {
+        newCurrentPlayerIndex = nextIndex;
+        setCurrentPlayerIndex(nextIndex);
+      }
+    }
+
     saveAuctionStateWithBroadcast({
       ...auctionState,
       players: updatedPlayers,
+      currentPlayerIndex: newCurrentPlayerIndex,
+      currentBid: newCurrentPlayerIndex !== auctionState.currentPlayerIndex ? updatedPlayers[newCurrentPlayerIndex]?.basePrice || 0 : auctionState.currentBid,
+      bidHistory: newCurrentPlayerIndex !== auctionState.currentPlayerIndex ? [] : auctionState.bidHistory,
+      hasBids: newCurrentPlayerIndex !== auctionState.currentPlayerIndex ? false : auctionState.hasBids,
     });
 
     setPlayers(updatedPlayers);
