@@ -34,6 +34,7 @@ interface OwnerDashboardProps {
   currentPlayer?: any;
   currentBid?: number;
   isAuctionActive?: boolean;
+  gradeQuotas?: Record<string, number>;
 }
 
 export default function OwnerDashboard({
@@ -44,6 +45,7 @@ export default function OwnerDashboard({
   currentPlayer,
   currentBid,
   isAuctionActive,
+  gradeQuotas = { A: 3, B: 4, C: 5 },
 }: OwnerDashboardProps) {
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
 
@@ -238,13 +240,13 @@ export default function OwnerDashboard({
                 )}
                 <div className="flex flex-wrap gap-2">
                   <Badge className="bg-grade-a text-white text-xs">
-                    A: {team.gradeCount.A || 0}
+                    A: {team.gradeCount.A || 0}/{gradeQuotas.A || 3}
                   </Badge>
                   <Badge className="bg-grade-b text-white text-xs">
-                    B: {team.gradeCount.B || 0}
+                    B: {team.gradeCount.B || 0}/{gradeQuotas.B || 4}
                   </Badge>
                   <Badge className="bg-grade-c text-white text-xs">
-                    C: {team.gradeCount.C || 0}
+                    C: {team.gradeCount.C || 0}/{gradeQuotas.C || 5}
                   </Badge>
                 </div>
               </CardContent>

@@ -154,6 +154,7 @@ export default function Owner() {
         currentPlayer={currentPlayer}
         currentBid={currentBid}
         isAuctionActive={isAuctionActive}
+        gradeQuotas={gradeQuotas}
       />
       {celebrationData && (
         <CelebrationPopup
