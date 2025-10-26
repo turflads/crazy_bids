@@ -113,6 +113,7 @@ export default function SuperAdmin() {
     const updatedPlayers = [...players];
     const oldPlayer = { ...updatedPlayers[index] };
     
+    // Update player in auction state with all new values
     updatedPlayers[index] = {
       ...updatedPlayers[index],
       status: editValues.status,
@@ -123,79 +124,35 @@ export default function SuperAdmin() {
       grade: editValues.grade,
     };
 
-    // Update team state if player was sold to a different team or price changed
-    if (editValues.status === 'sold' && editValues.team) {
-      const updatedTeams = { ...teams };
-      
-      // Remove from old team if team changed
-      if (oldPlayer.status === 'sold' && oldPlayer.team && oldPlayer.team !== editValues.team) {
-        if (updatedTeams[oldPlayer.team]) {
-          updatedTeams[oldPlayer.team].usedPurse -= oldPlayer.soldPrice || 0;
-          updatedTeams[oldPlayer.team].players = updatedTeams[oldPlayer.team].players.filter(
-            (p: any) => !(p.firstName === oldPlayer.firstName && p.lastName === oldPlayer.lastName)
-          );
-          updatedTeams[oldPlayer.team].gradeCount[oldPlayer.grade] = 
-            (updatedTeams[oldPlayer.team].gradeCount[oldPlayer.grade] || 1) - 1;
-        }
-      }
+    // Single consolidated team state update
+    const updatedTeams = { ...teams };
+    let teamStateChanged = false;
 
-      // Add to new team or update price
-      if (updatedTeams[editValues.team]) {
-        if (oldPlayer.team === editValues.team) {
-          // Same team, just update price
-          const priceDiff = (parseFloat(editValues.soldPrice) || 0) - (oldPlayer.soldPrice || 0);
-          updatedTeams[editValues.team].usedPurse += priceDiff;
-          
-          // Update player in team's roster
-          const playerInRoster = updatedTeams[editValues.team].players.find(
-            (p: any) => p.firstName === oldPlayer.firstName && p.lastName === oldPlayer.lastName
-          );
-          if (playerInRoster) {
-            playerInRoster.soldPrice = parseFloat(editValues.soldPrice) || 0;
-          }
-        } else {
-          // New team
-          updatedTeams[editValues.team].usedPurse += parseFloat(editValues.soldPrice) || 0;
-          updatedTeams[editValues.team].players.push({
-            ...updatedPlayers[index],
-            soldPrice: parseFloat(editValues.soldPrice) || 0,
-          });
-          updatedTeams[editValues.team].gradeCount[editValues.grade] = 
-            (updatedTeams[editValues.team].gradeCount[editValues.grade] || 0) + 1;
-        }
-      }
-
-      saveTeamStateWithBroadcast(updatedTeams);
-      setTeams(updatedTeams);
+    // Case 1: Player was sold before - remove from old team
+    if (oldPlayer.status === 'sold' && oldPlayer.team && updatedTeams[oldPlayer.team]) {
+      updatedTeams[oldPlayer.team].usedPurse -= oldPlayer.soldPrice || 0;
+      updatedTeams[oldPlayer.team].players = updatedTeams[oldPlayer.team].players.filter(
+        (p: any) => !(p.firstName === oldPlayer.firstName && p.lastName === oldPlayer.lastName)
+      );
+      updatedTeams[oldPlayer.team].gradeCount[oldPlayer.grade] = 
+        Math.max(0, (updatedTeams[oldPlayer.team].gradeCount[oldPlayer.grade] || 1) - 1);
+      teamStateChanged = true;
     }
 
-    // If player was unsold and is now marked sold
-    if (oldPlayer.status === 'unsold' && editValues.status === 'sold' && editValues.team) {
-      const updatedTeams = { ...teams };
-      if (updatedTeams[editValues.team]) {
-        updatedTeams[editValues.team].usedPurse += parseFloat(editValues.soldPrice) || 0;
-        updatedTeams[editValues.team].players.push({
-          ...updatedPlayers[index],
-          soldPrice: parseFloat(editValues.soldPrice) || 0,
-        });
-        updatedTeams[editValues.team].gradeCount[editValues.grade] = 
-          (updatedTeams[editValues.team].gradeCount[editValues.grade] || 0) + 1;
-      }
-      saveTeamStateWithBroadcast(updatedTeams);
-      setTeams(updatedTeams);
+    // Case 2: Player is sold now - add to new team (or re-add to same team with new data)
+    if (editValues.status === 'sold' && editValues.team && updatedTeams[editValues.team]) {
+      updatedTeams[editValues.team].usedPurse += parseFloat(editValues.soldPrice) || 0;
+      updatedTeams[editValues.team].players.push({
+        ...updatedPlayers[index],
+        soldPrice: parseFloat(editValues.soldPrice) || 0,
+      });
+      updatedTeams[editValues.team].gradeCount[editValues.grade] = 
+        (updatedTeams[editValues.team].gradeCount[editValues.grade] || 0) + 1;
+      teamStateChanged = true;
     }
 
-    // If player was sold and is now unsold
-    if (oldPlayer.status === 'sold' && editValues.status === 'unsold' && oldPlayer.team) {
-      const updatedTeams = { ...teams };
-      if (updatedTeams[oldPlayer.team]) {
-        updatedTeams[oldPlayer.team].usedPurse -= oldPlayer.soldPrice || 0;
-        updatedTeams[oldPlayer.team].players = updatedTeams[oldPlayer.team].players.filter(
-          (p: any) => !(p.firstName === oldPlayer.firstName && p.lastName === oldPlayer.lastName)
-        );
-        updatedTeams[oldPlayer.team].gradeCount[oldPlayer.grade] = 
-          (updatedTeams[oldPlayer.team].gradeCount[oldPlayer.grade] || 1) - 1;
-      }
+    // Save team state if any changes were made
+    if (teamStateChanged) {
       saveTeamStateWithBroadcast(updatedTeams);
       setTeams(updatedTeams);
     }

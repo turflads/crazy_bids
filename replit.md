@@ -2,7 +2,7 @@
 
 ## Overview
 
-A comprehensive web application for conducting live cricket player auctions with real-time bidding, team management, and grade-based player acquisition. The platform supports role-based access control (Admin, Owner, Viewer) and features grade quotas, purse tracking, and celebration animations for sold players. Built with React (Vite), Express, and localStorage for state management.
+A comprehensive web application for conducting live cricket player auctions with real-time bidding, team management, and grade-based player acquisition. The platform supports role-based access control (Super Admin, Admin, Owner, Viewer) and features grade quotas, purse tracking, celebration animations for sold players, and backend-like editing capabilities for corrections. Built with React (Vite), Express, and localStorage for state management.
 
 ## User Preferences
 
@@ -30,7 +30,8 @@ Preferred communication style: Simple, everyday language.
 - **TanStack Query (React Query)** for future API integration capabilities
 
 **Key Components**
-- **Role-based dashboards**: AdminDashboard, OwnerDashboard, ViewerDashboard with distinct feature sets
+- **Role-based dashboards**: SuperAdminDashboard, AdminDashboard, OwnerDashboard, ViewerDashboard with distinct feature sets
+- **Super Admin controls**: Full editing interface for correcting auction mistakes (team purses, player assignments, sold prices)
 - **Real-time auction controls**: Bidding interface with grade-based increments and validation
 - **Player management**: Excel import via XLSX library, configurable column mapping
 - **Celebration system**: CSS animations and fireworks effect for sold players
@@ -101,8 +102,9 @@ Preferred communication style: Simple, everyday language.
 ### Authentication & Authorization
 
 **Simple Credentials System**
-- Hardcoded username/password pairs in `Login.tsx` (lines 22-26)
-- Three roles with distinct capabilities:
+- Hardcoded username/password pairs in `Login.tsx` (lines 24-28)
+- Four roles with distinct capabilities:
+  - **Super Admin**: Full backend-like editing rights - can modify team purses, player status, sold prices, and team assignments. All changes sync instantly to all dashboards.
   - **Admin**: Full auction control, player management, team oversight
   - **Owner**: View-only access to teams, players, and live auction
   - **Viewer**: Public dashboard with current auction and standings
