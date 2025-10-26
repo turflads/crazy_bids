@@ -11,8 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getAuctionState } from "@/lib/auctionState";
-import { getTeamState, saveTeamStateWithBroadcast } from "@/lib/teamState";
-import { saveAuctionStateWithBroadcast } from "@/lib/webSocketState";
+import { getTeamState } from "@/lib/teamState";
+import { saveAuctionStateWithBroadcast, saveTeamStateWithBroadcast } from "@/lib/webSocketState";
 import { loadAuctionConfig, type Team } from "@/lib/auctionConfig";
 import { useToast } from "@/hooks/use-toast";
 import { Edit2, Save, X, AlertTriangle, DollarSign, Users, Shield } from "lucide-react";
@@ -257,11 +257,20 @@ export default function SuperAdmin() {
     }).format(amount);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setLocation("/");
+  };
+
   if (!user) return null;
 
   return (
     <div className="min-h-screen bg-background">
-      <NavBar username={user.username} role={user.role} />
+      <NavBar 
+        username={user.username} 
+        userRole={user.role as 'admin' | 'owner' | 'viewer'} 
+        onLogout={handleLogout}
+      />
       
       <div className="container mx-auto p-6 space-y-6">
         <div className="flex items-center gap-3">

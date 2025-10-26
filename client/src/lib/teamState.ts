@@ -29,6 +29,9 @@ import('./webSocketState').then(module => {
   saveTeamStateWithBroadcast = module.saveTeamStateWithBroadcast;
 });
 
+// Export the wrapper function to use in other components
+export { saveTeamStateWithBroadcast };
+
 export const initializeTeams = (teamNames: { name: string; flag?: string; logo?: string; totalPurse?: number }[]) => {
   const existing = getTeamState();
   const teams: Record<string, TeamData> = {};
