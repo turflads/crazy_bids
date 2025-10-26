@@ -1,0 +1,612 @@
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
+import NavBar from "@/components/NavBar";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { getAuctionState } from "@/lib/auctionState";
+import { getTeamState, saveTeamStateWithBroadcast } from "@/lib/teamState";
+import { saveAuctionStateWithBroadcast } from "@/lib/webSocketState";
+import { loadAuctionConfig, type Team } from "@/lib/auctionConfig";
+import { useToast } from "@/hooks/use-toast";
+import { Edit2, Save, X, AlertTriangle, DollarSign, Users, Shield } from "lucide-react";
+
+export default function SuperAdmin() {
+  const [, setLocation] = useLocation();
+  const [user, setUser] = useState<{ username: string; role: string } | null>(null);
+  const { toast } = useToast();
+
+  const [teams, setTeams] = useState<Record<string, any>>({});
+  const [configTeams, setConfigTeams] = useState<Team[]>([]);
+  const [players, setPlayers] = useState<any[]>([]);
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+
+  // Editing states
+  const [editingTeam, setEditingTeam] = useState<string | null>(null);
+  const [editingPlayer, setEditingPlayer] = useState<number | null>(null);
+  const [editValues, setEditValues] = useState<any>({});
+
+  // Role check
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const userData = JSON.parse(storedUser);
+      if (userData.role !== "superadmin") {
+        setLocation("/");
+        return;
+      }
+      setUser(userData);
+    } else {
+      setLocation("/");
+    }
+  }, [setLocation]);
+
+  // Load initial data
+  useEffect(() => {
+    const loadData = async () => {
+      const config = await loadAuctionConfig();
+      setConfigTeams(config.teams);
+
+      const teamState = getTeamState();
+      setTeams(teamState);
+
+      const auctionState = getAuctionState();
+      if (auctionState && auctionState.players) {
+        setPlayers(auctionState.players);
+        setCurrentPlayerIndex(auctionState.currentPlayerIndex || 0);
+      }
+    };
+
+    loadData();
+
+    // Refresh data every 5 seconds
+    const interval = setInterval(loadData, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleEditTeam = (teamName: string) => {
+    setEditingTeam(teamName);
+    setEditValues({
+      totalPurse: teams[teamName]?.totalPurse || 0,
+      usedPurse: teams[teamName]?.usedPurse || 0,
+    });
+  };
+
+  const handleSaveTeam = (teamName: string) => {
+    const updatedTeams = { ...teams };
+    updatedTeams[teamName] = {
+      ...updatedTeams[teamName],
+      totalPurse: parseFloat(editValues.totalPurse) || 0,
+      usedPurse: parseFloat(editValues.usedPurse) || 0,
+    };
+
+    saveTeamStateWithBroadcast(updatedTeams);
+    setTeams(updatedTeams);
+    setEditingTeam(null);
+
+    toast({
+      title: "Team Updated",
+      description: `${teamName}'s purse has been updated successfully.`,
+    });
+  };
+
+  const handleEditPlayer = (index: number) => {
+    const player = players[index];
+    setEditingPlayer(index);
+    setEditValues({
+      status: player.status || 'unsold',
+      team: player.team || '',
+      soldPrice: player.soldPrice || 0,
+      firstName: player.firstName || '',
+      lastName: player.lastName || '',
+      grade: player.grade || 'C',
+    });
+  };
+
+  const handleSavePlayer = (index: number) => {
+    const updatedPlayers = [...players];
+    const oldPlayer = { ...updatedPlayers[index] };
+    
+    updatedPlayers[index] = {
+      ...updatedPlayers[index],
+      status: editValues.status,
+      team: editValues.status === 'sold' ? editValues.team : undefined,
+      soldPrice: editValues.status === 'sold' ? parseFloat(editValues.soldPrice) || 0 : undefined,
+      firstName: editValues.firstName,
+      lastName: editValues.lastName,
+      grade: editValues.grade,
+    };
+
+    // Update team state if player was sold to a different team or price changed
+    if (editValues.status === 'sold' && editValues.team) {
+      const updatedTeams = { ...teams };
+      
+      // Remove from old team if team changed
+      if (oldPlayer.status === 'sold' && oldPlayer.team && oldPlayer.team !== editValues.team) {
+        if (updatedTeams[oldPlayer.team]) {
+          updatedTeams[oldPlayer.team].usedPurse -= oldPlayer.soldPrice || 0;
+          updatedTeams[oldPlayer.team].players = updatedTeams[oldPlayer.team].players.filter(
+            (p: any) => !(p.firstName === oldPlayer.firstName && p.lastName === oldPlayer.lastName)
+          );
+          updatedTeams[oldPlayer.team].gradeCount[oldPlayer.grade] = 
+            (updatedTeams[oldPlayer.team].gradeCount[oldPlayer.grade] || 1) - 1;
+        }
+      }
+
+      // Add to new team or update price
+      if (updatedTeams[editValues.team]) {
+        if (oldPlayer.team === editValues.team) {
+          // Same team, just update price
+          const priceDiff = (parseFloat(editValues.soldPrice) || 0) - (oldPlayer.soldPrice || 0);
+          updatedTeams[editValues.team].usedPurse += priceDiff;
+          
+          // Update player in team's roster
+          const playerInRoster = updatedTeams[editValues.team].players.find(
+            (p: any) => p.firstName === oldPlayer.firstName && p.lastName === oldPlayer.lastName
+          );
+          if (playerInRoster) {
+            playerInRoster.soldPrice = parseFloat(editValues.soldPrice) || 0;
+          }
+        } else {
+          // New team
+          updatedTeams[editValues.team].usedPurse += parseFloat(editValues.soldPrice) || 0;
+          updatedTeams[editValues.team].players.push({
+            ...updatedPlayers[index],
+            soldPrice: parseFloat(editValues.soldPrice) || 0,
+          });
+          updatedTeams[editValues.team].gradeCount[editValues.grade] = 
+            (updatedTeams[editValues.team].gradeCount[editValues.grade] || 0) + 1;
+        }
+      }
+
+      saveTeamStateWithBroadcast(updatedTeams);
+      setTeams(updatedTeams);
+    }
+
+    // If player was unsold and is now marked sold
+    if (oldPlayer.status === 'unsold' && editValues.status === 'sold' && editValues.team) {
+      const updatedTeams = { ...teams };
+      if (updatedTeams[editValues.team]) {
+        updatedTeams[editValues.team].usedPurse += parseFloat(editValues.soldPrice) || 0;
+        updatedTeams[editValues.team].players.push({
+          ...updatedPlayers[index],
+          soldPrice: parseFloat(editValues.soldPrice) || 0,
+        });
+        updatedTeams[editValues.team].gradeCount[editValues.grade] = 
+          (updatedTeams[editValues.team].gradeCount[editValues.grade] || 0) + 1;
+      }
+      saveTeamStateWithBroadcast(updatedTeams);
+      setTeams(updatedTeams);
+    }
+
+    // If player was sold and is now unsold
+    if (oldPlayer.status === 'sold' && editValues.status === 'unsold' && oldPlayer.team) {
+      const updatedTeams = { ...teams };
+      if (updatedTeams[oldPlayer.team]) {
+        updatedTeams[oldPlayer.team].usedPurse -= oldPlayer.soldPrice || 0;
+        updatedTeams[oldPlayer.team].players = updatedTeams[oldPlayer.team].players.filter(
+          (p: any) => !(p.firstName === oldPlayer.firstName && p.lastName === oldPlayer.lastName)
+        );
+        updatedTeams[oldPlayer.team].gradeCount[oldPlayer.grade] = 
+          (updatedTeams[oldPlayer.team].gradeCount[oldPlayer.grade] || 1) - 1;
+      }
+      saveTeamStateWithBroadcast(updatedTeams);
+      setTeams(updatedTeams);
+    }
+
+    // Save updated auction state
+    const auctionState = getAuctionState();
+    saveAuctionStateWithBroadcast({
+      ...auctionState,
+      players: updatedPlayers,
+    });
+
+    setPlayers(updatedPlayers);
+    setEditingPlayer(null);
+
+    toast({
+      title: "Player Updated",
+      description: `${editValues.firstName} ${editValues.lastName} has been updated successfully.`,
+    });
+  };
+
+  const handleRemovePlayerFromTeam = (teamName: string, playerIndex: number) => {
+    const updatedTeams = { ...teams };
+    const player = updatedTeams[teamName].players[playerIndex];
+    
+    updatedTeams[teamName].usedPurse -= player.soldPrice || 0;
+    updatedTeams[teamName].players.splice(playerIndex, 1);
+    updatedTeams[teamName].gradeCount[player.grade] = 
+      (updatedTeams[teamName].gradeCount[player.grade] || 1) - 1;
+
+    saveTeamStateWithBroadcast(updatedTeams);
+    setTeams(updatedTeams);
+
+    // Mark player as unsold in auction state
+    const updatedPlayers = players.map(p => {
+      if (p.firstName === player.firstName && p.lastName === player.lastName) {
+        return { ...p, status: 'unsold', team: undefined, soldPrice: undefined };
+      }
+      return p;
+    });
+
+    const auctionState = getAuctionState();
+    saveAuctionStateWithBroadcast({
+      ...auctionState,
+      players: updatedPlayers,
+    });
+    setPlayers(updatedPlayers);
+
+    toast({
+      title: "Player Removed",
+      description: `${player.firstName} ${player.lastName} removed from ${teamName}.`,
+    });
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  if (!user) return null;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <NavBar username={user.username} role={user.role} />
+      
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="flex items-center gap-3">
+          <Shield className="h-8 w-8 text-destructive" data-testid="icon-superadmin" />
+          <div>
+            <h1 className="text-3xl font-bold" data-testid="heading-superadmin">Super Admin Dashboard</h1>
+            <p className="text-muted-foreground" data-testid="text-superadmin-description">
+              Full editing access - All changes sync across all dashboards
+            </p>
+          </div>
+        </div>
+
+        <Tabs defaultValue="teams" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="teams" data-testid="tab-teams">
+              <DollarSign className="h-4 w-4 mr-2" />
+              Teams & Purse
+            </TabsTrigger>
+            <TabsTrigger value="players" data-testid="tab-players">
+              <Users className="h-4 w-4 mr-2" />
+              Players
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="teams" className="space-y-4">
+            {Object.entries(teams).map(([teamName, teamData]: [string, any]) => (
+              <Card key={teamName}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{teamData.flag}</span>
+                      <div>
+                        <CardTitle data-testid={`text-team-${teamName}`}>{teamName}</CardTitle>
+                        <CardDescription>
+                          Players: {teamData.players?.length || 0}
+                        </CardDescription>
+                      </div>
+                    </div>
+                    {editingTeam === teamName ? (
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => handleSaveTeam(teamName)}
+                          data-testid={`button-save-team-${teamName}`}
+                        >
+                          <Save className="h-4 w-4 mr-2" />
+                          Save
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setEditingTeam(null)}
+                          data-testid={`button-cancel-team-${teamName}`}
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditTeam(teamName)}
+                        data-testid={`button-edit-team-${teamName}`}
+                      >
+                        <Edit2 className="h-4 w-4 mr-2" />
+                        Edit Purse
+                      </Button>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {editingTeam === teamName ? (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor={`total-${teamName}`}>Total Purse</Label>
+                        <Input
+                          id={`total-${teamName}`}
+                          type="number"
+                          value={editValues.totalPurse}
+                          onChange={(e) => setEditValues({ ...editValues, totalPurse: e.target.value })}
+                          data-testid={`input-total-purse-${teamName}`}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`used-${teamName}`}>Used Purse</Label>
+                        <Input
+                          id={`used-${teamName}`}
+                          type="number"
+                          value={editValues.usedPurse}
+                          onChange={(e) => setEditValues({ ...editValues, usedPurse: e.target.value })}
+                          data-testid={`input-used-purse-${teamName}`}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Total Purse</p>
+                        <p className="text-lg font-semibold" data-testid={`text-total-purse-${teamName}`}>
+                          {formatCurrency(teamData.totalPurse)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Used Purse</p>
+                        <p className="text-lg font-semibold" data-testid={`text-used-purse-${teamName}`}>
+                          {formatCurrency(teamData.usedPurse)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Remaining</p>
+                        <p className="text-lg font-semibold text-green-600" data-testid={`text-remaining-purse-${teamName}`}>
+                          {formatCurrency(teamData.totalPurse - teamData.usedPurse)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {teamData.players?.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="font-semibold mb-2">Squad ({teamData.players.length})</h4>
+                      <ScrollArea className="h-[200px]">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Player</TableHead>
+                              <TableHead>Grade</TableHead>
+                              <TableHead>Price</TableHead>
+                              <TableHead>Action</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {teamData.players.map((player: any, idx: number) => (
+                              <TableRow key={idx}>
+                                <TableCell data-testid={`text-player-${teamName}-${idx}`}>
+                                  {player.firstName} {player.lastName}
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant={player.grade === 'A' ? 'default' : player.grade === 'B' ? 'secondary' : 'outline'}>
+                                    {player.grade}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell data-testid={`text-price-${teamName}-${idx}`}>
+                                  {formatCurrency(player.soldPrice || 0)}
+                                </TableCell>
+                                <TableCell>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => handleRemovePlayerFromTeam(teamName, idx)}
+                                    data-testid={`button-remove-player-${teamName}-${idx}`}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </ScrollArea>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </TabsContent>
+
+          <TabsContent value="players" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>All Players</CardTitle>
+                <CardDescription>
+                  Edit player status, team assignments, and sold prices
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[600px]">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Player</TableHead>
+                        <TableHead>Grade</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Team</TableHead>
+                        <TableHead>Sold Price</TableHead>
+                        <TableHead>Action</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {players.map((player, idx) => (
+                        <TableRow key={idx}>
+                          {editingPlayer === idx ? (
+                            <>
+                              <TableCell>
+                                <div className="space-y-2">
+                                  <Input
+                                    placeholder="First Name"
+                                    value={editValues.firstName}
+                                    onChange={(e) => setEditValues({ ...editValues, firstName: e.target.value })}
+                                    data-testid={`input-firstname-${idx}`}
+                                  />
+                                  <Input
+                                    placeholder="Last Name"
+                                    value={editValues.lastName}
+                                    onChange={(e) => setEditValues({ ...editValues, lastName: e.target.value })}
+                                    data-testid={`input-lastname-${idx}`}
+                                  />
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Select
+                                  value={editValues.grade}
+                                  onValueChange={(value) => setEditValues({ ...editValues, grade: value })}
+                                >
+                                  <SelectTrigger data-testid={`select-grade-${idx}`}>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="A">A</SelectItem>
+                                    <SelectItem value="B">B</SelectItem>
+                                    <SelectItem value="C">C</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </TableCell>
+                              <TableCell>
+                                <Select
+                                  value={editValues.status}
+                                  onValueChange={(value) => setEditValues({ ...editValues, status: value })}
+                                >
+                                  <SelectTrigger data-testid={`select-status-${idx}`}>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="sold">Sold</SelectItem>
+                                    <SelectItem value="unsold">Unsold</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </TableCell>
+                              <TableCell>
+                                {editValues.status === 'sold' && (
+                                  <Select
+                                    value={editValues.team}
+                                    onValueChange={(value) => setEditValues({ ...editValues, team: value })}
+                                  >
+                                    <SelectTrigger data-testid={`select-team-${idx}`}>
+                                      <SelectValue placeholder="Select Team" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {configTeams.map((team) => (
+                                        <SelectItem key={team.name} value={team.name}>
+                                          {team.flag} {team.name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {editValues.status === 'sold' && (
+                                  <Input
+                                    type="number"
+                                    placeholder="Sold Price"
+                                    value={editValues.soldPrice}
+                                    onChange={(e) => setEditValues({ ...editValues, soldPrice: e.target.value })}
+                                    data-testid={`input-soldprice-${idx}`}
+                                  />
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleSavePlayer(idx)}
+                                    data-testid={`button-save-player-${idx}`}
+                                  >
+                                    <Save className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setEditingPlayer(null)}
+                                    data-testid={`button-cancel-player-${idx}`}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </>
+                          ) : (
+                            <>
+                              <TableCell data-testid={`text-player-${idx}`}>
+                                {player.firstName} {player.lastName}
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant={player.grade === 'A' ? 'default' : player.grade === 'B' ? 'secondary' : 'outline'}>
+                                  {player.grade}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant={player.status === 'sold' ? 'default' : 'outline'} data-testid={`badge-status-${idx}`}>
+                                  {player.status || 'unsold'}
+                                </Badge>
+                              </TableCell>
+                              <TableCell data-testid={`text-team-${idx}`}>
+                                {player.team || '-'}
+                              </TableCell>
+                              <TableCell data-testid={`text-soldprice-${idx}`}>
+                                {player.soldPrice ? formatCurrency(player.soldPrice) : '-'}
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleEditPlayer(idx)}
+                                  data-testid={`button-edit-player-${idx}`}
+                                >
+                                  <Edit2 className="h-4 w-4 mr-2" />
+                                  Edit
+                                </Button>
+                              </TableCell>
+                            </>
+                          )}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        <Card className="border-destructive">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              <CardTitle className="text-destructive">Warning</CardTitle>
+            </div>
+            <CardDescription>
+              All changes made here will immediately sync to Admin, Owner, and Viewer dashboards.
+              Use with caution!
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    </div>
+  );
+}

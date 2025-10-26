@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
 import Login from "@/pages/Login";
+import SuperAdmin from "@/pages/SuperAdmin";
 import Admin from "@/pages/Admin";
 import Owner from "@/pages/Owner";
 import Viewer from "@/pages/Viewer";
@@ -14,6 +15,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Login} />
+      <Route path="/superadmin" component={SuperAdmin} />
       <Route path="/admin" component={Admin} />
       <Route path="/owner" component={Owner} />
       <Route path="/viewer" component={Viewer} />
