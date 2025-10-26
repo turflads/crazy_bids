@@ -1,8 +1,5 @@
 // WebSocket-aware state management utilities
-// These functions save to localStorage AND broadcast via WebSocket WITH FULL PAYLOAD
-
-// Note: We can't import useWebSocketContext here because this is not a React component
-// Instead, we'll use a global WebSocket reference that gets set by the context
+// These functions save to localStorage, POST to API, AND broadcast via WebSocket
 
 let wsGlobal: {
   broadcastAuctionUpdate: (data: any) => void;
@@ -19,21 +16,37 @@ export function setWebSocketBroadcaster(broadcaster: {
 import { saveAuctionState as saveAuctionStateLocal } from './auctionState';
 import { saveTeamState as saveTeamStateLocal } from './teamState';
 
-// Wrapper for saveAuctionState that also broadcasts via WebSocket
+// Wrapper for saveAuctionState that saves locally, POSTs to API, and broadcasts via WebSocket
 export function saveAuctionStateWithBroadcast(state: any) {
-  // Save to localStorage first
+  // 1. Save to localStorage first
   saveAuctionStateLocal(state);
-  // Broadcast the full state via WebSocket to all other clients
+  
+  // 2. POST to API for cross-device/cross-browser sync (Vercel KV)
+  fetch('/api/auction-state', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(state),
+  }).catch(err => console.error('Failed to sync auction state to server:', err));
+  
+  // 3. Broadcast via WebSocket if connected (won't work on Vercel free tier)
   if (wsGlobal) {
     wsGlobal.broadcastAuctionUpdate(state);
   }
 }
 
-// Wrapper for saveTeamState that also broadcasts via WebSocket
+// Wrapper for saveTeamState that saves locally, POSTs to API, and broadcasts via WebSocket
 export function saveTeamStateWithBroadcast(teams: any) {
-  // Save to localStorage first
+  // 1. Save to localStorage first
   saveTeamStateLocal(teams);
-  // Broadcast the full state via WebSocket to all other clients
+  
+  // 2. POST to API for cross-device/cross-browser sync (Vercel KV)
+  fetch('/api/team-state', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(teams),
+  }).catch(err => console.error('Failed to sync team state to server:', err));
+  
+  // 3. Broadcast via WebSocket if connected (won't work on Vercel free tier)
   if (wsGlobal) {
     wsGlobal.broadcastTeamUpdate(teams);
   }
