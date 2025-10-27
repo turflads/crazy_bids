@@ -2,10 +2,45 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
 // Server-side in-memory state cache for cross-device sync
 let serverAuctionState: any = null;
 let serverTeamState: any = null;
+
+// Configure multer for file uploads
+const uploadDir = path.join(process.cwd(), 'client', 'public', 'presentations');
+
+// Ensure upload directory exists
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage_multer = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'presentation-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage_multer,
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['.ppt', '.pptx', '.ppsx'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowedTypes.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only PowerPoint files are allowed.'));
+    }
+  }
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API endpoints for state synchronization
@@ -30,6 +65,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/team-state', (req, res) => {
     serverTeamState = req.body;
     res.json({ success: true });
+  });
+
+  // Upload presentation endpoint
+  app.post('/api/upload-presentation', upload.single('presentation'), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+
+      const filePath = '/presentations/' + req.file.filename;
+      res.json({ 
+        success: true, 
+        path: filePath,
+        filename: req.file.filename 
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      res.status(500).json({ error: 'Upload failed' });
+    }
   });
 
   const httpServer = createServer(app);

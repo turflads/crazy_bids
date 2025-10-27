@@ -6,7 +6,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Play, Pause, RotateCcw, Users } from "lucide-react";
+import { Play, Pause, RotateCcw, Users, Presentation, Upload } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import AuctionControls from "./AuctionControls";
 import PlayerCard from "./PlayerCard";
 import TeamOverviewCard from "./TeamOverviewCard";
@@ -75,7 +78,79 @@ export default function AdminDashboard({
   onResetAuction,
 }: AdminDashboardProps) {
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [presentationPath, setPresentationPath] = useState<string | null>(
+    localStorage.getItem("presentationPath")
+  );
+  const { toast } = useToast();
   const currentPlayer = players[currentPlayerIndex];
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check if it's a PowerPoint file
+    const validTypes = [
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+    ];
+    
+    if (!validTypes.includes(file.type) && !file.name.match(/\.(ppt|pptx|ppsx)$/i)) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload a PowerPoint file (.ppt, .pptx, or .ppsx)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('presentation', file);
+
+      const response = await fetch('/api/upload-presentation', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await response.json();
+      localStorage.setItem('presentationPath', data.path);
+      setPresentationPath(data.path);
+      setShowUploadDialog(false);
+      
+      toast({
+        title: "Success!",
+        description: "Presentation uploaded successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload presentation. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const openPresentation = () => {
+    if (!presentationPath) {
+      toast({
+        title: "No presentation",
+        description: "Please upload a presentation first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Open presentation in new window using Office Online viewer
+    const fullUrl = window.location.origin + presentationPath;
+    const viewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fullUrl)}`;
+    window.open(viewerUrl, '_blank', 'width=1024,height=768');
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -86,6 +161,15 @@ export default function AdminDashboard({
             <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
               Player {currentPlayerIndex + 1} of {players.length}
             </span>
+            <Button 
+              onClick={() => setShowUploadDialog(true)} 
+              variant="outline" 
+              size="sm" 
+              data-testid="button-upload-presentation"
+            >
+              <Upload className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Upload PPT</span>
+            </Button>
             <Button onClick={onResetAuction} variant="outline" size="sm" data-testid="button-reset-auction">
               <RotateCcw className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Reset</span>
@@ -149,7 +233,49 @@ export default function AdminDashboard({
             </div>
           </div>
         </div>
+
+        {/* Presentation Button - Only visible when auction is paused */}
+        {!isAuctionActive && presentationPath && (
+          <div className="flex justify-center mt-6">
+            <Button 
+              onClick={openPresentation} 
+              variant="default" 
+              size="lg"
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg"
+              data-testid="button-open-presentation"
+            >
+              <Presentation className="w-5 h-5 mr-2" />
+              Open Presentation
+            </Button>
+          </div>
+        )}
       </div>
+
+      {/* Upload Presentation Dialog */}
+      <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
+        <DialogContent data-testid="dialog-upload-presentation">
+          <DialogHeader>
+            <DialogTitle>Upload Presentation</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="presentation-file">PowerPoint File (.ppt, .pptx, .ppsx)</Label>
+              <Input
+                id="presentation-file"
+                type="file"
+                accept=".ppt,.pptx,.ppsx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.openxmlformats-officedocument.presentationml.slideshow"
+                onChange={handleFileUpload}
+                data-testid="input-presentation-file"
+              />
+            </div>
+            {presentationPath && (
+              <div className="text-sm text-muted-foreground">
+                Current: {presentationPath.split('/').pop()}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!selectedTeam} onOpenChange={() => setSelectedTeam(null)}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto" data-testid="dialog-team-players-admin">
