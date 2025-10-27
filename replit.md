@@ -2,7 +2,7 @@
 
 ## Overview
 
-A comprehensive web application for conducting live cricket player auctions with real-time bidding, team management, and grade-based player acquisition. The platform supports role-based access control (Super Admin, Admin, Owner, Viewer) and features grade quotas, purse tracking, celebration animations for sold players, and backend-like editing capabilities for corrections. Built with React (Vite), Express, and localStorage for state management.
+A comprehensive web application for conducting live cricket player auctions with real-time bidding, team management, and grade-based player acquisition. The platform supports role-based access control (Super Admin, Admin, Owner, Viewer) and features grade quotas, purse tracking, celebration animations for sold players, backend-like editing capabilities for corrections, and PowerPoint presentation integration for paused auctions. Built with React (Vite), Express, and localStorage for state management.
 
 ## User Preferences
 
@@ -35,6 +35,7 @@ Preferred communication style: Simple, everyday language.
 - **Real-time auction controls**: Bidding interface with grade-based increments and validation
 - **Player management**: Excel import via XLSX library, configurable column mapping
 - **Celebration system**: CSS animations and fireworks effect for sold players
+- **Presentation system**: PowerPoint upload and display feature for admin during auction breaks (paused state)
 
 ### Backend Architecture
 
@@ -98,6 +99,15 @@ Preferred communication style: Simple, everyday language.
 - Support for multiple column name variations (e.g., "runs", "Runs", "runs_scored")
 - Automatic base price assignment from grade configuration
 - Image path resolution for player photos
+
+**PowerPoint Presentation System**
+- File upload via admin panel with multer backend handling
+- Storage in `client/public/presentations/` directory for public access
+- Presentation path persisted in localStorage for cross-session availability
+- Conditional UI: "Open Presentation" button appears only when auction is paused
+- Office Online viewer integration for seamless in-browser PPT display
+- Support for .ppt, .pptx, and .ppsx formats (100MB file size limit)
+- Automatic directory creation on server startup
 
 ### Authentication & Authorization
 
