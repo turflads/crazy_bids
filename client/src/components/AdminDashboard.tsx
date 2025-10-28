@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -84,23 +84,6 @@ export default function AdminDashboard({
   );
   const { toast } = useToast();
   const currentPlayer = players[currentPlayerIndex];
-  const stickyRef = useRef<HTMLDivElement>(null);
-  const prevPlayerIndexRef = useRef(currentPlayerIndex);
-
-  // Ensure sticky section is visible when player changes
-  useEffect(() => {
-    if (prevPlayerIndexRef.current !== currentPlayerIndex) {
-      prevPlayerIndexRef.current = currentPlayerIndex;
-      
-      // Scroll sticky section into view only if needed (using 'nearest' behavior)
-      if (stickyRef.current) {
-        stickyRef.current.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'nearest'
-        });
-      }
-    }
-  }, [currentPlayerIndex]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -169,113 +152,150 @@ export default function AdminDashboard({
     window.open(viewerUrl, '_blank', 'width=1024,height=768');
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Sticky Header and Player/Controls Section */}
-      <div ref={stickyRef} className="sticky top-0 z-10 bg-background pb-6 border-b">
-        <div className="p-6 space-y-6">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <h2 className="text-xl sm:text-2xl font-bold">Auction Control Panel</h2>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
-                Player {currentPlayerIndex + 1} of {players.length}
-              </span>
-              <Button 
-                onClick={() => setShowUploadDialog(true)} 
-                variant="outline" 
-                size="sm" 
-                data-testid="button-upload-presentation"
-              >
-                <Upload className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Upload PPT</span>
-              </Button>
-              <Button onClick={onResetAuction} variant="outline" size="sm" data-testid="button-reset-auction">
-                <RotateCcw className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Reset</span>
-              </Button>
-              {isAuctionActive ? (
-                <Button onClick={onPauseAuction} variant="outline" size="sm" data-testid="button-pause-auction">
-                  <Pause className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Pause</span>
-                </Button>
-              ) : (
-                <Button onClick={onStartAuction} size="sm" data-testid="button-start-auction">
-                  <Play className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Start</span>
-                </Button>
-              )}
-            </div>
-          </div>
+  const handleTeamBid = (teamName: string) => {
+    if (!currentPlayer || !isAuctionActive) return;
+    
+    let newBid: number;
+    if (!hasBids) {
+      newBid = currentPlayer.basePrice;
+    } else {
+      const increment = gradeIncrements[currentPlayer.grade] || 500000;
+      newBid = currentBid + increment;
+    }
+    onBid(teamName, newBid);
+  };
 
-          {/* Player Card and Auction Controls - Side by Side */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
-              {currentPlayer && (
-                <div className="max-w-md mx-auto">
-                  <PlayerCard player={currentPlayer} />
-                </div>
-              )}
-            </div>
-            <div>
-              <AuctionControls
-                currentPlayer={currentPlayer}
-                currentBid={currentBid}
-                lastBidTeam={currentPlayer?.lastBidTeam}
-                lastBidTeamLogo={teams.find(t => t.name === currentPlayer?.lastBidTeam)?.logo}
-                lastBidTeamFlag={teams.find(t => t.name === currentPlayer?.lastBidTeam)?.flag}
-                gradeIncrements={gradeIncrements}
-                teams={teams}
-                isAuctionActive={isAuctionActive}
-                hasBids={hasBids}
-                onBid={onBid}
-                onSold={onSold}
-                onUnsold={onUnsold}
-                onCancelBid={onCancelBid}
-              />
-            </div>
-          </div>
+  return (
+    <div className="space-y-6 p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <h2 className="text-xl sm:text-2xl font-bold">Auction Control Panel</h2>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+            Player {currentPlayerIndex + 1} of {players.length}
+          </span>
+          <Button 
+            onClick={() => setShowUploadDialog(true)} 
+            variant="outline" 
+            size="sm" 
+            data-testid="button-upload-presentation"
+          >
+            <Upload className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Upload PPT</span>
+          </Button>
+          <Button onClick={onResetAuction} variant="outline" size="sm" data-testid="button-reset-auction">
+            <RotateCcw className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Reset</span>
+          </Button>
+          {isAuctionActive ? (
+            <Button onClick={onPauseAuction} variant="outline" size="sm" data-testid="button-pause-auction">
+              <Pause className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Pause</span>
+            </Button>
+          ) : (
+            <Button onClick={onStartAuction} size="sm" data-testid="button-start-auction">
+              <Play className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Start</span>
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Team Overview Section - Scrolls normally */}
-      <div className="p-6">
+      {/* Player Card and Auction Controls - Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left: Player Card + Team Buttons */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Team Overview</h3>
-          <div className="space-y-3">
-            {teamData.map((team) => (
-              <div key={team.name} onClick={() => setSelectedTeam(team)} className="cursor-pointer">
-                <TeamOverviewCard
-                  teamName={team.name}
-                  teamFlag={team.flag}
-                  teamLogo={team.logo}
-                  playersCount={team.playersCount}
-                  purseUsed={team.purseUsed}
-                  purseRemaining={team.purseRemaining}
-                  totalPurse={team.totalPurse}
-                  gradeCount={team.gradeCount}
-                  maxBid={team.maxBid}
-                  requiredGrades={gradeQuotas}
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Presentation Button - Only visible when auction is paused */}
-          {!isAuctionActive && presentationPath && (
-            <div className="flex justify-center mt-6 pb-6">
-              <Button 
-                onClick={openPresentation} 
-                variant="default" 
-                size="lg"
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg"
-                data-testid="button-open-presentation"
-              >
-                <Presentation className="w-5 h-5 mr-2" />
-                Open Presentation
-              </Button>
+          {currentPlayer && (
+            <div className="max-w-md mx-auto">
+              <PlayerCard player={currentPlayer} />
             </div>
           )}
+          
+          {/* Team Bidding Buttons - Single Horizontal Row */}
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-center">Click team to place bid:</p>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {teams.map((team) => (
+                <Button
+                  key={team.name}
+                  variant="outline"
+                  className="h-auto py-3 px-4 flex flex-col items-center justify-center gap-2 hover-elevate"
+                  onClick={() => handleTeamBid(team.name)}
+                  disabled={!isAuctionActive}
+                  data-testid={`button-bid-${team.name.toLowerCase().replace(/\s+/g, '-')}`}
+                >
+                  <TeamLogo 
+                    logo={team.logo} 
+                    flag={team.flag} 
+                    name={team.name}
+                    className="w-10 h-10 flex-shrink-0"
+                  />
+                  <span className="text-xs font-medium text-center leading-tight line-clamp-2 break-words">
+                    {team.name}
+                  </span>
+                </Button>
+              ))}
+            </div>
+          </div>
         </div>
+
+        {/* Right: Auction Controls */}
+        <div>
+          <AuctionControls
+            currentPlayer={currentPlayer}
+            currentBid={currentBid}
+            lastBidTeam={currentPlayer?.lastBidTeam}
+            lastBidTeamLogo={teams.find(t => t.name === currentPlayer?.lastBidTeam)?.logo}
+            lastBidTeamFlag={teams.find(t => t.name === currentPlayer?.lastBidTeam)?.flag}
+            gradeIncrements={gradeIncrements}
+            teams={teams}
+            isAuctionActive={isAuctionActive}
+            hasBids={hasBids}
+            onBid={onBid}
+            onSold={onSold}
+            onUnsold={onUnsold}
+            onCancelBid={onCancelBid}
+          />
+        </div>
+      </div>
+
+      {/* Team Overview Section */}
+      <div className="space-y-4 pt-6 border-t">
+        <h3 className="text-lg font-semibold">Team Overview</h3>
+        <div className="space-y-3">
+          {teamData.map((team) => (
+            <div key={team.name} onClick={() => setSelectedTeam(team)} className="cursor-pointer">
+              <TeamOverviewCard
+                teamName={team.name}
+                teamFlag={team.flag}
+                teamLogo={team.logo}
+                playersCount={team.playersCount}
+                purseUsed={team.purseUsed}
+                purseRemaining={team.purseRemaining}
+                totalPurse={team.totalPurse}
+                gradeCount={team.gradeCount}
+                maxBid={team.maxBid}
+                requiredGrades={gradeQuotas}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Presentation Button - Only visible when auction is paused */}
+        {!isAuctionActive && presentationPath && (
+          <div className="flex justify-center mt-6 pb-6">
+            <Button 
+              onClick={openPresentation} 
+              variant="default" 
+              size="lg"
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg"
+              data-testid="button-open-presentation"
+            >
+              <Presentation className="w-5 h-5 mr-2" />
+              Open Presentation
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Upload Presentation Dialog */}
@@ -304,6 +324,7 @@ export default function AdminDashboard({
         </DialogContent>
       </Dialog>
 
+      {/* Team Players Dialog */}
       <Dialog open={!!selectedTeam} onOpenChange={() => setSelectedTeam(null)}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto" data-testid="dialog-team-players-admin">
           {selectedTeam && (

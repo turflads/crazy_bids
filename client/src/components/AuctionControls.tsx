@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Gavel, CheckCircle, XCircle, Flag, Undo2 } from "lucide-react";
+import { Gavel, CheckCircle, XCircle, Undo2 } from "lucide-react";
 import TeamLogo from "./TeamLogo";
 
 interface Team {
@@ -59,19 +59,6 @@ export default function AuctionControls({
   const [customAmount, setCustomAmount] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("");
 
-  const handleTeamBid = (teamName: string) => {
-    if (!currentPlayer || !isAuctionActive) return;
-    
-    let newBid: number;
-    if (!hasBids) {
-      newBid = currentPlayer.basePrice;
-    } else {
-      const increment = gradeIncrements[currentPlayer.grade] || 500000;
-      newBid = currentBid + increment;
-    }
-    onBid(teamName, newBid);
-  };
-
   const handleCustomBid = () => {
     if (!customAmount || !selectedTeam || !currentPlayer || !isAuctionActive) return;
     
@@ -107,6 +94,7 @@ export default function AuctionControls({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Current Player */}
         <div className="p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground mb-1">Current Player</p>
           <h3 className="text-xl font-bold" data-testid="text-current-player">
@@ -120,6 +108,7 @@ export default function AuctionControls({
           </div>
         </div>
 
+        {/* Current Bid */}
         <div className="p-6 bg-primary/10 rounded-lg">
           <p className="text-sm text-muted-foreground mb-2 text-center">Current Bid</p>
           <p className="text-4xl font-bold font-mono text-primary text-center" data-testid="text-current-bid">
@@ -140,15 +129,15 @@ export default function AuctionControls({
           )}
         </div>
 
-        {currentPlayer && (
-          <div className="p-4 bg-muted rounded-lg">
-            <p className="text-sm text-muted-foreground mb-1">Next Increment</p>
-            <p className="text-lg font-semibold font-mono">
-              +₹{gradeIncrements[currentPlayer.grade]?.toLocaleString() || '0'}
-            </p>
-          </div>
-        )}
+        {/* Next Increment */}
+        <div className="p-4 bg-muted rounded-lg">
+          <p className="text-sm text-muted-foreground mb-1">Next Increment</p>
+          <p className="text-lg font-semibold font-mono">
+            +₹{gradeIncrements[currentPlayer.grade]?.toLocaleString() || '0'}
+          </p>
+        </div>
 
+        {/* Auction Not Active Warning */}
         {!isAuctionActive && (
           <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
             <p className="text-sm text-amber-600 dark:text-amber-400 text-center">
@@ -157,32 +146,7 @@ export default function AuctionControls({
           </div>
         )}
 
-        <div className="space-y-3">
-          <p className="text-sm font-medium">Click team to place bid:</p>
-          <div className="grid grid-cols-2 gap-3">
-            {teams.map((team) => (
-              <Button
-                key={team.name}
-                variant="outline"
-                className="h-auto min-h-[100px] py-3 px-2 flex flex-col items-center justify-center gap-2 hover-elevate"
-                onClick={() => handleTeamBid(team.name)}
-                disabled={!isAuctionActive}
-                data-testid={`button-bid-${team.name.toLowerCase().replace(/\s+/g, '-')}`}
-              >
-                <TeamLogo 
-                  logo={team.logo} 
-                  flag={team.flag} 
-                  name={team.name}
-                  className="w-10 h-10 flex-shrink-0"
-                />
-                <span className="text-xs font-medium text-center leading-tight line-clamp-2 break-words w-full">
-                  {team.name}
-                </span>
-              </Button>
-            ))}
-          </div>
-        </div>
-
+        {/* Custom Bid */}
         <div className="space-y-3 pt-4 border-t">
           <p className="text-sm font-medium">Custom Bid:</p>
           <div className="grid grid-cols-2 gap-3">
@@ -232,7 +196,8 @@ export default function AuctionControls({
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t">
+        {/* Action Buttons: Cancel, Sold, Unsold */}
+        <div className="grid grid-cols-3 gap-3 pt-2">
           <Button
             variant="outline"
             className="w-full"
