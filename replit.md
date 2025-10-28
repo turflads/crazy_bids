@@ -2,7 +2,16 @@
 
 ## Overview
 
-A comprehensive web application for conducting live cricket player auctions with real-time bidding, team management, and grade-based player acquisition. The platform supports role-based access control (Super Admin, Admin, Owner, Viewer) and features grade quotas, purse tracking, celebration animations for sold players, backend-like editing capabilities for corrections, and PowerPoint presentation integration for paused auctions. Built with React (Vite), Express, and localStorage for state management.
+A comprehensive web application for conducting live cricket player auctions with real-time bidding, team management, and grade-based player acquisition. The platform supports role-based access control (Super Admin, Admin, Owner, Viewer) and features grade quotas, purse tracking, celebration animations for sold players, backend-like editing capabilities for corrections, PowerPoint presentation integration for paused auctions, and league sponsor branding. Built with React (Vite), Express, and localStorage for state management.
+
+## Recent Updates (Latest)
+
+- **Admin Layout Redesign**: Reorganized Admin page with player card and auction controls side-by-side, team overview cards displayed in vertical rows below for better space utilization
+- **Current Bid Enhancement**: Added team logo and name display to current bid sections on Admin, Owner, and Viewer pages showing which team placed the last bid
+- **Sponsor Branding**: Added configurable league sponsor name and logo in navbar via `leagueConfig.ts` (SPONSOR_NAME, SPONSOR_LOGO constants)
+- Grade-specific max bid caps system (gradeMaxBidCaps in config.json) with comprehensive documentation
+- PowerPoint presentation upload and display feature for auction breaks
+- Owner page grade display shows "current/quota" format (e.g., "A: 0/3")
 
 ## User Preferences
 
@@ -31,11 +40,14 @@ Preferred communication style: Simple, everyday language.
 
 **Key Components**
 - **Role-based dashboards**: SuperAdminDashboard, AdminDashboard, OwnerDashboard, ViewerDashboard with distinct feature sets
+- **Admin layout**: Player card and auction controls side-by-side, team overview in vertical rows for better organization
+- **Current bid display**: Shows bid amount, team logo, and team name across all dashboards (Admin, Owner, Viewer)
 - **Super Admin controls**: Full editing interface for correcting auction mistakes (team purses, player assignments, sold prices)
 - **Real-time auction controls**: Bidding interface with grade-based increments and validation
 - **Player management**: Excel import via XLSX library, configurable column mapping
 - **Celebration system**: CSS animations and fireworks effect for sold players
 - **Presentation system**: PowerPoint upload and display feature for admin during auction breaks (paused state)
+- **Sponsor branding**: Configurable league sponsor name and logo in navbar
 
 ### Backend Architecture
 
@@ -73,9 +85,9 @@ Preferred communication style: Simple, everyday language.
 - Status flags: isAuctionActive, hasBids
 
 **Configuration**
-- JSON-based config (`config.json`) for grade base prices, increments, teams, and quotas
+- JSON-based config (`config.json`) for grade base prices, increments, teams, quotas, and optional grade max bid caps
 - Hot-reloadable without code changes for auction customization
-- Separate league branding config in `leagueConfig.ts`
+- League branding config in `leagueConfig.ts` (LEAGUE_NAME, SPONSOR_NAME, SPONSOR_LOGO)
 
 ### Business Logic
 
