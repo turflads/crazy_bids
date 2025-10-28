@@ -6,6 +6,7 @@ A comprehensive web application for conducting live cricket player auctions with
 
 ## Recent Updates (Latest)
 
+- **Smooth Scroll Fix**: Fixed unwanted scroll behavior when clicking Sold/Unsold buttons - now uses smart `scrollIntoView` with 'nearest' positioning that only scrolls when necessary
 - **Admin Sticky Layout**: Player card and auction controls now stick to the top of the page during scrolling, ensuring player visibility when viewing team cards (solves UX issue with 10+ teams)
 - **Admin Layout Redesign**: Reorganized Admin page with player card and auction controls side-by-side, team overview cards displayed in vertical rows below for better space utilization
 - **Current Bid Enhancement**: Added team logo and name display to current bid sections on Admin, Owner, and Viewer pages showing which team placed the last bid
