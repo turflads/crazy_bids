@@ -153,70 +153,75 @@ export default function AdminDashboard({
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <h2 className="text-xl sm:text-2xl font-bold">Auction Control Panel</h2>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
-              Player {currentPlayerIndex + 1} of {players.length}
-            </span>
-            <Button 
-              onClick={() => setShowUploadDialog(true)} 
-              variant="outline" 
-              size="sm" 
-              data-testid="button-upload-presentation"
-            >
-              <Upload className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Upload PPT</span>
-            </Button>
-            <Button onClick={onResetAuction} variant="outline" size="sm" data-testid="button-reset-auction">
-              <RotateCcw className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Reset</span>
-            </Button>
-            {isAuctionActive ? (
-              <Button onClick={onPauseAuction} variant="outline" size="sm" data-testid="button-pause-auction">
-                <Pause className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Pause</span>
+    <div className="space-y-6">
+      {/* Sticky Header and Player/Controls Section */}
+      <div className="sticky top-0 z-10 bg-background pb-6 border-b">
+        <div className="p-6 space-y-6">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <h2 className="text-xl sm:text-2xl font-bold">Auction Control Panel</h2>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+                Player {currentPlayerIndex + 1} of {players.length}
+              </span>
+              <Button 
+                onClick={() => setShowUploadDialog(true)} 
+                variant="outline" 
+                size="sm" 
+                data-testid="button-upload-presentation"
+              >
+                <Upload className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Upload PPT</span>
               </Button>
-            ) : (
-              <Button onClick={onStartAuction} size="sm" data-testid="button-start-auction">
-                <Play className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Start</span>
+              <Button onClick={onResetAuction} variant="outline" size="sm" data-testid="button-reset-auction">
+                <RotateCcw className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Reset</span>
               </Button>
-            )}
+              {isAuctionActive ? (
+                <Button onClick={onPauseAuction} variant="outline" size="sm" data-testid="button-pause-auction">
+                  <Pause className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Pause</span>
+                </Button>
+              ) : (
+                <Button onClick={onStartAuction} size="sm" data-testid="button-start-auction">
+                  <Play className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Start</span>
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Player Card and Auction Controls - Side by Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              {currentPlayer && (
+                <div className="max-w-md mx-auto">
+                  <PlayerCard player={currentPlayer} />
+                </div>
+              )}
+            </div>
+            <div>
+              <AuctionControls
+                currentPlayer={currentPlayer}
+                currentBid={currentBid}
+                lastBidTeam={currentPlayer?.lastBidTeam}
+                lastBidTeamLogo={teams.find(t => t.name === currentPlayer?.lastBidTeam)?.logo}
+                lastBidTeamFlag={teams.find(t => t.name === currentPlayer?.lastBidTeam)?.flag}
+                gradeIncrements={gradeIncrements}
+                teams={teams}
+                isAuctionActive={isAuctionActive}
+                hasBids={hasBids}
+                onBid={onBid}
+                onSold={onSold}
+                onUnsold={onUnsold}
+                onCancelBid={onCancelBid}
+              />
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Player Card and Auction Controls - Side by Side */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            {currentPlayer && (
-              <div className="max-w-md mx-auto">
-                <PlayerCard player={currentPlayer} />
-              </div>
-            )}
-          </div>
-          <div>
-            <AuctionControls
-              currentPlayer={currentPlayer}
-              currentBid={currentBid}
-              lastBidTeam={currentPlayer?.lastBidTeam}
-              lastBidTeamLogo={teams.find(t => t.name === currentPlayer?.lastBidTeam)?.logo}
-              lastBidTeamFlag={teams.find(t => t.name === currentPlayer?.lastBidTeam)?.flag}
-              gradeIncrements={gradeIncrements}
-              teams={teams}
-              isAuctionActive={isAuctionActive}
-              hasBids={hasBids}
-              onBid={onBid}
-              onSold={onSold}
-              onUnsold={onUnsold}
-              onCancelBid={onCancelBid}
-            />
-          </div>
-        </div>
-
-        {/* Team Overview - Rows Below */}
+      {/* Team Overview Section - Scrolls normally */}
+      <div className="p-6">
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Team Overview</h3>
           <div className="space-y-3">
@@ -237,23 +242,23 @@ export default function AdminDashboard({
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Presentation Button - Only visible when auction is paused */}
-        {!isAuctionActive && presentationPath && (
-          <div className="flex justify-center mt-6">
-            <Button 
-              onClick={openPresentation} 
-              variant="default" 
-              size="lg"
-              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg"
-              data-testid="button-open-presentation"
-            >
-              <Presentation className="w-5 h-5 mr-2" />
-              Open Presentation
-            </Button>
-          </div>
-        )}
+          {/* Presentation Button - Only visible when auction is paused */}
+          {!isAuctionActive && presentationPath && (
+            <div className="flex justify-center mt-6 pb-6">
+              <Button 
+                onClick={openPresentation} 
+                variant="default" 
+                size="lg"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg"
+                data-testid="button-open-presentation"
+              >
+                <Presentation className="w-5 h-5 mr-2" />
+                Open Presentation
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Upload Presentation Dialog */}
