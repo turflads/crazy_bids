@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -84,6 +84,23 @@ export default function AdminDashboard({
   );
   const { toast } = useToast();
   const currentPlayer = players[currentPlayerIndex];
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const prevPlayerIndexRef = useRef(currentPlayerIndex);
+
+  // Ensure sticky section is visible when player changes
+  useEffect(() => {
+    if (prevPlayerIndexRef.current !== currentPlayerIndex) {
+      prevPlayerIndexRef.current = currentPlayerIndex;
+      
+      // Scroll sticky section into view only if needed (using 'nearest' behavior)
+      if (stickyRef.current) {
+        stickyRef.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'nearest'
+        });
+      }
+    }
+  }, [currentPlayerIndex]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -155,7 +172,7 @@ export default function AdminDashboard({
   return (
     <div className="space-y-6">
       {/* Sticky Header and Player/Controls Section */}
-      <div className="sticky top-0 z-10 bg-background pb-6 border-b">
+      <div ref={stickyRef} className="sticky top-0 z-10 bg-background pb-6 border-b">
         <div className="p-6 space-y-6">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <h2 className="text-xl sm:text-2xl font-bold">Auction Control Panel</h2>
