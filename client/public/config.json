@@ -9,6 +9,11 @@
     "B": 300000,
     "C": 200000
   },
+  "gradeMaxBidCaps": {
+    "A": 15000000,
+    "B": 10000000,
+    "C": 5000000
+  },
   "teams": [
     {
       "name": "Chennai Super Kings",

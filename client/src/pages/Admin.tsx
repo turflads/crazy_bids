@@ -27,6 +27,7 @@ export default function Admin() {
   const [gradeIncrements, setGradeIncrements] = useState<Record<string, number>>({});
   const [gradeQuotas, setGradeQuotas] = useState<Record<string, number>>({});
   const [gradeBasePrices, setGradeBasePrices] = useState<Record<string, number>>({});
+  const [gradeMaxBidCaps, setGradeMaxBidCaps] = useState<Record<string, number>>({});
 
   // Initialize auction state
   const [players, setPlayers] = useState<any[]>([]);
@@ -46,6 +47,7 @@ export default function Admin() {
       setGradeIncrements(config.gradeIncrements);
       setGradeQuotas(config.gradeQuotas);
       setGradeBasePrices(config.gradeBasePrices);
+      setGradeMaxBidCaps(config.gradeMaxBidCaps || {});
       
       const loadedPlayers = await loadPlayersFromExcel();
       
@@ -121,6 +123,7 @@ export default function Admin() {
       setGradeIncrements(config.gradeIncrements);
       setGradeQuotas(config.gradeQuotas);
       setGradeBasePrices(config.gradeBasePrices);
+      setGradeMaxBidCaps(config.gradeMaxBidCaps || {});
     };
     
     const interval = setInterval(refreshConfig, 5000);
@@ -196,7 +199,8 @@ export default function Admin() {
       },
       currentPlayer.grade,
       gradeBasePrices,
-      gradeQuotas
+      gradeQuotas,
+      gradeMaxBidCaps
     ) : 0;
 
     return {
@@ -270,6 +274,12 @@ export default function Admin() {
             return;
           }
 
+          // Check if bid exceeds grade-specific cap (if configured)
+          if (gradeMaxBidCaps[currentPlayer.grade] && amount > gradeMaxBidCaps[currentPlayer.grade]) {
+            alert(`Bid exceeds Grade ${currentPlayer.grade} maximum limit!\nMax allowed for Grade ${currentPlayer.grade}: ₹${gradeMaxBidCaps[currentPlayer.grade].toLocaleString()}\nYour bid: ₹${amount.toLocaleString()}`);
+            return;
+          }
+
           // Calculate max bid for this team
           const maxBid = calculateMaxBidSync(
             {
@@ -280,7 +290,8 @@ export default function Admin() {
             },
             currentPlayer.grade,
             gradeBasePrices,
-            gradeQuotas
+            gradeQuotas,
+            gradeMaxBidCaps
           );
 
           // Check if bid exceeds max allowed (considering reserve for remaining quotas)

@@ -40,7 +40,13 @@ export async function calculateMaxBid(
   });
   
   // Max bid is remaining purse minus the reserve for all other required slots
-  const maxBid = remainingPurse - reserveForAllGrades;
+  let maxBid = remainingPurse - reserveForAllGrades;
+  
+  // Apply grade-specific max bid cap if configured
+  if (config.gradeMaxBidCaps && config.gradeMaxBidCaps[currentPlayerGrade]) {
+    const gradeCap = config.gradeMaxBidCaps[currentPlayerGrade];
+    maxBid = Math.min(maxBid, gradeCap);
+  }
   
   return Math.max(0, maxBid);
 }
@@ -49,7 +55,8 @@ export function calculateMaxBidSync(
   team: TeamRequirements,
   currentPlayerGrade: string,
   gradeBasePrices: Record<string, number>,
-  gradeQuotas: Record<string, number>
+  gradeQuotas: Record<string, number>,
+  gradeMaxBidCaps?: Record<string, number>
 ): number {
   const remainingPurse = team.totalPurse - team.usedPurse;
   
@@ -79,7 +86,13 @@ export function calculateMaxBidSync(
   });
   
   // Max bid is remaining purse minus the reserve for all other required slots
-  const maxBid = remainingPurse - reserveForAllGrades;
+  let maxBid = remainingPurse - reserveForAllGrades;
+  
+  // Apply grade-specific max bid cap if configured
+  if (gradeMaxBidCaps && gradeMaxBidCaps[currentPlayerGrade]) {
+    const gradeCap = gradeMaxBidCaps[currentPlayerGrade];
+    maxBid = Math.min(maxBid, gradeCap);
+  }
   
   return Math.max(0, maxBid);
 }

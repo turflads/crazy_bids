@@ -12,6 +12,7 @@ export default function Owner() {
   const [user, setUser] = useState<{ username: string; role: string } | null>(null);
   const [gradeQuotas, setGradeQuotas] = useState<Record<string, number>>({});
   const [gradeBasePrices, setGradeBasePrices] = useState<Record<string, number>>({});
+  const [gradeMaxBidCaps, setGradeMaxBidCaps] = useState<Record<string, number>>({});
   const [celebrationData, setCelebrationData] = useState<{
     open: boolean;
     playerName: string;
@@ -49,7 +50,8 @@ export default function Owner() {
       },
       currentPlayer.grade,
       gradeBasePrices,
-      gradeQuotas
+      gradeQuotas,
+      gradeMaxBidCaps
     ) : 0;
 
     return {
@@ -71,6 +73,7 @@ export default function Owner() {
       const config = await loadAuctionConfig(true);
       setGradeQuotas(config.gradeQuotas);
       setGradeBasePrices(config.gradeBasePrices);
+      setGradeMaxBidCaps(config.gradeMaxBidCaps || {});
     };
     
     loadConfig();

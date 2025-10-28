@@ -80,8 +80,9 @@ Preferred communication style: Simple, everyday language.
 ### Business Logic
 
 **Bidding Validation System**
-- Three-tier validation: purse sufficiency, max bid calculation, grade quota fulfillment
-- Max bid formula: `remainingPurse - reserveForUnfilledQuotas`
+- Four-tier validation: grade quota fulfillment, purse sufficiency, grade-specific max bid caps (optional), smart max bid calculation
+- Max bid formula: `min(gradeCap, remainingPurse - reserveForUnfilledQuotas)`
+- Grade-specific caps configurable in config.json (e.g., Grade A max ₹15M, Grade B max ₹10M)
 - Real-time feedback with descriptive error messages
 
 **Grade Quota Management**

@@ -8,6 +8,7 @@ export interface Team {
 export interface AuctionConfig {
   gradeBasePrices: Record<string, number>;
   gradeIncrements: Record<string, number>;
+  gradeMaxBidCaps?: Record<string, number>; // Optional: max bid caps per grade
   teams: Team[];
   gradeQuotas: Record<string, number>;
 }
