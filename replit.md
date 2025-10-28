@@ -6,9 +6,8 @@ A comprehensive web application for conducting live cricket player auctions with
 
 ## Recent Updates (Latest)
 
-- **Smooth Scroll Fix**: Fixed unwanted scroll behavior when clicking Sold/Unsold buttons - now uses smart `scrollIntoView` with 'nearest' positioning that only scrolls when necessary
-- **Admin Sticky Layout**: Player card and auction controls now stick to the top of the page during scrolling, ensuring player visibility when viewing team cards (solves UX issue with 10+ teams)
-- **Admin Layout Redesign**: Reorganized Admin page with player card and auction controls side-by-side, team overview cards displayed in vertical rows below for better space utilization
+- **Admin Layout Complete Redesign**: Fixed scroll issues and simplified layout - removed sticky positioning entirely. New structure: Player card + team bidding buttons (horizontal row) on left, auction controls on right, team overview cards visible below. Team buttons now accessible without scrolling.
+- **AuctionControls Reorganization**: Custom bid and action buttons (Cancel/Sold/Unsold) now positioned directly below Next Increment for logical grouping. Team bidding buttons moved to main dashboard below player card.
 - **Current Bid Enhancement**: Added team logo and name display to current bid sections on Admin, Owner, and Viewer pages showing which team placed the last bid
 - **Sponsor Branding**: Added configurable league sponsor name and logo in navbar via `leagueConfig.ts` (SPONSOR_NAME, SPONSOR_LOGO constants)
 - Grade-specific max bid caps system (gradeMaxBidCaps in config.json) with comprehensive documentation
