@@ -172,9 +172,17 @@ export default function OwnerDashboard({
                   ₹{currentBid?.toLocaleString()}
                 </p>
                 {currentPlayer.lastBidTeam && (
-                  <p className="text-sm text-muted-foreground mt-1 truncate">
-                    by {currentPlayer.lastBidTeam}
-                  </p>
+                  <div className="flex items-center justify-center sm:justify-end gap-2 mt-2">
+                    <TeamLogo 
+                      logo={allTeamsData.find(t => t.team === currentPlayer.lastBidTeam)?.logo}
+                      flag={allTeamsData.find(t => t.team === currentPlayer.lastBidTeam)?.flag}
+                      name={currentPlayer.lastBidTeam}
+                      className="w-6 h-6 flex-shrink-0"
+                    />
+                    <p className="text-sm text-muted-foreground truncate" data-testid="text-last-bid-team">
+                      {currentPlayer.lastBidTeam}
+                    </p>
+                  </div>
                 )}
               </div>
             </div>

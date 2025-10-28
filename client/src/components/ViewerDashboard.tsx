@@ -62,16 +62,23 @@ export default function ViewerDashboard({
               </div>
               <div className="space-y-4">
                 <div className="p-4 sm:p-6 bg-primary/10 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-2">Current Bid</p>
-                  <p className="text-3xl sm:text-4xl font-bold font-mono text-primary break-all" data-testid="text-viewer-current-bid">
+                  <p className="text-sm text-muted-foreground mb-2 text-center">Current Bid</p>
+                  <p className="text-3xl sm:text-4xl font-bold font-mono text-primary break-all text-center" data-testid="text-viewer-current-bid">
                     ₹{currentAuction.currentBid.toLocaleString()}
                   </p>
-                </div>
-                <div className="p-4 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Leading Team</p>
-                  <p className="text-lg sm:text-xl font-semibold truncate" data-testid="text-leading-team">
-                    {currentAuction.leadingTeam}
-                  </p>
+                  {currentAuction.leadingTeam && (
+                    <div className="mt-4 pt-4 border-t border-primary/20 flex items-center justify-center gap-3">
+                      <TeamLogo 
+                        logo={teamStandings.find(t => t.team === currentAuction.leadingTeam)?.logo}
+                        flag={teamStandings.find(t => t.team === currentAuction.leadingTeam)?.flag}
+                        name={currentAuction.leadingTeam}
+                        className="w-8 h-8 flex-shrink-0"
+                      />
+                      <p className="text-sm font-semibold text-muted-foreground" data-testid="text-leading-team">
+                        {currentAuction.leadingTeam}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

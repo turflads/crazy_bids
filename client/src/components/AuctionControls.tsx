@@ -28,6 +28,9 @@ interface AuctionControlsProps {
     basePrice: number;
   };
   currentBid: number;
+  lastBidTeam?: string;
+  lastBidTeamLogo?: string;
+  lastBidTeamFlag?: string;
   gradeIncrements: Record<string, number>;
   teams: Team[];
   isAuctionActive: boolean;
@@ -41,6 +44,9 @@ interface AuctionControlsProps {
 export default function AuctionControls({
   currentPlayer,
   currentBid,
+  lastBidTeam,
+  lastBidTeamLogo,
+  lastBidTeamFlag,
   gradeIncrements,
   teams,
   isAuctionActive,
@@ -114,11 +120,24 @@ export default function AuctionControls({
           </div>
         </div>
 
-        <div className="p-6 bg-primary/10 rounded-lg text-center">
-          <p className="text-sm text-muted-foreground mb-2">Current Bid</p>
-          <p className="text-4xl font-bold font-mono text-primary" data-testid="text-current-bid">
+        <div className="p-6 bg-primary/10 rounded-lg">
+          <p className="text-sm text-muted-foreground mb-2 text-center">Current Bid</p>
+          <p className="text-4xl font-bold font-mono text-primary text-center" data-testid="text-current-bid">
             ₹{currentBid.toLocaleString()}
           </p>
+          {hasBids && lastBidTeam && (
+            <div className="mt-4 pt-4 border-t border-primary/20 flex items-center justify-center gap-3">
+              <TeamLogo 
+                logo={lastBidTeamLogo} 
+                flag={lastBidTeamFlag} 
+                name={lastBidTeam}
+                className="w-8 h-8 flex-shrink-0"
+              />
+              <span className="text-sm font-semibold text-muted-foreground" data-testid="text-last-bid-team">
+                {lastBidTeam}
+              </span>
+            </div>
+          )}
         </div>
 
         {currentPlayer && (

@@ -188,16 +188,22 @@ export default function AdminDashboard({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 space-y-6">
+        {/* Player Card and Auction Controls - Side by Side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
             {currentPlayer && (
               <div className="max-w-md mx-auto">
                 <PlayerCard player={currentPlayer} />
               </div>
             )}
+          </div>
+          <div>
             <AuctionControls
               currentPlayer={currentPlayer}
               currentBid={currentBid}
+              lastBidTeam={currentPlayer?.lastBidTeam}
+              lastBidTeamLogo={teams.find(t => t.name === currentPlayer?.lastBidTeam)?.logo}
+              lastBidTeamFlag={teams.find(t => t.name === currentPlayer?.lastBidTeam)?.flag}
               gradeIncrements={gradeIncrements}
               teams={teams}
               isAuctionActive={isAuctionActive}
@@ -208,29 +214,28 @@ export default function AdminDashboard({
               onCancelBid={onCancelBid}
             />
           </div>
+        </div>
 
-          <div className="lg:col-span-2">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Team Overview</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {teamData.map((team) => (
-                  <div key={team.name} onClick={() => setSelectedTeam(team)} className="cursor-pointer">
-                    <TeamOverviewCard
-                      teamName={team.name}
-                      teamFlag={team.flag}
-                      teamLogo={team.logo}
-                      playersCount={team.playersCount}
-                      purseUsed={team.purseUsed}
-                      purseRemaining={team.purseRemaining}
-                      totalPurse={team.totalPurse}
-                      gradeCount={team.gradeCount}
-                      maxBid={team.maxBid}
-                      requiredGrades={gradeQuotas}
-                    />
-                  </div>
-                ))}
+        {/* Team Overview - Rows Below */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Team Overview</h3>
+          <div className="space-y-3">
+            {teamData.map((team) => (
+              <div key={team.name} onClick={() => setSelectedTeam(team)} className="cursor-pointer">
+                <TeamOverviewCard
+                  teamName={team.name}
+                  teamFlag={team.flag}
+                  teamLogo={team.logo}
+                  playersCount={team.playersCount}
+                  purseUsed={team.purseUsed}
+                  purseRemaining={team.purseRemaining}
+                  totalPurse={team.totalPurse}
+                  gradeCount={team.gradeCount}
+                  maxBid={team.maxBid}
+                  requiredGrades={gradeQuotas}
+                />
               </div>
-            </div>
+            ))}
           </div>
         </div>
 

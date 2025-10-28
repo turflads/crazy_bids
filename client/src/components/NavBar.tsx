@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trophy, LogOut, Circle } from "lucide-react";
-import { LEAGUE_NAME } from "@/config/leagueConfig";
+import { LEAGUE_NAME, SPONSOR_NAME, SPONSOR_LOGO } from "@/config/leagueConfig";
 
 interface NavBarProps {
   userRole: 'admin' | 'owner' | 'viewer';
@@ -29,7 +29,23 @@ export default function NavBar({ userRole, username, isAuctionLive, onLogout }: 
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
-            <h1 className="text-lg sm:text-xl font-bold truncate">{LEAGUE_NAME}</h1>
+            <div className="flex flex-col">
+              <h1 className="text-lg sm:text-xl font-bold truncate">{LEAGUE_NAME}</h1>
+              {SPONSOR_NAME && (
+                <div className="flex items-center gap-2">
+                  {SPONSOR_LOGO && (
+                    <img 
+                      src={SPONSOR_LOGO} 
+                      alt="Sponsor" 
+                      className="h-4 w-auto object-contain"
+                    />
+                  )}
+                  <span className="text-xs text-muted-foreground whitespace-nowrap" data-testid="text-sponsor">
+                    {SPONSOR_NAME}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
           {isAuctionLive && (
             <Badge className="bg-auction-live text-white animate-pulse flex-shrink-0" data-testid="badge-live-auction">
