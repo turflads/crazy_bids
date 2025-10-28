@@ -22,6 +22,24 @@
       "totalPurse": 100000000
     },
     {
+      "name": "Chennai Super Kings2",
+      "flag": "🟡",
+      "logo": "/images/chennai-super-kings.png",
+      "totalPurse": 100000000
+    },
+    {
+      "name": "Chennai Super Kings3",
+      "flag": "🟡",
+      "logo": "/images/chennai-super-kings.png",
+      "totalPurse": 100000000
+    },
+    {
+      "name": "Chennai Super Kings4",
+      "flag": "🟡",
+      "logo": "/images/chennai-super-kings.png",
+      "totalPurse": 100000000
+    },
+    {
       "name": "Royal Challengers",
       "flag": "🔴",
       "logo": "/images/royal-challengers.png",
