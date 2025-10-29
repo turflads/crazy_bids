@@ -1,0 +1,85 @@
+═══════════════════════════════════════════════════════════════════════════════
+  QUICK SWITCH GUIDE: Unsold Player Strategies
+═══════════════════════════════════════════════════════════════════════════════
+
+📋 BEFORE YOU START: Check your Excel file organization!
+
+    Option 1: Sorted by Grade          Option 2: Random/Mixed Order
+    ┌─────────────────────┐            ┌─────────────────────┐
+    │ A1 - Grade A        │            │ A1 - Grade A        │
+    │ A2 - Grade A        │            │ C2 - Grade C        │
+    │ A3 - Grade A        │            │ B1 - Grade B        │
+    │ B1 - Grade B        │            │ A2 - Grade A        │
+    │ B2 - Grade B        │            │ B2 - Grade B        │
+    │ C1 - Grade C        │            │ C1 - Grade C        │
+    └─────────────────────┘            └─────────────────────┘
+    
+    Use STRATEGY 1 →                   Use STRATEGY 2 →
+    (Grade-Based)                      (All at End)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 STRATEGY 1: Grade-Based Re-Auction (for SORTED Excel files)
+───────────────────────────────────────────────────────────────────────────────
+
+HOW IT WORKS:
+  • Unsold Grade A → comes back after ALL Grade A players
+  • Unsold Grade B → comes back after ALL Grade B players
+  • Like real IPL auction!
+
+TO ACTIVATE:
+  1. Open: client/src/pages/Admin.tsx
+  2. Find line 441: // ---- STRATEGY 1: GRADE-BASED RE-AUCTION
+  3. REMOVE the /* on line 441 and */ on line 464
+  4. ADD /* before line 469 and */ after line 479
+  5. Save file
+  6. Hard refresh browser (Ctrl + Shift + R)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 STRATEGY 2: All Unsold at End (for RANDOM Excel files) ✅ CURRENTLY ACTIVE
+───────────────────────────────────────────────────────────────────────────────
+
+HOW IT WORKS:
+  • ALL unsold players come together at the END
+  • Doesn't matter what grade they are
+  • Works with any Excel file order
+
+TO ACTIVATE:
+  1. Open: client/src/pages/Admin.tsx
+  2. Find line 469: // ---- STRATEGY 2: ALL UNSOLD AT END
+  3. Make sure this section is NOT wrapped in /* */
+  4. Make sure Strategy 1 (lines 441-464) IS wrapped in /* */
+  5. Save file
+  6. Hard refresh browser (Ctrl + Shift + R)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ VERIFICATION: Check which strategy is running
+───────────────────────────────────────────────────────────────────────────────
+
+1. Open browser console (F12)
+2. Mark any player as "Unsold"
+3. Check the console log message:
+
+   Strategy 1 shows: [GRADE-BASED] Player unsold and re-queued after Grade X...
+   Strategy 2 shows: [ALL AT END] Player unsold and re-queued at end...
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📝 EXAMPLE: How to comment/uncomment code
+───────────────────────────────────────────────────────────────────────────────
+
+COMMENTED (inactive):
+    /*
+    let insertIndex = currentPlayerIndex;
+    console.log("This code won't run");
+    */
+
+UNCOMMENTED (active):
+    let insertIndex = currentPlayerIndex;
+    console.log("This code WILL run");
+
+═══════════════════════════════════════════════════════════════════════════════
+
+For detailed documentation, see: UNSOLD_PLAYER_STRATEGIES.md

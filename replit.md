@@ -6,7 +6,11 @@ A comprehensive web application for conducting live cricket player auctions with
 
 ## Recent Updates (Latest)
 
-- **Grade-Based Unsold Re-Auction**: Unsold players now come up for auction after their grade category finishes. Example: Unsold Grade A players re-appear after all Grade A players are done, before Grade B starts. This matches real IPL auction flow.
+- **Dual-Strategy Unsold Player System**: TWO unsold player handling modes available via comment/uncomment:
+  - **Strategy 1 (Grade-Based)**: For sorted Excel files (A,A,B,B,C,C) - unsold players reappear after their grade finishes
+  - **Strategy 2 (All at End)**: For random Excel files (A,C,B,A,C,B) - all unsold players come together at the end
+  - Currently active: Strategy 2 (All at End)
+  - Switch by commenting/uncommenting code blocks in `Admin.tsx` (detailed guide in `UNSOLD_PLAYER_STRATEGIES.md`)
 - **Excel Report Download**: Admin can download auction results as Excel file with columns: Player Name, Phone Number, Team, Grade, Sold Price. Button in header downloads as `auction_report_YYYY-MM-DD.xlsx`.
 - **Phone Number Support**: Added phone number field to player data structure. Import from Excel using 'phone' column.
 - **Admin Layout Complete Redesign**: Fixed scroll issues and simplified layout - removed sticky positioning entirely. New structure: Player card + team bidding buttons (horizontal row) on left, auction controls on right, team overview cards visible below. Team buttons now accessible without scrolling.

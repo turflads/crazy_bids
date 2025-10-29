@@ -418,35 +418,74 @@ export default function Admin() {
           // Remove from current position
           updatedPlayers.splice(currentPlayerIndex, 1);
           
-          // Find the last player of the same grade after current position
-          // This ensures unsold players come after their grade category
+          // ==================== UNSOLD PLAYER RE-AUCTION STRATEGY ====================
+          // Choose ONE strategy based on your Excel file organization:
+          // 
+          // STRATEGY 1: Grade-Based Re-Auction (for sorted Excel files: A, A, A, B, B, C, C)
+          //   - Unsold Grade A players come back AFTER all Grade A players finish
+          //   - Then Grade B starts
+          //   - Use this when Excel is sorted by grade
+          //
+          // STRATEGY 2: All Unsold at End (for random Excel files: A, C, B, A, B, C)
+          //   - ALL unsold players come back at the END together
+          //   - Use this when Excel has random/mixed grade order
+          //
+          // TO SWITCH: Comment out one strategy, uncomment the other
+          // ===========================================================================
+          
+          // ---- STRATEGY 1: GRADE-BASED RE-AUCTION (Sorted Excel Files) ----
+          // UNCOMMENT THIS BLOCK FOR SORTED EXCEL FILES (A, A, B, B, C, C):
+          /*
           let insertIndex = currentPlayerIndex; // Default to current position (right before next grade)
+          let foundMoreOfSameGrade = false;
           
           for (let i = currentPlayerIndex; i < updatedPlayers.length; i++) {
             if (updatedPlayers[i].grade === currentPlayer.grade) {
               insertIndex = i + 1; // Insert after the last same-grade player
+              foundMoreOfSameGrade = true;
             }
           }
           
           // Insert the unsold player at the calculated position
           updatedPlayers.splice(insertIndex, 0, unsoldPlayer);
           
-          setPlayers(updatedPlayers);
-          
-          console.log(`Player unsold and re-queued after Grade ${currentPlayer.grade} players at position ${insertIndex}`);
+          console.log(`[GRADE-BASED] Player unsold and re-queued after Grade ${currentPlayer.grade} players at position ${insertIndex}`);
           
           // Calculate new index to continue auction
-          // If we inserted at or before current position, we need to skip the unsold player
           let newIndex = currentPlayerIndex;
-          if (insertIndex <= currentPlayerIndex) {
-            // We inserted before/at current, so move to the next player
-            newIndex = currentPlayerIndex + 1;
+          
+          if (foundMoreOfSameGrade) {
+            // There are more players of this grade ahead, move to next player (skip the unsold one)
+            // Do nothing - stay at currentPlayerIndex which now points to the next same-grade player
+          } else {
+            // This was the last player of this grade, unsold player is inserted right here
+            // Stay on this position so the unsold player comes up immediately before next grade
+            // Do nothing - currentPlayerIndex already points to the reinserted unsold player
           }
           
           // Ensure index is within bounds
           newIndex = Math.min(newIndex, updatedPlayers.length - 1);
           newIndex = Math.max(0, newIndex);
+          */
           
+          // ---- STRATEGY 2: ALL UNSOLD AT END (Random Excel Files) ----
+          // COMMENT THIS BLOCK FOR SORTED EXCEL FILES, KEEP FOR RANDOM FILES:
+          
+          // Add unsold player to the end of the list
+          updatedPlayers.push(unsoldPlayer);
+          
+          console.log(`[ALL AT END] Player unsold and re-queued at end, position ${updatedPlayers.length - 1}`);
+          
+          // Continue with current position (now showing next player)
+          let newIndex = currentPlayerIndex;
+          
+          // Ensure index is within bounds
+          newIndex = Math.min(newIndex, updatedPlayers.length - 1);
+          newIndex = Math.max(0, newIndex);
+          
+          
+          // ---- COMMON CODE (applies to both strategies) ----
+          setPlayers(updatedPlayers);
           setCurrentPlayerIndex(newIndex);
           setCurrentBid(updatedPlayers[newIndex]?.basePrice || 0);
           setBidHistory([]);
