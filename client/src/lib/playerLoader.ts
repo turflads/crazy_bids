@@ -16,6 +16,7 @@ const EXCEL_COLUMNS = {
   NAME_COLUMN: 'name',        // Player's full name
   GRADE_COLUMN: 'grade',      // Player grade (A, B, C)
   PHOTO_COLUMN: 'photo',      // Player photo filename
+  PHONE_COLUMN: 'phone',      // Player phone number
   
   // Optional stat columns - THESE ARE CONFIGURED TO MATCH YOUR EXCEL FILE
   BATTING_STYLE_COLUMN: 'Batting -',     // Batting style
@@ -39,6 +40,7 @@ export interface PlayerData {
   basePrice: number;
   status: 'unsold' | 'sold';
   image?: string;
+  phoneNumber?: string;   // Player phone number
   // Player statistics
   battingStyle?: string;  // e.g., "Right-hand bat"
   bowlingStyle?: string;  // e.g., "Right-arm medium"
@@ -66,6 +68,7 @@ export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
       const lastName = nameParts.slice(1).join(' ') || '';
       const grade = (row[EXCEL_COLUMNS.GRADE_COLUMN] || 'C').toString().toUpperCase();
       const photo = row[EXCEL_COLUMNS.PHOTO_COLUMN] || '';
+      const phone = row[EXCEL_COLUMNS.PHONE_COLUMN] || '';
 
       // Read stats using configured column names (will be undefined if column is empty or doesn't exist)
       const battingStyle = EXCEL_COLUMNS.BATTING_STYLE_COLUMN ? row[EXCEL_COLUMNS.BATTING_STYLE_COLUMN] : undefined;
@@ -84,6 +87,7 @@ export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
         basePrice: config.gradeBasePrices[grade] || 1000000,
         status: 'unsold' as const,
         image: photo ? `/player_images/${photo}` : undefined,
+        phoneNumber: phone ? String(phone) : undefined,
         // Stats fields - will be undefined if columns don't exist or are empty
         battingStyle: battingStyle ? String(battingStyle) : undefined,
         bowlingStyle: bowlingStyle ? String(bowlingStyle) : undefined,

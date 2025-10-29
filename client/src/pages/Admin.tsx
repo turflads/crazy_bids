@@ -405,7 +405,7 @@ export default function Admin() {
         onUnsold={() => {
           const currentPlayer = players[currentPlayerIndex];
           
-          // Re-queue the unsold player at the end with cleared bid data
+          // Create unsold player with cleared bid data
           const updatedPlayers = [...players];
           const unsoldPlayer = {
             ...currentPlayer,
@@ -418,17 +418,34 @@ export default function Admin() {
           // Remove from current position
           updatedPlayers.splice(currentPlayerIndex, 1);
           
-          // Add to the end
-          updatedPlayers.push(unsoldPlayer);
+          // Find the last player of the same grade after current position
+          // This ensures unsold players come after their grade category
+          let insertIndex = currentPlayerIndex; // Default to current position (right before next grade)
+          
+          for (let i = currentPlayerIndex; i < updatedPlayers.length; i++) {
+            if (updatedPlayers[i].grade === currentPlayer.grade) {
+              insertIndex = i + 1; // Insert after the last same-grade player
+            }
+          }
+          
+          // Insert the unsold player at the calculated position
+          updatedPlayers.splice(insertIndex, 0, unsoldPlayer);
           
           setPlayers(updatedPlayers);
           
-          console.log('Player unsold and re-queued at the end');
+          console.log(`Player unsold and re-queued after Grade ${currentPlayer.grade} players at position ${insertIndex}`);
           
-          // Adjust index if we removed the last player
-          const newIndex = currentPlayerIndex >= updatedPlayers.length 
-            ? Math.max(0, updatedPlayers.length - 1)
-            : currentPlayerIndex;
+          // Calculate new index to continue auction
+          // If we inserted at or before current position, we need to skip the unsold player
+          let newIndex = currentPlayerIndex;
+          if (insertIndex <= currentPlayerIndex) {
+            // We inserted before/at current, so move to the next player
+            newIndex = currentPlayerIndex + 1;
+          }
+          
+          // Ensure index is within bounds
+          newIndex = Math.min(newIndex, updatedPlayers.length - 1);
+          newIndex = Math.max(0, newIndex);
           
           setCurrentPlayerIndex(newIndex);
           setCurrentBid(updatedPlayers[newIndex]?.basePrice || 0);

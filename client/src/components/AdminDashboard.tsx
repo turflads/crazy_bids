@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Play, Pause, RotateCcw, Users, Presentation, Upload } from "lucide-react";
+import { Play, Pause, RotateCcw, Users, Presentation, Upload, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +14,7 @@ import AuctionControls from "./AuctionControls";
 import PlayerCard from "./PlayerCard";
 import TeamOverviewCard from "./TeamOverviewCard";
 import TeamLogo from "./TeamLogo";
+import * as XLSX from 'xlsx';
 
 interface Team {
   name: string;
@@ -152,6 +153,51 @@ export default function AdminDashboard({
     window.open(viewerUrl, '_blank', 'width=1024,height=768');
   };
 
+  const downloadAuctionReport = () => {
+    // Get all sold players from all teams
+    const soldPlayers: any[] = [];
+    
+    teamData.forEach(team => {
+      team.players.forEach(player => {
+        soldPlayers.push({
+          'Player Name': `${player.firstName} ${player.lastName}`,
+          'Phone Number': player.phoneNumber || 'N/A',
+          'Team': team.name,
+          'Grade': player.grade,
+          'Sold Price': player.soldPrice ? `₹${player.soldPrice.toLocaleString()}` : 'N/A',
+        });
+      });
+    });
+
+    if (soldPlayers.length === 0) {
+      toast({
+        title: "No data to export",
+        description: "No players have been sold yet",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create worksheet
+    const worksheet = XLSX.utils.json_to_sheet(soldPlayers);
+    
+    // Create workbook
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Auction Results');
+    
+    // Generate filename with current date
+    const date = new Date().toISOString().split('T')[0];
+    const filename = `auction_report_${date}.xlsx`;
+    
+    // Download
+    XLSX.writeFile(workbook, filename);
+    
+    toast({
+      title: "Report downloaded!",
+      description: `${soldPlayers.length} players exported to ${filename}`,
+    });
+  };
+
   const handleTeamBid = (teamName: string) => {
     if (!currentPlayer || !isAuctionActive) return;
     
@@ -174,6 +220,15 @@ export default function AdminDashboard({
           <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
             Player {currentPlayerIndex + 1} of {players.length}
           </span>
+          <Button 
+            onClick={downloadAuctionReport} 
+            variant="outline" 
+            size="sm" 
+            data-testid="button-download-report"
+          >
+            <Download className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Download Report</span>
+          </Button>
           <Button 
             onClick={() => setShowUploadDialog(true)} 
             variant="outline" 
