@@ -178,7 +178,7 @@ Preferred communication style: Simple, everyday language.
 - **esbuild**: Server bundling
 - **Vite**: Client bundling and asset optimization
 - **PostCSS** with **Autoprefixer**: CSS processing
-- Azure deployment configuration with custom domain support (documented in `/docs`)
+- Deployment-ready for Railway or Fly.io (see `/docs/DEPLOYMENT_GUIDE.md`)
 
 ### Form Management
 - **react-hook-form**: Form state management (available for future forms)

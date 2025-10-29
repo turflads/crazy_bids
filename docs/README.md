@@ -1,104 +1,194 @@
-# 📚 Documentation Directory
+# 📚 Cricket Auction Documentation
 
-This folder contains all documentation files for the Cricket Player Auction application.
-
----
-
-## 🚀 **[START HERE](START_HERE.md)** ← CONFUSED? CLICK THIS!
-
-**Not sure which guide to use?** The START_HERE guide will direct you to the right documentation based on:
-- Your experience level (Beginner, Advanced)
-- What you need to do (Deploy, Configure, Customize)
-- Specific deployment scenario (First time, CI/CD, Custom domain)
+Welcome to the complete documentation for the Cricket Player Auction platform!
 
 ---
 
-## 📖 Documentation Categories
+## 🚀 **Getting Started**
 
-### 1️⃣ Azure Deployment Guides
+New to the system? Start here:
 
-**Choose based on your needs:**
-
-| Document | Use When | Time |
-|----------|----------|------|
-| **[START_HERE.md](START_HERE.md)** | You're confused about where to start | 2 min |
-| **[QUICK_START_AZURE.md](QUICK_START_AZURE.md)** | First time deploying or want fast deployment | 10 min |
-| **[AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md)** | Need detailed Azure deployment guide | 30 min |
-| **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** | Pre-deployment verification | 5 min |
-| **[AZURE_404_FIX.md](AZURE_404_FIX.md)** | Getting 404 error on Azure domain | 15 min |
-
-### 2️⃣ Configuration Guides
-
-**Customize the auction for your league:**
-
-| Document | Purpose |
-|----------|---------|
-| **[CONFIGURATION_GUIDE.md](CONFIGURATION_GUIDE.md)** | Configure teams, quotas, grades, purse |
-| **[HOW_TO_CHANGE_LEAGUE_NAME.md](HOW_TO_CHANGE_LEAGUE_NAME.md)** | Change "TLPL S4" to your league name |
-| **[EXCEL_COLUMN_CONFIG.md](EXCEL_COLUMN_CONFIG.md)** | Configure Excel import column mapping |
-| **[PLAYER_STATS_GUIDE.md](PLAYER_STATS_GUIDE.md)** | Add batting/bowling stats to players |
-| **[HOW_TO_CONFIGURE_AUCTION.txt](HOW_TO_CONFIGURE_AUCTION.txt)** | Quick configuration reference |
-
-### 3️⃣ Technical Documentation
-
-**For developers and advanced users:**
-
-| Document | Purpose |
-|----------|---------|
-| **[replit.md](replit.md)** | System architecture & recent changes |
-| **[design_guidelines.md](design_guidelines.md)** | UI/UX design system & component usage |
-| **[PACKAGE_JSON_UPDATES.md](PACKAGE_JSON_UPDATES.md)** | Dependency updates & package info |
+1. **[START_HERE.md](./START_HERE.md)** - Quick overview and first steps
+2. **[HOW_TO_CONFIGURE_AUCTION.txt](./HOW_TO_CONFIGURE_AUCTION.txt)** - Basic auction setup
+3. **[CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md)** - Detailed configuration options
 
 ---
 
-## ⚡ Quick Reference
+## 📖 **Documentation Index**
 
-### Common Tasks
+### **Setup & Configuration**
+- **[CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md)** - Complete config.json reference
+- **[HOW_TO_CONFIGURE_AUCTION.txt](./HOW_TO_CONFIGURE_AUCTION.txt)** - Step-by-step auction setup
+- **[HOW_TO_CHANGE_LEAGUE_NAME.md](./HOW_TO_CHANGE_LEAGUE_NAME.md)** - Customize league branding
 
-**Deploying for the first time?**
-→ [START_HERE.md](START_HERE.md) then [QUICK_START_AZURE.md](QUICK_START_AZURE.md)
+### **Player Management**
+- **[EXCEL_COLUMN_CONFIG.md](./EXCEL_COLUMN_CONFIG.md)** - Excel file format and column mapping
+- **[PLAYER_STATS_GUIDE.md](./PLAYER_STATS_GUIDE.md)** - Player statistics and data fields
 
-**Changing league name?**
-→ [HOW_TO_CHANGE_LEAGUE_NAME.md](HOW_TO_CHANGE_LEAGUE_NAME.md)
+### **Advanced Features**
+- **[GRADE_MAX_BID_CAPS_GUIDE.md](./GRADE_MAX_BID_CAPS_GUIDE.md)** - Set maximum bid limits per grade
+- **[UNSOLD_PLAYER_STRATEGIES.md](./UNSOLD_PLAYER_STRATEGIES.md)** - Two modes for handling unsold players
+- **[QUICK_SWITCH_GUIDE.txt](./QUICK_SWITCH_GUIDE.txt)** - Quick reference for switching unsold strategies
 
-**Adding/changing teams?**
-→ [CONFIGURATION_GUIDE.md](CONFIGURATION_GUIDE.md)
+### **Deployment**
+- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - Deploy to Railway or Fly.io
 
-**Importing players from Excel?**
-→ [EXCEL_COLUMN_CONFIG.md](EXCEL_COLUMN_CONFIG.md)
-
-**Adding player statistics?**
-→ [PLAYER_STATS_GUIDE.md](PLAYER_STATS_GUIDE.md)
-
----
-
-## 🎯 Recommended Reading Order
-
-### For First-Time Azure Deployment
-1. [START_HERE.md](START_HERE.md) - Choose your deployment path
-2. [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) - Verify readiness
-3. [QUICK_START_AZURE.md](QUICK_START_AZURE.md) - Deploy to Azure
-4. [HOW_TO_CHANGE_LEAGUE_NAME.md](HOW_TO_CHANGE_LEAGUE_NAME.md) - Customize branding
-5. [CONFIGURATION_GUIDE.md](CONFIGURATION_GUIDE.md) - Set up teams
-6. [EXCEL_COLUMN_CONFIG.md](EXCEL_COLUMN_CONFIG.md) - Import players
-
-### For Advanced Azure Deployment
-1. [AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md) - Full deployment options
-2. [replit.md](replit.md) - Understand the architecture
-3. [design_guidelines.md](design_guidelines.md) - Customize UI/UX
+### **Design & Development**
+- **[design_guidelines.md](./design_guidelines.md)** - UI/UX design principles and component usage
 
 ---
 
-## 📞 Need Help?
+## 🎯 **Quick Links**
 
-**Can't find what you're looking for?**
+### **Common Tasks**
 
-1. Check [START_HERE.md](START_HERE.md) first
-2. Use the table above to find the right guide
-3. Search for keywords in the relevant document
-
-**Still stuck?** Most guides have a troubleshooting section at the end.
+| Task | Documentation |
+|------|--------------|
+| Set up teams and purses | [CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md) |
+| Import players from Excel | [EXCEL_COLUMN_CONFIG.md](./EXCEL_COLUMN_CONFIG.md) |
+| Change league name/logo | [HOW_TO_CHANGE_LEAGUE_NAME.md](./HOW_TO_CHANGE_LEAGUE_NAME.md) |
+| Configure grade quotas | [CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md) |
+| Set max bid limits | [GRADE_MAX_BID_CAPS_GUIDE.md](./GRADE_MAX_BID_CAPS_GUIDE.md) |
+| Handle unsold players | [UNSOLD_PLAYER_STRATEGIES.md](./UNSOLD_PLAYER_STRATEGIES.md) |
+| Deploy the app | [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) |
 
 ---
 
-**Ready to deploy to Azure? Open [START_HERE.md](START_HERE.md) now! 🚀**
+## 📋 **Feature Documentation**
+
+### **Unsold Player System**
+The platform supports **two different strategies** for handling unsold players:
+
+1. **Grade-Based Re-Auction** (for sorted Excel files)
+   - Unsold Grade A players come back after all Grade A players
+   - Like real IPL auction flow
+   
+2. **All Unsold at End** (for random Excel files)
+   - All unsold players come together at the end
+   - Works with any Excel file order
+
+📖 **Read more**: [UNSOLD_PLAYER_STRATEGIES.md](./UNSOLD_PLAYER_STRATEGIES.md) | [QUICK_SWITCH_GUIDE.txt](./QUICK_SWITCH_GUIDE.txt)
+
+### **Grade Max Bid Caps**
+Optional feature to set maximum bid limits per grade:
+- Grade A max: ₹15M
+- Grade B max: ₹10M  
+- Grade C max: ₹5M
+
+📖 **Read more**: [GRADE_MAX_BID_CAPS_GUIDE.md](./GRADE_MAX_BID_CAPS_GUIDE.md)
+
+### **Excel Report Export**
+Admin can download auction results as Excel file with:
+- Player Name
+- Phone Number
+- Team
+- Grade
+- Sold Price
+
+📖 **Read more**: [EXCEL_COLUMN_CONFIG.md](./EXCEL_COLUMN_CONFIG.md)
+
+---
+
+## 🎨 **UI/UX Guidelines**
+
+For developers working on the frontend:
+
+📖 **Read**: [design_guidelines.md](./design_guidelines.md)
+
+Covers:
+- Component usage (shadcn/ui)
+- Color system and theming
+- Responsive design patterns
+- Dark mode implementation
+
+---
+
+## 🔐 **Default Login Credentials**
+
+| Role | Username | Password |
+|------|----------|----------|
+| Super Admin | `superadmin` | `superadmin123` |
+| Admin | `admin` | `admin123` |
+| Owner | `owner` | `owner123` |
+| Viewer | `viewer` | `viewer123` |
+
+⚠️ **Change these before deploying to production!**
+
+Edit: `client/src/pages/Login.tsx`
+
+---
+
+## 🆘 **Need Help?**
+
+### **Documentation Issues**
+- Check if you're reading the latest version
+- Look for related guides in this folder
+- Search for keywords in the docs
+
+### **Technical Issues**
+- Check browser console (F12) for errors
+- Verify configuration files are correct
+- Ensure Excel file format matches documentation
+
+### **Feature Requests**
+- Review existing documentation first
+- Check if feature exists but needs configuration
+- Consider if it aligns with project goals
+
+---
+
+## 📊 **System Requirements**
+
+### **Development**
+- Node.js 18+
+- npm or yarn
+- Modern web browser
+
+### **Production**
+- Railway or Fly.io account
+- Custom domain (optional)
+- SSL certificate (provided by platforms)
+
+---
+
+## 🎓 **Learning Path**
+
+**New Users:**
+1. Read START_HERE.md
+2. Configure teams in config.json
+3. Import players from Excel
+4. Test auction flow locally
+
+**Advanced Users:**
+1. Configure grade max bid caps
+2. Choose unsold player strategy
+3. Customize league branding
+4. Deploy to production
+
+**Developers:**
+1. Read design_guidelines.md
+2. Understand state management (replit.md)
+3. Review component architecture
+4. Follow TypeScript patterns
+
+---
+
+## 📅 **Version History**
+
+See **[replit.md](../replit.md)** in the root folder for:
+- Recent updates
+- System architecture
+- Technical specifications
+- Development notes
+
+---
+
+## 🎉 **Ready to Go!**
+
+You now have access to all the documentation you need to run a successful cricket player auction!
+
+Pick a guide from above and get started. 🏏
+
+---
+
+*Last Updated: October 2025*
