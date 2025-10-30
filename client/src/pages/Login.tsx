@@ -18,10 +18,10 @@ export default function Login() {
     //   john: { password: "john123", role: "owner" }
     // ============================================================================
     const credentials: Record<string, { password: string; role: string }> = {
-      superadmin: { password: "superadmin123", role: "superadmin" },
-      admin: { password: "admin123", role: "admin" },
-      owner: { password: "owner123", role: "owner" },
-      viewer: { password: "viewer123", role: "viewer" },
+      superadmin: { password: "superadmin@cc", role: "superadmin" },
+      admin: { password: "admin@cc", role: "admin" },
+      owner: { password: "owner@cc", role: "owner" },
+      viewer: { password: "viewer@cc", role: "viewer" },
     };
 
     const user = credentials[username];
