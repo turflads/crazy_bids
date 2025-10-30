@@ -36,16 +36,20 @@ export class AudioManager {
       return;
     }
     
-    // Use free sound effect URLs or local files
-    // For entrance music: upbeat fanfare sound
+    // Use local Pixabay royalty-free sound effects
+    // For entrance music: Fanfare 1 by BenKirb (5 seconds)
+    // Source: https://pixabay.com/sound-effects/fanfare-1-276819/
+    // Download and place in client/public/sounds/fanfare.mp3
     this.entranceAudio = new Audio();
-    this.entranceAudio.src = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'; // Fanfare
+    this.entranceAudio.src = '/sounds/fanfare.mp3';
     this.entranceAudio.volume = this.volume;
     this.entranceAudio.loop = false;
 
-    // For drum roll: continuous drum roll sound
+    // For drum roll: Drum Roll 3 by LazyChillZone (3 seconds)
+    // Source: https://pixabay.com/sound-effects/drum-roll-3-228357/
+    // Download and place in client/public/sounds/drumroll.mp3
     this.drumRollAudio = new Audio();
-    this.drumRollAudio.src = 'https://assets.mixkit.co/active_storage/sfx/2558/2558-preview.mp3'; // Drum roll
+    this.drumRollAudio.src = '/sounds/drumroll.mp3';
     this.drumRollAudio.volume = this.volume;
     this.drumRollAudio.loop = true;
 
