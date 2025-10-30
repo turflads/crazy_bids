@@ -30,7 +30,9 @@ interface PlayerCardProps {
 }
 
 export default function PlayerCard({ player, onViewDetails, showStats = true, animate = false }: PlayerCardProps) {
+  const [isRevealing, setIsRevealing] = useState(false);
   const [isFlipping, setIsFlipping] = useState(false);
+  const [prevPlayerId, setPrevPlayerId] = useState(player.id);
   const [prevSoldStatus, setPrevSoldStatus] = useState(player.status === 'sold');
   
   const gradeColors: Record<string, string> = {
@@ -40,6 +42,16 @@ export default function PlayerCard({ player, onViewDetails, showStats = true, an
   };
 
   const isSold = player.status === 'sold' || !!player.soldPrice;
+
+  // Detect when a NEW player appears and trigger reveal animation
+  useEffect(() => {
+    if (animate && player.id !== prevPlayerId) {
+      setIsRevealing(true);
+      setTimeout(() => setIsRevealing(false), 600);
+      setPrevPlayerId(player.id);
+      setPrevSoldStatus(false); // Reset sold status for new player
+    }
+  }, [player.id, prevPlayerId, animate]);
 
   // Detect when player becomes sold and trigger flip animation
   useEffect(() => {
@@ -53,7 +65,7 @@ export default function PlayerCard({ player, onViewDetails, showStats = true, an
   return (
     <Card 
       className={`overflow-visible hover-elevate ${isSold ? 'border-l-4 border-l-auction-sold' : ''} ${
-        animate ? 'player-card-reveal' : ''
+        isRevealing ? 'player-card-reveal' : ''
       } ${isFlipping ? 'player-card-flip' : ''}`}
       data-testid={`card-player-${player.id}`}
     >

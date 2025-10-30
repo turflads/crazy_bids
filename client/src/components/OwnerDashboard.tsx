@@ -48,7 +48,9 @@ export default function OwnerDashboard({
   gradeQuotas = { A: 3, B: 4, C: 5 },
 }: OwnerDashboardProps) {
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
+  const [isRevealing, setIsRevealing] = useState(false);
   const [isFlipping, setIsFlipping] = useState(false);
+  const [prevPlayerId, setPrevPlayerId] = useState(currentPlayer?.id);
   const [prevSoldStatus, setPrevSoldStatus] = useState(currentPlayer?.status === 'sold');
 
   const gradeColorMap: Record<string, string> = {
@@ -57,6 +59,16 @@ export default function OwnerDashboard({
     C: 'bg-grade-c',
   };
   const gradeColor = currentPlayer ? (gradeColorMap[currentPlayer.grade] || 'bg-primary') : 'bg-primary';
+
+  // Detect when a NEW player appears and trigger reveal animation
+  useEffect(() => {
+    if (currentPlayer && currentPlayer.id !== prevPlayerId) {
+      setIsRevealing(true);
+      setTimeout(() => setIsRevealing(false), 600);
+      setPrevPlayerId(currentPlayer.id);
+      setPrevSoldStatus(false); // Reset sold status for new player
+    }
+  }, [currentPlayer?.id, prevPlayerId]);
 
   // Detect when player becomes sold and trigger flip animation
   useEffect(() => {
@@ -76,7 +88,7 @@ export default function OwnerDashboard({
 
       {currentPlayer && isAuctionActive && (
         <Card 
-          className={`border-primary/50 bg-primary/5 player-card-reveal ${isFlipping ? 'player-card-flip' : ''}`}
+          className={`border-primary/50 bg-primary/5 ${isRevealing ? 'player-card-reveal' : ''} ${isFlipping ? 'player-card-flip' : ''}`}
           data-testid="card-current-auction"
         >
           <style>{`
