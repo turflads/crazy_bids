@@ -58,7 +58,7 @@ export default function ViewerChat({ username }: ViewerChatProps) {
   };
 
   return (
-    <Card className="flex flex-col h-[600px]">
+    <Card className="flex flex-col h-[600px] relative overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <MessageCircle className="w-5 h-5" />
@@ -68,24 +68,27 @@ export default function ViewerChat({ username }: ViewerChatProps) {
           {isConnected ? "Connected" : "Disconnected"}
         </Badge>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col gap-3 overflow-hidden p-0 relative">
-        {/* Floating Reactions Overlay */}
-        {reactions.length > 0 && (
-          <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden" style={{ height: '100%' }}>
-            {reactions.map((reaction) => (
-              <div
-                key={reaction.id}
-                className="absolute animate-float-up text-4xl"
-                style={{
-                  left: `${Math.random() * 80 + 10}%`,
-                  animation: `floatUp 5s ease-out forwards`,
-                }}
-              >
-                {reaction.emoji}
-              </div>
-            ))}
-          </div>
-        )}
+      
+      {/* Floating Reactions Overlay - Outside CardContent for proper positioning */}
+      {reactions.length > 0 && (
+        <div className="absolute inset-0 pointer-events-none z-50" style={{ height: '100%', width: '100%' }}>
+          {reactions.map((reaction) => (
+            <div
+              key={reaction.id}
+              className="absolute text-4xl"
+              style={{
+                left: `${Math.random() * 80 + 10}%`,
+                bottom: '20px',
+                animation: `floatUp 5s ease-out forwards`,
+              }}
+            >
+              {reaction.emoji}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <CardContent className="flex-1 flex flex-col gap-3 overflow-hidden p-0">
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto px-4 space-y-2">
