@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,6 +48,8 @@ export default function OwnerDashboard({
   gradeQuotas = { A: 3, B: 4, C: 5 },
 }: OwnerDashboardProps) {
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [prevSoldStatus, setPrevSoldStatus] = useState(currentPlayer?.status === 'sold');
 
   const gradeColorMap: Record<string, string> = {
     A: 'bg-grade-a',
@@ -56,6 +58,16 @@ export default function OwnerDashboard({
   };
   const gradeColor = currentPlayer ? (gradeColorMap[currentPlayer.grade] || 'bg-primary') : 'bg-primary';
 
+  // Detect when player becomes sold and trigger flip animation
+  useEffect(() => {
+    const isSold = currentPlayer?.status === 'sold' || !!currentPlayer?.soldPrice;
+    if (currentPlayer && !prevSoldStatus && isSold) {
+      setIsFlipping(true);
+      setTimeout(() => setIsFlipping(false), 600);
+    }
+    setPrevSoldStatus(isSold);
+  }, [currentPlayer?.status, currentPlayer?.soldPrice, prevSoldStatus, currentPlayer]);
+
   return (
     <div className="p-6 space-y-6">
       <div>
@@ -63,7 +75,44 @@ export default function OwnerDashboard({
       </div>
 
       {currentPlayer && isAuctionActive && (
-        <Card className="border-primary/50 bg-primary/5" data-testid="card-current-auction">
+        <Card 
+          className={`border-primary/50 bg-primary/5 player-card-reveal ${isFlipping ? 'player-card-flip' : ''}`}
+          data-testid="card-current-auction"
+        >
+          <style>{`
+            @keyframes revealPlayer {
+              from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+              }
+            }
+            
+            @keyframes flipCard {
+              0% {
+                transform: rotateY(0deg);
+              }
+              50% {
+                transform: rotateY(180deg);
+              }
+              100% {
+                transform: rotateY(360deg);
+              }
+            }
+            
+            .player-card-reveal {
+              animation: revealPlayer 0.6s ease-out;
+              transform-style: preserve-3d;
+            }
+            
+            .player-card-flip {
+              animation: flipCard 0.6s ease-in-out;
+              transform-style: preserve-3d;
+            }
+          `}</style>
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">
               <Gavel className="w-5 h-5 text-primary" />

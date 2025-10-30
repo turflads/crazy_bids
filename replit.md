@@ -17,7 +17,7 @@ A comprehensive web application for conducting live cricket player auctions with
   - Reveal animation when player appears (smooth entrance with translateY + scale)
   - 3D flip animation when player is sold (360° rotateY transform)
   - Automatic trigger on status change to "sold"
-  - Enabled on Viewer page current auction player card
+  - Enabled on **all three pages**: Admin, Owner, and Viewer current auction player cards
   - CSS-based animations using preserve-3d transform-style
 - **Dual-Strategy Unsold Player System**: TWO unsold player handling modes available via comment/uncomment:
   - **Strategy 1 (Grade-Based)**: For sorted Excel files (A,A,B,B,C,C) - unsold players reappear after their grade finishes

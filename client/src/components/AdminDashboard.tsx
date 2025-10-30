@@ -262,7 +262,7 @@ export default function AdminDashboard({
         <div className="space-y-4">
           {currentPlayer && (
             <div className="max-w-md mx-auto">
-              <PlayerCard player={currentPlayer} />
+              <PlayerCard player={currentPlayer} animate={true} />
             </div>
           )}
           
