@@ -19,6 +19,11 @@ export default function ViewerChat({ username }: ViewerChatProps) {
   const { messages, reactions, sendMessage, sendReaction, isConnected } = useChatWebSocket();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Debug: Log reactions whenever they change
+  useEffect(() => {
+    console.log('Reactions updated:', reactions.length, reactions);
+  }, [reactions]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };

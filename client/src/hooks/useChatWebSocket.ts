@@ -69,8 +69,10 @@ export function useChatWebSocket() {
               });
             } else if (data.type === 'chat_reaction' && data.data) {
               const newReaction = data.data as ChatReaction;
+              console.log('Received reaction from WebSocket:', newReaction);
               setReactions(prev => {
                 const updated = [...prev, newReaction];
+                console.log('Updated reactions array:', updated);
                 const state = getChatState();
                 state.reactions = updated;
                 saveChatState(state);
@@ -157,6 +159,7 @@ export function useChatWebSocket() {
     }
 
     const reaction = addChatReaction(username, emoji);
+    console.log('Sending reaction via WebSocket:', reaction);
     
     wsRef.current.send(JSON.stringify({
       type: 'chat_reaction',
