@@ -118,6 +118,14 @@ export default function AdminDashboard({
     }
   }, [isAuctionActive]);
 
+  // Stop drum roll when player is sold or unsold
+  useEffect(() => {
+    if (currentPlayer && (currentPlayer.status === 'sold' || currentPlayer.status === 'unsold') && isDrumRollPlayingRef.current) {
+      audioManager.stopDrumRoll();
+      isDrumRollPlayingRef.current = false;
+    }
+  }, [currentPlayer?.status]);
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;

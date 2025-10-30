@@ -7,6 +7,11 @@ export class AudioManager {
   private volume: number = 0.5;
 
   private constructor() {
+    // Guard against SSR - only initialize in browser
+    if (typeof window === 'undefined') {
+      return;
+    }
+    
     // Initialize audio elements
     this.setupAudio();
     
@@ -26,6 +31,11 @@ export class AudioManager {
   }
 
   private setupAudio() {
+    // Guard against SSR
+    if (typeof window === 'undefined') {
+      return;
+    }
+    
     // Use free sound effect URLs or local files
     // For entrance music: upbeat fanfare sound
     this.entranceAudio = new Audio();

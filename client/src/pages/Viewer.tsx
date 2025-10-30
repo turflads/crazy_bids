@@ -32,6 +32,7 @@ export default function Viewer() {
     player: currentPlayer,
     currentBid: auctionState.currentBid || currentPlayer.basePrice,
     leadingTeam: currentPlayer.lastBidTeam || 'No bids yet',
+    isAuctionActive: auctionState.isAuctionActive,
   } : undefined;
 
   const recentSales = allPlayers.filter((p: any) => p.status === 'sold').slice(-3).reverse();

@@ -58,13 +58,13 @@ export default function OwnerDashboard({
   };
   const gradeColor = currentPlayer ? (gradeColorMap[currentPlayer.grade] || 'bg-primary') : 'bg-primary';
 
-  // Play entrance music when a new player appears
+  // Play entrance music when a new player appears (only if auction is active)
   useEffect(() => {
-    if (currentPlayer && currentPlayer.id !== prevPlayerIdRef.current) {
+    if (currentPlayer && currentPlayer.id !== prevPlayerIdRef.current && isAuctionActive) {
       audioManager.playEntranceMusic();
       prevPlayerIdRef.current = currentPlayer.id;
     }
-  }, [currentPlayer?.id]);
+  }, [currentPlayer?.id, isAuctionActive]);
 
 
   return (

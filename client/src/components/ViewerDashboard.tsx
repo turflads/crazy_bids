@@ -30,6 +30,7 @@ interface ViewerDashboardProps {
     player: any;
     currentBid: number;
     leadingTeam: string;
+    isAuctionActive?: boolean;
   };
   recentSales: any[];
   allPlayers: any[];
@@ -47,13 +48,14 @@ export default function ViewerDashboard({
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
   const prevPlayerIdRef = useRef(currentAuction?.player?.id);
 
-  // Play entrance music when a new player appears
+  // Play entrance music when a new player appears (only if auction is active)
   useEffect(() => {
-    if (currentAuction?.player && currentAuction.player.id !== prevPlayerIdRef.current) {
+    const isActive = currentAuction?.isAuctionActive ?? false;
+    if (currentAuction?.player && currentAuction.player.id !== prevPlayerIdRef.current && isActive) {
       audioManager.playEntranceMusic();
       prevPlayerIdRef.current = currentAuction.player.id;
     }
-  }, [currentAuction?.player?.id]);
+  }, [currentAuction?.player?.id, currentAuction?.isAuctionActive]);
 
   return (
     <div className="p-6 space-y-6">
