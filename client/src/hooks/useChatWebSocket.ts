@@ -7,12 +7,41 @@ export function useChatWebSocket() {
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+  const reactionTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   useEffect(() => {
-    // Load initial state
+    // Load initial state and clear old reactions on mount
     const state = getChatState();
     setMessages(state.messages);
-    setReactions(state.reactions);
+    
+    // Clear reactions older than 5 seconds from localStorage
+    const now = Date.now();
+    const fiveSecondsAgo = now - 5000;
+    const freshReactions = state.reactions.filter(r => r.timestamp > fiveSecondsAgo);
+    state.reactions = freshReactions;
+    saveChatState(state);
+    setReactions(freshReactions);
+    
+    // Schedule removal for hydrated reactions based on their remaining lifetime
+    freshReactions.forEach(reaction => {
+      const elapsed = now - reaction.timestamp;
+      const remainingTime = 5000 - elapsed;
+      
+      if (remainingTime > 0) {
+        const timeoutId = setTimeout(() => {
+          setReactions(prev => {
+            const filtered = prev.filter(r => r.id !== reaction.id);
+            const state = getChatState();
+            state.reactions = filtered;
+            saveChatState(state);
+            return filtered;
+          });
+          reactionTimeoutsRef.current.delete(reaction.id);
+        }, remainingTime);
+        
+        reactionTimeoutsRef.current.set(reaction.id, timeoutId);
+      }
+    });
 
     const connectWebSocket = () => {
       try {
@@ -49,9 +78,19 @@ export function useChatWebSocket() {
               });
               
               // Auto-remove reaction after 5 seconds
-              setTimeout(() => {
-                setReactions(prev => prev.filter(r => r.id !== newReaction.id));
+              const timeoutId = setTimeout(() => {
+                setReactions(prev => {
+                  const filtered = prev.filter(r => r.id !== newReaction.id);
+                  // Also remove from localStorage
+                  const state = getChatState();
+                  state.reactions = filtered;
+                  saveChatState(state);
+                  return filtered;
+                });
+                reactionTimeoutsRef.current.delete(newReaction.id);
               }, 5000);
+              
+              reactionTimeoutsRef.current.set(newReaction.id, timeoutId);
             }
           } catch (error) {
             console.error('Error parsing chat message:', error);
@@ -90,6 +129,9 @@ export function useChatWebSocket() {
       if (wsRef.current) {
         wsRef.current.close();
       }
+      // Clear all reaction timeouts to avoid setState-after-unmount warnings
+      reactionTimeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+      reactionTimeoutsRef.current.clear();
     };
   }, []);
 
