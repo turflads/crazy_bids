@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, User } from "lucide-react";
+import { useState } from "react";
 
 interface PlayerCardProps {
   player: {
@@ -10,6 +11,8 @@ interface PlayerCardProps {
     lastName: string;
     grade: string;
     image?: string;
+    imageUrl?: string;      // Resolved image URL (preferred)
+    imageSource?: string;   // Image source type
     cricherosLink?: string;
     basePrice?: number;
     status?: 'unsold' | 'sold';
@@ -28,6 +31,7 @@ interface PlayerCardProps {
 }
 
 export default function PlayerCard({ player, onViewDetails, showStats = true }: PlayerCardProps) {
+  const [imageError, setImageError] = useState(false);
   
   const gradeColors: Record<string, string> = {
     A: 'bg-grade-a',
@@ -43,14 +47,22 @@ export default function PlayerCard({ player, onViewDetails, showStats = true }: 
       data-testid={`card-player-${player.id}`}
     >
       <div className="aspect-video bg-muted relative overflow-hidden">
-        {player.image ? (
+        {(player.imageUrl || player.image) && !imageError ? (
           <img 
-            src={player.image} 
+            src={player.imageUrl || player.image} 
             alt={`${player.firstName} ${player.lastName}`}
             className="w-full h-full object-cover"
+            onError={() => {
+              console.warn(`[PlayerCard] Failed to load image for player ${player.id}:`, player.imageUrl || player.image);
+              setImageError(true);
+            }}
+            data-testid={`img-player-${player.id}`}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
+          <div 
+            className="w-full h-full flex items-center justify-center"
+            data-testid={`img-placeholder-${player.id}`}
+          >
             <User className="w-16 h-16 text-muted-foreground" />
           </div>
         )}

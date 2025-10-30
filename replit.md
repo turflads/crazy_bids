@@ -2,37 +2,7 @@
 
 ## Overview
 
-A comprehensive web application for conducting live cricket player auctions with real-time bidding, team management, and grade-based player acquisition. The platform supports role-based access control (Super Admin, Admin, Owner, Viewer) and features grade quotas, purse tracking, celebration animations for sold players, backend-like editing capabilities for corrections, PowerPoint presentation integration for paused auctions, and league sponsor branding. Built with React (Vite), Express, and localStorage for state management.
-
-## Recent Updates (Latest)
-
-- **Music & Sound Effects**: Immersive audio experience for live auctions:
-  - Entrance music plays automatically when a new player appears (all pages)
-  - Drum roll sound during active bidding (starts on first bid, stops when sold/unsold/paused)
-  - Volume controls and mute toggle in Admin dashboard header
-  - Audio preferences persist in localStorage
-  - Uses Pixabay royalty-free sounds (Fanfare 1 by BenKirb, Drum Roll 3 by LazyChillZone)
-  - Local audio files in `client/public/sounds/` (fanfare.mp3, drumroll.mp3) - user must download from Pixabay
-- **Live Chat (Viewer Only)**: Real-time chat system exclusively for Viewer page with:
-  - Message board with auto-scroll and timestamps
-  - WebSocket-based real-time broadcasting to all viewers
-  - Connection status indicator
-  - Messages stored in localStorage (100 messages max)
-  - Emoji reactions feature with floating animations (8 reaction emojis: 🔥👏😮🎉💪⚡❤️👍)
-- **Dual-Strategy Unsold Player System**: TWO unsold player handling modes available via comment/uncomment:
-  - **Strategy 1 (Grade-Based)**: For sorted Excel files (A,A,B,B,C,C) - unsold players reappear after their grade finishes
-  - **Strategy 2 (All at End)**: For random Excel files (A,C,B,A,C,B) - all unsold players come together at the end
-  - Currently active: Strategy 2 (All at End)
-  - Switch by commenting/uncommenting code blocks in `Admin.tsx` (detailed guide in `UNSOLD_PLAYER_STRATEGIES.md`)
-- **Excel Report Download**: Admin can download auction results as Excel file with columns: Player Name, Phone Number, Team, Grade, Sold Price. Button in header downloads as `auction_report_YYYY-MM-DD.xlsx`.
-- **Phone Number Support**: Added phone number field to player data structure. Import from Excel using 'phone' column.
-- **Admin Layout Complete Redesign**: Fixed scroll issues and simplified layout - removed sticky positioning entirely. New structure: Player card + team bidding buttons (horizontal row) on left, auction controls on right, team overview cards visible below. Team buttons now accessible without scrolling.
-- **AuctionControls Reorganization**: Custom bid and action buttons (Cancel/Sold/Unsold) now positioned directly below Next Increment for logical grouping. Team bidding buttons moved to main dashboard below player card.
-- **Current Bid Enhancement**: Added team logo and name display to current bid sections on Admin, Owner, and Viewer pages showing which team placed the last bid
-- **Sponsor Branding**: Added configurable league sponsor name and logo in navbar via `leagueConfig.ts` (SPONSOR_NAME, SPONSOR_LOGO constants)
-- Grade-specific max bid caps system (gradeMaxBidCaps in config.json) with comprehensive documentation
-- PowerPoint presentation upload and display feature for auction breaks
-- Owner page grade display shows "current/quota" format (e.g., "A: 0/3")
+This project is a comprehensive web application designed for conducting live cricket player auctions. It features real-time bidding, robust team and player management, and a grade-based player acquisition system. The platform supports multiple user roles (Super Admin, Admin, Owner, Viewer) with distinct functionalities, including grade quotas, purse tracking, and dynamic auction controls. Key capabilities include immersive audio experiences, live chat for viewers, dual strategies for handling unsold players, and Excel report generation. The application also supports various player data inputs, including Google Drive images, and offers extensive customization for league branding and auction rules. The ultimate goal is to provide a flexible and engaging platform for cricket player auctions, suitable for various league sizes and formats, with future ambitions to support multiple concurrent tournaments.
 
 ## User Preferences
 
@@ -42,207 +12,61 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 
-**Framework & Build Tool**
-- **React 18** with TypeScript for type-safe component development
-- **Vite** as the build tool and development server for fast HMR and optimized production builds
-- **Wouter** for lightweight client-side routing instead of React Router
-
-**Design System**
-- **shadcn/ui** component library (New York style) with Radix UI primitives for accessible, customizable components
-- **Tailwind CSS** with custom design tokens for consistent spacing, colors, and typography
-- Custom color system supporting light/dark modes with grade-specific colors (A=purple, B=blue, C=orange)
-- **Inter** font for UI, **JetBrains Mono** for numeric data display
-
-**State Management**
-- **localStorage-based state persistence** for auction and team data (no backend database)
-- Custom hooks (`useAuctionSync`) for cross-tab synchronization via storage events and polling
-- Centralized state modules: `auctionState.ts` and `teamState.ts` for predictable state updates
-- **TanStack Query (React Query)** for future API integration capabilities
-
-**Key Components**
-- **Role-based dashboards**: SuperAdminDashboard, AdminDashboard, OwnerDashboard, ViewerDashboard with distinct feature sets
-- **Admin layout**: Player card and auction controls side-by-side, team overview in vertical rows for better organization
-- **Current bid display**: Shows bid amount, team logo, and team name across all dashboards (Admin, Owner, Viewer)
-- **Super Admin controls**: Full editing interface for correcting auction mistakes (team purses, player assignments, sold prices)
-- **Real-time auction controls**: Bidding interface with grade-based increments and validation
-- **Player management**: Excel import via XLSX library, configurable column mapping
-- **Audio manager**: Singleton service managing entrance music and drum roll sounds with localStorage persistence
-- **Celebration system**: CSS animations and fireworks effect for sold players
-- **Presentation system**: PowerPoint upload and display feature for admin during auction breaks (paused state)
-- **Sponsor branding**: Configurable league sponsor name and logo in navbar
+The frontend is built with **React 18** and **TypeScript**, utilizing **Vite** for fast development and optimized builds. **Wouter** handles client-side routing. The design system leverages **shadcn/ui** (New York style) with **Radix UI** primitives, styled using **Tailwind CSS** with custom design tokens for a consistent and accessible user experience. State management primarily uses **localStorage** for persistence across sessions and tabs, with custom hooks for cross-tab synchronization. **TanStack Query** is configured for future API integration. The application features role-based dashboards (Super Admin, Admin, Owner, Viewer), a reorganized Admin layout for improved usability, a comprehensive bidding interface with validation, and an Excel import system for player data supporting Google Drive image links. It also includes an audio manager for in-auction sound effects, celebration animations for sold players, a presentation system for auction breaks, and configurable sponsor branding.
 
 ### Backend Architecture
 
-**Server Framework**
-- **Express.js** with TypeScript for API endpoints (currently minimal, designed for future expansion)
-- **Vite SSR middleware** in development for seamless hot module replacement
-- Static file serving for production builds from `dist/public`
-
-**Storage Interface**
-- Abstract `IStorage` interface with in-memory implementation (`MemStorage`)
-- Designed for easy migration to PostgreSQL with Drizzle ORM (configuration ready)
-- Current implementation uses localStorage on frontend for all auction data
-
-**Build & Deployment**
-- **esbuild** for fast server bundling with ESM output
-- Production build outputs to `dist/` with separate client (`dist/public`) and server (`dist/index.js`) bundles
-- Asset copying handled via npm scripts for config files, Excel data, and images
+The backend utilizes **Express.js** with **TypeScript**, primarily serving API endpoints (currently minimal but designed for expansion) and static files. **Vite SSR middleware** is used during development. A flexible storage interface (`IStorage`) is defined, with the current implementation relying on frontend localStorage. The architecture is prepared for migration to **PostgreSQL** using **Drizzle ORM**. **esbuild** is used for fast server bundling.
 
 ### Data Model
 
-**Player Schema**
-- Core fields: firstName, lastName, grade (A/B/C), basePrice, status (sold/unsold)
-- Optional statistics: battingStyle, bowlingStyle, runs, wickets, strikeRate, bowlingAverage
-- CricHeroes profile link support for external player data
-- Image storage via photo filename references in `attached_assets/`
-
-**Team Schema**
-- Team metadata: name, flag emoji, logo image path, totalPurse
-- Dynamic calculations: usedPurse, purseRemaining, playersCount, gradeCount
-- Max bid calculator considering remaining grade quotas and purse constraints
-
-**Auction State**
-- Linear player progression with currentPlayerIndex
-- Bid tracking: currentBid, lastBidTeam, bidHistory array
-- Status flags: isAuctionActive, hasBids
-
-**Configuration**
-- JSON-based config (`config.json`) for grade base prices, increments, teams, quotas, and optional grade max bid caps
-- Hot-reloadable without code changes for auction customization
-- League branding config in `leagueConfig.ts` (LEAGUE_NAME, SPONSOR_NAME, SPONSOR_LOGO)
+The core data models include **Player Schema** (firstName, lastName, grade, basePrice, status, optional statistics, flexible image handling for local and Google Drive links), **Team Schema** (name, flag, logo, totalPurse, dynamic calculations for usedPurse, purseRemaining, playersCount, gradeCount, and max bid), and **Auction State** (currentPlayerIndex, currentBid, bidHistory, status flags). Configuration is managed via a `config.json` file for auction rules (grade base prices, increments, teams, quotas, grade-specific max bid caps) and `leagueConfig.ts` for branding.
 
 ### Business Logic
 
-**Bidding Validation System**
-- Four-tier validation: grade quota fulfillment, purse sufficiency, grade-specific max bid caps (optional), smart max bid calculation
-- Max bid formula: `min(gradeCap, remainingPurse - reserveForUnfilledQuotas)`
-- Grade-specific caps configurable in config.json (e.g., Grade A max ₹15M, Grade B max ₹10M)
-- Real-time feedback with descriptive error messages
-
-**Grade Quota Management**
-- Configurable quotas per grade (default: A=3, B=4, C=5)
-- Progress tracking with visual indicators (completion badges)
-- Quota enforcement prevents bidding when team quota is fulfilled
-
-**Auction Flow**
-- Admin-controlled start/pause/reset with navigation controls
-- Unsold marking with optional re-entry into auction pool
-- Celebration popup on successful sale with team logo display
-
-**Excel Import System**
-- Configurable column mapping in `playerLoader.ts`
-- Support for multiple column name variations (e.g., "runs", "Runs", "runs_scored")
-- Automatic base price assignment from grade configuration
-- Image path resolution for player photos
-
-**PowerPoint Presentation System**
-- File upload via admin panel with multer backend handling
-- Storage in `client/public/presentations/` directory for public access
-- Presentation path persisted in localStorage for cross-session availability
-- Conditional UI: "Open Presentation" button appears only when auction is paused
-- Office Online viewer integration for seamless in-browser PPT display
-- Support for .ppt, .pptx, and .ppsx formats (100MB file size limit)
-- Automatic directory creation on server startup
+The system incorporates a robust **Bidding Validation System** with four tiers: grade quota fulfillment, purse sufficiency, optional grade-specific max bid caps, and a smart max bid calculation formula. **Grade Quota Management** allows configurable quotas per grade with progress tracking. **Auction Flow** is Admin-controlled, supporting start/pause/reset, unsold player handling, and celebration popups. An **Excel Import System** with configurable column mapping and automatic image path resolution is included. A **PowerPoint Presentation System** enables admins to upload and display presentations during auction breaks using Office Online viewer integration.
 
 ### Authentication & Authorization
 
-**Simple Credentials System**
-- Hardcoded username/password pairs in `Login.tsx` (lines 24-28)
-- Four roles with distinct capabilities:
-  - **Super Admin**: Full backend-like editing rights - can modify team purses, player status, sold prices, and team assignments. All changes sync instantly to all dashboards.
-  - **Admin**: Full auction control, player management, team oversight
-  - **Owner**: View-only access to teams, players, and live auction
-  - **Viewer**: Public dashboard with current auction and standings
-- Session persistence via localStorage with username and role
+A simple **Credentials System** uses hardcoded username/password pairs for four distinct roles: Super Admin (full editing rights), Admin (full auction control), Owner (view-only team/player access), and Viewer (public dashboard). Session persistence is managed via localStorage.
 
 ### Cross-Tab Synchronization
 
-**Real-time Updates**
-- Storage events listener for same-origin tab communication
-- 2-second polling interval as fallback for state freshness
-- Window focus event handler for immediate sync on tab switch
-- Ensures all connected clients see consistent auction state
+The application ensures real-time updates and consistent auction state across multiple connected clients through **Storage Events** for same-origin tab communication, a 2-second polling interval as a fallback, and a window focus event handler for immediate synchronization.
 
 ## External Dependencies
 
 ### Third-Party UI Libraries
-- **Radix UI**: 20+ accessible component primitives (Dialog, Dropdown, Tabs, etc.)
-- **Lucide React**: Icon library for consistent iconography
-- **class-variance-authority**: Type-safe component variant management
-- **cmdk**: Command palette component (available for future features)
+- **Radix UI**: Accessible component primitives.
+- **Lucide React**: Icon library.
+- **class-variance-authority**: Type-safe component variant management.
 
 ### Data Processing
-- **XLSX (SheetJS)**: Excel file parsing for player import
-- **date-fns**: Date formatting utilities
-- **Zod**: Runtime validation (via drizzle-zod)
+- **XLSX (SheetJS)**: Excel file parsing.
+- **date-fns**: Date formatting.
+- **Zod**: Runtime validation (via drizzle-zod).
 
 ### Database (Configured, Not Used)
-- **Drizzle ORM** with PostgreSQL dialect configured
-- **@neondatabase/serverless**: Neon serverless Postgres driver ready
-- **connect-pg-simple**: Session store for PostgreSQL (for future auth)
-- Schema defined in `shared/schema.ts` with users table
+- **Drizzle ORM**: Configured for PostgreSQL.
+- **@neondatabase/serverless**: Neon serverless Postgres driver.
+- **connect-pg-simple**: Session store for PostgreSQL.
 
 ### Development Tools
-- **tsx**: TypeScript execution for development server
-- **@replit/vite-plugin-runtime-error-modal**: Enhanced error overlay
-- **@replit/vite-plugin-cartographer**: Code navigation (Replit-specific)
-- **@replit/vite-plugin-dev-banner**: Development environment indicator
+- **tsx**: TypeScript execution for development.
+- **@replit/vite-plugin-runtime-error-modal**: Enhanced error overlay.
+- **@replit/vite-plugin-cartographer**: Code navigation.
+- **@replit/vite-plugin-dev-banner**: Development environment indicator.
 
 ### Build & Deployment
-- **esbuild**: Server bundling
-- **Vite**: Client bundling and asset optimization
-- **PostCSS** with **Autoprefixer**: CSS processing
-- Deployment-ready for Railway or Fly.io (see `/docs/DEPLOYMENT_GUIDE.md`)
+- **esbuild**: Server bundling.
+- **Vite**: Client bundling and asset optimization.
+- **PostCSS** with **Autoprefixer**: CSS processing.
 
 ### Form Management
-- **react-hook-form**: Form state management (available for future forms)
-- **@hookform/resolvers**: Zod integration for form validation
+- **react-hook-form**: Form state management.
+- **@hookform/resolvers**: Zod integration for form validation.
 
 ### Asset Management
-- Team logos stored in `client/public/images/` with fallback to emoji flags
-- Player photos stored in `attached_assets/` directory
-- Configuration file (`config.json`) in `client/public/` for runtime access
-
-## Future Features (Planned)
-
-### Multiple Tournaments System (#24)
-**Goal**: Manage multiple leagues simultaneously with different team sets per league
-
-**Architecture Plan**:
-- **Data Structure**:
-  ```
-  tournaments/
-  ├── tournament_1/
-  │   ├── config.json (teams, grades, quotas)
-  │   ├── players.json (player pool)
-  │   ├── auction_state (localStorage key)
-  │   └── team_state (localStorage key)
-  ├── tournament_2/
-  └── ...
-  
-  localStorage:
-  ├── activeTournamentId: "tournament_1"
-  ├── tournaments: [{ id, name, sponsor, created, status }]
-  ├── tournament_1_auction: {...}
-  ├── tournament_1_teams: {...}
-  └── ...
-  ```
-
-- **Key Features**:
-  - Tournament Manager (Super Admin only): Create/delete/clone tournaments
-  - Per-Tournament Isolation: Separate teams, players, branding, auction state
-  - Tournament Selector: Header dropdown to switch between active tournaments
-  - Import/Export: Per-tournament Excel import/export with tournament data backup
-
-- **Implementation Phases**:
-  1. Tournament data structure + selection UI
-  2. Migration system (convert existing → Tournament 1)
-  3. Create/clone/delete tournaments
-  4. Per-tournament Excel import/export
-  5. Tournament-specific reports and analytics
-
-- **Benefits**:
-  - Run multiple leagues (e.g., "TLPL S4", "IPL 2025", "Local League")
-  - Different team sets per tournament
-  - Independent auction histories
-  - Easy league comparisons
+- Team logos in `client/public/images/`.
+- Player photos in `attached_assets/`.
+- Configuration (`config.json`) in `client/public/`.

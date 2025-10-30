@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import { loadAuctionConfig } from './auctionConfig';
+import { resolvePlayerImage, type ImageSource } from './playerImageResolver';
 
 // ============================================================================
 // EXCEL COLUMN CONFIGURATION - CHANGE THESE TO MATCH YOUR EXCEL FILE
@@ -39,7 +40,10 @@ export interface PlayerData {
   grade: string;
   basePrice: number;
   status: 'unsold' | 'sold';
-  image?: string;
+  image?: string;         // Backward compatibility - use imageUrl instead
+  imageOriginal?: string; // Original value from Excel (path or link)
+  imageUrl?: string;      // Resolved render-ready URL
+  imageSource?: ImageSource; // Source type: local, gdrive, remote, unknown
   phoneNumber?: string;   // Player phone number
   // Player statistics
   battingStyle?: string;  // e.g., "Right-hand bat"
@@ -79,6 +83,14 @@ export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
       const bowlingAverage = EXCEL_COLUMNS.BOWLING_AVG_COLUMN ? row[EXCEL_COLUMNS.BOWLING_AVG_COLUMN] : undefined;
       const cricherosLink = EXCEL_COLUMNS.CRICHEROES_LINK_COLUMN ? row[EXCEL_COLUMNS.CRICHEROES_LINK_COLUMN] : undefined;
 
+      // Resolve player image (supports local paths and Google Drive links)
+      const resolvedImage = resolvePlayerImage(photo);
+      
+      // Log warning if Google Drive link couldn't be parsed
+      if (resolvedImage.sourceKind === 'gdrive' && !resolvedImage.resolvedUrl) {
+        console.warn(`[Excel Import] Could not parse Google Drive link for player "${name}": ${photo}`);
+      }
+
       return {
         id: (index + 1).toString(),
         firstName,
@@ -86,7 +98,10 @@ export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
         grade,
         basePrice: config.gradeBasePrices[grade] || 1000000,
         status: 'unsold' as const,
-        image: photo ? `/player_images/${photo}` : undefined,
+        image: resolvedImage.resolvedUrl || undefined, // Backward compatibility
+        imageOriginal: resolvedImage.originalValue || undefined,
+        imageUrl: resolvedImage.resolvedUrl || undefined,
+        imageSource: resolvedImage.sourceKind,
         phoneNumber: phone ? String(phone) : undefined,
         // Stats fields - will be undefined if columns don't exist or are empty
         battingStyle: battingStyle ? String(battingStyle) : undefined,
