@@ -120,6 +120,7 @@ export default function Viewer() {
         recentSales={recentSales}
         allPlayers={allPlayers}
         teamStandings={teamStandings}
+        username={user.username}
       />
       {celebrationData && (
         <CelebrationPopup

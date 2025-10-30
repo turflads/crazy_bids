@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import PlayerCard from "./PlayerCard";
 import TeamLogo from "./TeamLogo";
+import ViewerChat from "./ViewerChat";
 import { Trophy, TrendingUp, Users } from "lucide-react";
 
 interface TeamData {
@@ -32,6 +33,7 @@ interface ViewerDashboardProps {
   recentSales: any[];
   allPlayers: any[];
   teamStandings: TeamData[];
+  username: string;
 }
 
 export default function ViewerDashboard({
@@ -39,6 +41,7 @@ export default function ViewerDashboard({
   recentSales,
   allPlayers,
   teamStandings,
+  username,
 }: ViewerDashboardProps) {
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
 
@@ -58,7 +61,7 @@ export default function ViewerDashboard({
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="max-w-sm mx-auto w-full">
-                <PlayerCard player={currentAuction.player} />
+                <PlayerCard player={currentAuction.player} animate={true} />
               </div>
               <div className="space-y-4">
                 <div className="p-4 sm:p-6 bg-primary/10 rounded-lg">
@@ -86,85 +89,93 @@ export default function ViewerDashboard({
         </Card>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5" />
-              Recent Sales
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recentSales.map((sale) => (
-                <div
-                  key={sale.id}
-                  className="flex items-center justify-between p-3 bg-muted rounded-lg hover-elevate"
-                  data-testid={`card-recent-sale-${sale.id}`}
-                >
-                  <div>
-                    <p className="font-semibold">
-                      {sale.firstName} {sale.lastName}
-                    </p>
-                    <p className="text-sm text-muted-foreground">{sale.team}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-mono font-semibold text-auction-sold">
-                      ₹{sale.soldPrice?.toLocaleString()}
-                    </p>
-                    <Badge className="bg-grade-a text-white mt-1">Grade {sale.grade}</Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Trophy className="w-5 h-5" />
-              Team Standings
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {teamStandings.map((team) => (
-                <div
-                  key={team.team}
-                  className="p-3 bg-muted rounded-lg cursor-pointer hover-elevate active-elevate-2"
-                  data-testid={`card-team-${team.team}`}
-                  onClick={() => setSelectedTeam(team)}
-                >
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                      <TeamLogo 
-                        logo={team.logo} 
-                        flag={team.flag} 
-                        name={team.team}
-                        className="w-8 h-8 flex-shrink-0"
-                      />
-                      <p className="font-semibold truncate">{team.team}</p>
-                    </div>
-                    <Badge variant="outline" className="flex-shrink-0 text-xs">{team.playersCount} <span className="hidden sm:inline">Players</span></Badge>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Recent Sales & Team Standings */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                Recent Sales
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {recentSales.map((sale) => (
+                  <div
+                    key={sale.id}
+                    className="flex items-center justify-between p-3 bg-muted rounded-lg hover-elevate"
+                    data-testid={`card-recent-sale-${sale.id}`}
+                  >
                     <div>
-                      <p className="text-muted-foreground">Purse Used</p>
-                      <p className="font-mono">₹{team.purseUsed.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Remaining</p>
-                      <p className="font-mono text-auction-sold">
-                        ₹{team.purseRemaining.toLocaleString()}
+                      <p className="font-semibold">
+                        {sale.firstName} {sale.lastName}
                       </p>
+                      <p className="text-sm text-muted-foreground">{sale.team}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-mono font-semibold text-auction-sold">
+                        ₹{sale.soldPrice?.toLocaleString()}
+                      </p>
+                      <Badge className="bg-grade-a text-white mt-1">Grade {sale.grade}</Badge>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Trophy className="w-5 h-5" />
+                Team Standings
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {teamStandings.map((team) => (
+                  <div
+                    key={team.team}
+                    className="p-3 bg-muted rounded-lg cursor-pointer hover-elevate active-elevate-2"
+                    data-testid={`card-team-${team.team}`}
+                    onClick={() => setSelectedTeam(team)}
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <TeamLogo 
+                          logo={team.logo} 
+                          flag={team.flag} 
+                          name={team.team}
+                          className="w-8 h-8 flex-shrink-0"
+                        />
+                        <p className="font-semibold truncate">{team.team}</p>
+                      </div>
+                      <Badge variant="outline" className="flex-shrink-0 text-xs">{team.playersCount} <span className="hidden sm:inline">Players</span></Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <p className="text-muted-foreground">Purse Used</p>
+                        <p className="font-mono">₹{team.purseUsed.toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Remaining</p>
+                        <p className="font-mono text-auction-sold">
+                          ₹{team.purseRemaining.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Column - Live Chat */}
+        <div className="lg:col-span-1">
+          <ViewerChat username={username} />
+        </div>
       </div>
 
       <Dialog open={!!selectedTeam} onOpenChange={() => setSelectedTeam(null)}>

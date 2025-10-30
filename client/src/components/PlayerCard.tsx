@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,9 +26,13 @@ interface PlayerCardProps {
   };
   onViewDetails?: () => void;
   showStats?: boolean; // Control whether to show stats section
+  animate?: boolean; // Enable 3D animations
 }
 
-export default function PlayerCard({ player, onViewDetails, showStats = true }: PlayerCardProps) {
+export default function PlayerCard({ player, onViewDetails, showStats = true, animate = false }: PlayerCardProps) {
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [prevSoldStatus, setPrevSoldStatus] = useState(player.status === 'sold');
+  
   const gradeColors: Record<string, string> = {
     A: 'bg-grade-a',
     B: 'bg-grade-b',
@@ -36,8 +41,56 @@ export default function PlayerCard({ player, onViewDetails, showStats = true }: 
 
   const isSold = player.status === 'sold' || !!player.soldPrice;
 
+  // Detect when player becomes sold and trigger flip animation
+  useEffect(() => {
+    if (animate && !prevSoldStatus && isSold) {
+      setIsFlipping(true);
+      setTimeout(() => setIsFlipping(false), 600);
+    }
+    setPrevSoldStatus(isSold);
+  }, [isSold, prevSoldStatus, animate]);
+
   return (
-    <Card className={`overflow-hidden hover-elevate ${isSold ? 'border-l-4 border-l-auction-sold' : ''}`}>
+    <Card 
+      className={`overflow-visible hover-elevate ${isSold ? 'border-l-4 border-l-auction-sold' : ''} ${
+        animate ? 'player-card-reveal' : ''
+      } ${isFlipping ? 'player-card-flip' : ''}`}
+      data-testid={`card-player-${player.id}`}
+    >
+      <style>{`
+        @keyframes revealPlayer {
+          from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        
+        @keyframes flipCard {
+          0% {
+            transform: rotateY(0deg);
+          }
+          50% {
+            transform: rotateY(180deg);
+          }
+          100% {
+            transform: rotateY(360deg);
+          }
+        }
+        
+        .player-card-reveal {
+          animation: revealPlayer 0.6s ease-out;
+          transform-style: preserve-3d;
+        }
+        
+        .player-card-flip {
+          animation: flipCard 0.6s ease-in-out;
+          transform-style: preserve-3d;
+        }
+      `}</style>
       <div className="aspect-video bg-muted relative overflow-hidden">
         {player.image ? (
           <img 

@@ -122,6 +122,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } else if (data.type === 'team_update' && data.data) {
           serverTeamState = data.data;
         }
+        // Handle chat messages and reactions - broadcast to all clients
+        else if (data.type === 'chat_message' || data.type === 'chat_reaction') {
+          // Broadcast to all connected clients (including sender for confirmation)
+          wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify(data));
+            }
+          });
+          return; // Don't process further
+        }
         
         // Broadcast message to all connected clients except sender
         wss.clients.forEach((client) => {
