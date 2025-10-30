@@ -11,9 +11,7 @@ A comprehensive web application for conducting live cricket player auctions with
   - WebSocket-based real-time broadcasting to all viewers
   - Connection status indicator
   - Messages stored in localStorage (100 messages max)
-  - Note: Emoji reactions feature implemented but display needs debugging
-- **3D Player Card Animations**: Animation infrastructure implemented on all three pages (Admin, Owner, Viewer)
-  - Note: Animation triggers need debugging for reliable display
+  - Emoji reactions feature with floating animations (8 reaction emojis: 🔥👏😮🎉💪⚡❤️👍)
 - **Dual-Strategy Unsold Player System**: TWO unsold player handling modes available via comment/uncomment:
   - **Strategy 1 (Grade-Based)**: For sorted Excel files (A,A,B,B,C,C) - unsold players reappear after their grade finishes
   - **Strategy 2 (All at End)**: For random Excel files (A,C,B,A,C,B) - all unsold players come together at the end

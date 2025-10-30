@@ -61,7 +61,7 @@ export default function ViewerDashboard({
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="max-w-sm mx-auto w-full">
-                <PlayerCard player={currentAuction.player} animate={true} />
+                <PlayerCard player={currentAuction.player} />
               </div>
               <div className="space-y-4">
                 <div className="p-4 sm:p-6 bg-primary/10 rounded-lg">
