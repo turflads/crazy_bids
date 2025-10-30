@@ -6,6 +6,12 @@ A comprehensive web application for conducting live cricket player auctions with
 
 ## Recent Updates (Latest)
 
+- **Music & Sound Effects**: Immersive audio experience for live auctions:
+  - Entrance music plays automatically when a new player appears (all pages)
+  - Drum roll sound during active bidding (starts on first bid, stops when sold/unsold/paused)
+  - Volume controls and mute toggle in Admin dashboard header
+  - Audio preferences persist in localStorage
+  - Uses free Mixkit sound effects library (customizable audio sources)
 - **Live Chat (Viewer Only)**: Real-time chat system exclusively for Viewer page with:
   - Message board with auto-scroll and timestamps
   - WebSocket-based real-time broadcasting to all viewers
@@ -59,6 +65,7 @@ Preferred communication style: Simple, everyday language.
 - **Super Admin controls**: Full editing interface for correcting auction mistakes (team purses, player assignments, sold prices)
 - **Real-time auction controls**: Bidding interface with grade-based increments and validation
 - **Player management**: Excel import via XLSX library, configurable column mapping
+- **Audio manager**: Singleton service managing entrance music and drum roll sounds with localStorage persistence
 - **Celebration system**: CSS animations and fireworks effect for sold players
 - **Presentation system**: PowerPoint upload and display feature for admin during auction breaks (paused state)
 - **Sponsor branding**: Configurable league sponsor name and logo in navbar

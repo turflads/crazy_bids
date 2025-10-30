@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Play, Pause, RotateCcw, Users, Presentation, Upload, Download } from "lucide-react";
+import { Play, Pause, RotateCcw, Users, Presentation, Upload, Download, Volume2, VolumeX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -88,6 +88,8 @@ export default function AdminDashboard({
   const currentPlayer = players[currentPlayerIndex];
   const prevPlayerIndexRef = useRef(currentPlayerIndex);
   const isDrumRollPlayingRef = useRef(false);
+  const [isAudioMuted, setIsAudioMuted] = useState(audioManager.isMutedState());
+  const [audioVolume, setAudioVolume] = useState(audioManager.getVolume());
 
   // Play entrance music when a new player appears
   useEffect(() => {
@@ -241,6 +243,18 @@ export default function AdminDashboard({
     onBid(teamName, newBid);
   };
 
+  const toggleAudioMute = () => {
+    const newMutedState = !isAudioMuted;
+    setIsAudioMuted(newMutedState);
+    audioManager.setMuted(newMutedState);
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    setAudioVolume(newVolume);
+    audioManager.setVolume(newVolume);
+  };
+
   return (
     <div className="space-y-6 p-6">
       {/* Header */}
@@ -250,6 +264,37 @@ export default function AdminDashboard({
           <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
             Player {currentPlayerIndex + 1} of {players.length}
           </span>
+          
+          {/* Audio Controls */}
+          <div className="flex items-center gap-2 bg-muted/50 rounded-md px-2 py-1">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="h-7 w-7"
+              onClick={toggleAudioMute}
+              data-testid="button-audio-mute"
+              title={isAudioMuted ? "Unmute audio" : "Mute audio"}
+            >
+              {isAudioMuted ? (
+                <VolumeX className="w-4 h-4" />
+              ) : (
+                <Volume2 className="w-4 h-4" />
+              )}
+            </Button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={audioVolume}
+              onChange={handleVolumeChange}
+              className="w-16 h-1 accent-primary"
+              disabled={isAudioMuted}
+              data-testid="slider-audio-volume"
+              title="Volume"
+            />
+          </div>
+
           <Button 
             onClick={downloadAuctionReport} 
             variant="outline" 
