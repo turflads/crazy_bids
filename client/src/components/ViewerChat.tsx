@@ -35,9 +35,13 @@ export default function ViewerChat({ username }: ViewerChatProps) {
   };
 
   const handleReaction = (emoji: string) => {
+    console.log('Reaction clicked:', emoji, 'Connected:', isConnected);
     if (isConnected) {
+      console.log('Sending reaction...');
       sendReaction(username, emoji);
       setShowReactions(false);
+    } else {
+      console.error('Not connected to WebSocket');
     }
   };
 
@@ -59,10 +63,10 @@ export default function ViewerChat({ username }: ViewerChatProps) {
           {isConnected ? "Connected" : "Disconnected"}
         </Badge>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col gap-3 overflow-hidden p-0">
+      <CardContent className="flex-1 flex flex-col gap-3 overflow-hidden p-0 relative">
         {/* Floating Reactions Overlay */}
         {reactions.length > 0 && (
-          <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden" style={{ height: '100%' }}>
             {reactions.map((reaction) => (
               <div
                 key={reaction.id}
