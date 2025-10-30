@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -10,6 +10,7 @@ import {
 import PlayerCard from "./PlayerCard";
 import TeamLogo from "./TeamLogo";
 import ViewerChat from "./ViewerChat";
+import { audioManager } from "@/lib/audioManager";
 import { Trophy, TrendingUp, Users } from "lucide-react";
 
 interface TeamData {
@@ -44,6 +45,15 @@ export default function ViewerDashboard({
   username,
 }: ViewerDashboardProps) {
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
+  const prevPlayerIdRef = useRef(currentAuction?.player?.id);
+
+  // Play entrance music when a new player appears
+  useEffect(() => {
+    if (currentAuction?.player && currentAuction.player.id !== prevPlayerIdRef.current) {
+      audioManager.playEntranceMusic();
+      prevPlayerIdRef.current = currentAuction.player.id;
+    }
+  }, [currentAuction?.player?.id]);
 
   return (
     <div className="p-6 space-y-6">

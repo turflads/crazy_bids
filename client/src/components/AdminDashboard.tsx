@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,6 +14,7 @@ import AuctionControls from "./AuctionControls";
 import PlayerCard from "./PlayerCard";
 import TeamOverviewCard from "./TeamOverviewCard";
 import TeamLogo from "./TeamLogo";
+import { audioManager } from "@/lib/audioManager";
 import * as XLSX from 'xlsx';
 
 interface Team {
@@ -85,6 +86,35 @@ export default function AdminDashboard({
   );
   const { toast } = useToast();
   const currentPlayer = players[currentPlayerIndex];
+  const prevPlayerIndexRef = useRef(currentPlayerIndex);
+  const isDrumRollPlayingRef = useRef(false);
+
+  // Play entrance music when a new player appears
+  useEffect(() => {
+    if (currentPlayerIndex !== prevPlayerIndexRef.current && currentPlayer && isAuctionActive) {
+      audioManager.playEntranceMusic();
+      prevPlayerIndexRef.current = currentPlayerIndex;
+    }
+  }, [currentPlayerIndex, currentPlayer, isAuctionActive]);
+
+  // Start drum roll when bidding begins (first bid placed)
+  useEffect(() => {
+    if (hasBids && isAuctionActive && !isDrumRollPlayingRef.current) {
+      audioManager.startDrumRoll();
+      isDrumRollPlayingRef.current = true;
+    } else if (!hasBids && isDrumRollPlayingRef.current) {
+      audioManager.stopDrumRoll();
+      isDrumRollPlayingRef.current = false;
+    }
+  }, [hasBids, isAuctionActive]);
+
+  // Stop drum roll when auction is paused
+  useEffect(() => {
+    if (!isAuctionActive && isDrumRollPlayingRef.current) {
+      audioManager.stopDrumRoll();
+      isDrumRollPlayingRef.current = false;
+    }
+  }, [isAuctionActive]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
