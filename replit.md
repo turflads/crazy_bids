@@ -11,7 +11,8 @@ A comprehensive web application for conducting live cricket player auctions with
   - Drum roll sound during active bidding (starts on first bid, stops when sold/unsold/paused)
   - Volume controls and mute toggle in Admin dashboard header
   - Audio preferences persist in localStorage
-  - Uses free Mixkit sound effects library (customizable audio sources)
+  - Uses Pixabay royalty-free sounds (Fanfare 1 by BenKirb, Drum Roll 3 by LazyChillZone)
+  - Local audio files in `client/public/sounds/` (fanfare.mp3, drumroll.mp3) - user must download from Pixabay
 - **Live Chat (Viewer Only)**: Real-time chat system exclusively for Viewer page with:
   - Message board with auto-scroll and timestamps
   - WebSocket-based real-time broadcasting to all viewers
@@ -201,3 +202,47 @@ Preferred communication style: Simple, everyday language.
 - Team logos stored in `client/public/images/` with fallback to emoji flags
 - Player photos stored in `attached_assets/` directory
 - Configuration file (`config.json`) in `client/public/` for runtime access
+
+## Future Features (Planned)
+
+### Multiple Tournaments System (#24)
+**Goal**: Manage multiple leagues simultaneously with different team sets per league
+
+**Architecture Plan**:
+- **Data Structure**:
+  ```
+  tournaments/
+  ├── tournament_1/
+  │   ├── config.json (teams, grades, quotas)
+  │   ├── players.json (player pool)
+  │   ├── auction_state (localStorage key)
+  │   └── team_state (localStorage key)
+  ├── tournament_2/
+  └── ...
+  
+  localStorage:
+  ├── activeTournamentId: "tournament_1"
+  ├── tournaments: [{ id, name, sponsor, created, status }]
+  ├── tournament_1_auction: {...}
+  ├── tournament_1_teams: {...}
+  └── ...
+  ```
+
+- **Key Features**:
+  - Tournament Manager (Super Admin only): Create/delete/clone tournaments
+  - Per-Tournament Isolation: Separate teams, players, branding, auction state
+  - Tournament Selector: Header dropdown to switch between active tournaments
+  - Import/Export: Per-tournament Excel import/export with tournament data backup
+
+- **Implementation Phases**:
+  1. Tournament data structure + selection UI
+  2. Migration system (convert existing → Tournament 1)
+  3. Create/clone/delete tournaments
+  4. Per-tournament Excel import/export
+  5. Tournament-specific reports and analytics
+
+- **Benefits**:
+  - Run multiple leagues (e.g., "TLPL S4", "IPL 2025", "Local League")
+  - Different team sets per tournament
+  - Independent auction histories
+  - Easy league comparisons
