@@ -89,9 +89,23 @@ export default function Admin() {
         
         if (existingState && existingState.players.length > 0) {
           // Restore complete auction state from localStorage
-          setPlayers(existingState.players);
-          setCurrentPlayerIndex(existingState.currentPlayerIndex);
-          setCurrentBid(existingState.currentBid);
+          const restoredPlayers = existingState.players;
+          let restoredIndex = existingState.currentPlayerIndex;
+          
+          // Check if current player is sold (may have been sold by Super Admin)
+          // If so, find the first unsold player
+          const currentPlayer = restoredPlayers[restoredIndex];
+          if (currentPlayer && currentPlayer.status === 'sold') {
+            // Find first unsold player
+            const firstUnsoldIndex = restoredPlayers.findIndex(p => p.status !== 'sold');
+            if (firstUnsoldIndex !== -1) {
+              restoredIndex = firstUnsoldIndex;
+            }
+          }
+          
+          setPlayers(restoredPlayers);
+          setCurrentPlayerIndex(restoredIndex);
+          setCurrentBid(restoredPlayers[restoredIndex]?.basePrice || existingState.currentBid);
           setIsAuctionActive(existingState.isAuctionActive);
           setBidHistory(existingState.bidHistory || []);
           setHasBids(existingState.hasBids || false);
@@ -192,6 +206,60 @@ export default function Admin() {
       setLocation("/");
     }
   }, [setLocation]);
+
+  // Listen for cross-tab changes (e.g., Super Admin marking players as sold)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'auctionState' && e.newValue) {
+        try {
+          const newState = JSON.parse(e.newValue);
+          if (newState.players && Array.isArray(newState.players)) {
+            setPlayers(newState.players);
+            
+            // Check if current player is now sold - if so, skip to next unsold
+            const currentPlayer = newState.players[currentPlayerIndex];
+            if (currentPlayer && currentPlayer.status === 'sold') {
+              const nextUnsoldIndex = findNextUnsoldPlayer(currentPlayerIndex, newState.players);
+              if (nextUnsoldIndex !== null) {
+                setCurrentPlayerIndex(nextUnsoldIndex);
+                setCurrentBid(newState.players[nextUnsoldIndex]?.basePrice || 0);
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Error handling storage change:', err);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [currentPlayerIndex, players]);
+
+  // Poll for player changes (backup for same-tab updates)
+  useEffect(() => {
+    const checkForPlayerUpdates = () => {
+      const currentState = getAuctionState();
+      if (currentState && currentState.players) {
+        // Check if current player status changed to sold
+        const currentPlayer = currentState.players[currentPlayerIndex];
+        if (currentPlayer && currentPlayer.status === 'sold') {
+          // Only update if our local state doesn't match
+          if (players[currentPlayerIndex]?.status !== 'sold') {
+            setPlayers(currentState.players);
+            const nextUnsoldIndex = findNextUnsoldPlayer(currentPlayerIndex, currentState.players);
+            if (nextUnsoldIndex !== null) {
+              setCurrentPlayerIndex(nextUnsoldIndex);
+              setCurrentBid(currentState.players[nextUnsoldIndex]?.basePrice || 0);
+            }
+          }
+        }
+      }
+    };
+
+    const interval = setInterval(checkForPlayerUpdates, 2000);
+    return () => clearInterval(interval);
+  }, [currentPlayerIndex, players]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
