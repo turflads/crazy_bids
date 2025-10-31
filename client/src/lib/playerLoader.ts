@@ -20,7 +20,7 @@ const EXCEL_COLUMNS = {
   PHONE_COLUMN: "phone", // Player phone number
 
   // Optional stat columns - THESE ARE CONFIGURED TO MATCH YOUR EXCEL FILE
-  BATTING_STYLE_COLUMN: "role", // Batting style
+  BATTING_STYLE_COLUMN: "Role", // Batting style
   // BOWLING_STYLE_COLUMN: 'Bowling -',     // Bowling style
   RUNS_COLUMN: "MZPL RUNS", // Total runs scored
   WICKETS_COLUMN: "MZPL WKTS", // Total wickets taken
