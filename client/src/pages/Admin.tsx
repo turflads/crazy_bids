@@ -29,6 +29,37 @@ export default function Admin() {
   const [gradeBasePrices, setGradeBasePrices] = useState<Record<string, number>>({});
   const [gradeMaxBidCaps, setGradeMaxBidCaps] = useState<Record<string, number>>({});
 
+  // Helper function to find the next unsold player
+  // Searches entire roster (wraps around) EXCLUDING current index
+  // Returns index of next different unsold player, or null if none exist
+  const findNextUnsoldPlayer = (currentIndex: number, playersList: any[]): number | null => {
+    // Handle empty player list
+    if (playersList.length === 0) {
+      return null;
+    }
+    
+    // Search forward from current position (skip current)
+    let nextIndex = currentIndex + 1;
+    while (nextIndex < playersList.length) {
+      const player = playersList[nextIndex];
+      if (player.status !== 'sold' && !player.soldPrice) {
+        return nextIndex;
+      }
+      nextIndex++;
+    }
+    
+    // Wrap around: search from beginning up to (but NOT including) current
+    for (let i = 0; i < currentIndex; i++) {
+      const player = playersList[i];
+      if (player.status !== 'sold' && !player.soldPrice) {
+        return i;
+      }
+    }
+    
+    // No OTHER unsold player exists (current might be unsold, but no others)
+    return null;
+  };
+
   // Initialize auction state
   const [players, setPlayers] = useState<any[]>([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -236,9 +267,40 @@ export default function Admin() {
         isAuctionActive={isAuctionActive}
         hasBids={hasBids}
         teamData={teamData}
-        onNextPlayer={() => setCurrentPlayerIndex(Math.min(currentPlayerIndex + 1, players.length - 1))}
+        onNextPlayer={() => {
+          const nextUnsoldIndex = findNextUnsoldPlayer(currentPlayerIndex, players);
+          
+          // Check if no other unsold players exist
+          if (nextUnsoldIndex === null) {
+            if (!isAuctionActive) {
+              alert('Auction is complete. All players have been sold.');
+            } else {
+              alert('No more unsold players remaining.');
+            }
+            return;
+          }
+          
+          const nextPlayer = players[nextUnsoldIndex];
+          setCurrentPlayerIndex(nextUnsoldIndex);
+          setCurrentBid(nextPlayer?.basePrice || 0);
+        }}
         onPrevPlayer={() => setCurrentPlayerIndex(Math.max(currentPlayerIndex - 1, 0))}
         onStartAuction={() => {
+          // When starting auction, find first unsold player
+          // (in case Super Admin has pre-sold some players)
+          const firstUnsoldIndex = findNextUnsoldPlayer(-1, players);
+          
+          // Check if no unsold players found
+          if (firstUnsoldIndex === null) {
+            alert('No unsold players available. Cannot start auction.');
+            return;
+          }
+          
+          const firstPlayer = players[firstUnsoldIndex];
+          if (firstUnsoldIndex !== currentPlayerIndex) {
+            setCurrentPlayerIndex(firstUnsoldIndex);
+            setCurrentBid(firstPlayer?.basePrice || 0);
+          }
           setIsAuctionActive(true);
           console.log('Auction started');
         }}
@@ -368,15 +430,32 @@ export default function Admin() {
             soldPrice: soldPrice,
           };
           
-          // Calculate next index before state updates
-          const nextIndex = Math.min(currentPlayerIndex + 1, updatedPlayers.length - 1);
+          // Find next unsold player - skip already sold players
+          const nextIndex = findNextUnsoldPlayer(currentPlayerIndex, updatedPlayers);
           
-          // Update all state together to ensure consistency
+          // Update player list first
           setPlayers(updatedPlayers);
-          setCurrentPlayerIndex(nextIndex);
-          setCurrentBid(updatedPlayers[nextIndex]?.basePrice || 0);
           setBidHistory([]);
           setHasBids(false);
+          
+          // Check if no more unsold players - auction complete!
+          if (nextIndex === null) {
+            console.log('All players have been sold! Auction complete.');
+            // End the auction
+            setIsAuctionActive(false);
+            // Stay on current (just sold) player
+            setCurrentPlayerIndex(currentPlayerIndex);
+            setCurrentBid(0);
+            // Show completion alert after celebration
+            setTimeout(() => {
+              alert('Auction Complete! All players have been sold.');
+            }, 5500);
+          } else {
+            // Move to next unsold player
+            const nextPlayer = updatedPlayers[nextIndex];
+            setCurrentPlayerIndex(nextIndex);
+            setCurrentBid(nextPlayer?.basePrice || 0);
+          }
           
           // Update team state
           updateTeamAfterPurchase(soldTeam, currentPlayer, soldPrice);

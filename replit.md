@@ -24,7 +24,7 @@ The core data models include **Player Schema** (firstName, lastName, grade, base
 
 ### Business Logic
 
-The system incorporates a robust **Bidding Validation System** with four tiers: grade quota fulfillment, purse sufficiency, optional grade-specific max bid caps, and a smart max bid calculation formula. **Grade Quota Management** allows configurable quotas per grade with progress tracking. **Auction Flow** is Admin-controlled, supporting start/pause/reset, unsold player handling, and celebration popups. An **Excel Import System** with configurable column mapping and automatic image path resolution is included. A **PowerPoint Presentation System** enables admins to upload and display presentations during auction breaks using Office Online viewer integration.
+The system incorporates a robust **Bidding Validation System** with four tiers: grade quota fulfillment, purse sufficiency, optional grade-specific max bid caps, and a smart max bid calculation formula. **Grade Quota Management** allows configurable quotas per grade with progress tracking. **Auction Flow** is Admin-controlled, supporting start/pause/reset, unsold player handling, and celebration popups. **Skip-Sold-Players Feature** enables Super Admin to pre-sell players before auction starts; Admin auction flow automatically skips already-sold players using wrap-around roster search, detecting auction completion when no unsold players remain and auto-pausing with completion alert. An **Excel Import System** with configurable column mapping and automatic image path resolution is included. A **PowerPoint Presentation System** enables admins to upload and display presentations during auction breaks using Office Online viewer integration.
 
 ### Authentication & Authorization
 
