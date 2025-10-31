@@ -42,7 +42,8 @@ export default function Admin() {
     let nextIndex = currentIndex + 1;
     while (nextIndex < playersList.length) {
       const player = playersList[nextIndex];
-      if (player.status !== 'sold' && !player.soldPrice) {
+      // Check only status field - it's the primary indicator
+      if (player.status !== 'sold') {
         return nextIndex;
       }
       nextIndex++;
@@ -51,7 +52,8 @@ export default function Admin() {
     // Wrap around: search from beginning up to (but NOT including) current
     for (let i = 0; i < currentIndex; i++) {
       const player = playersList[i];
-      if (player.status !== 'sold' && !player.soldPrice) {
+      // Check only status field - it's the primary indicator
+      if (player.status !== 'sold') {
         return i;
       }
     }
