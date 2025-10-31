@@ -53,7 +53,14 @@ export default function PlayerCard({ player, onViewDetails, showStats = true }: 
             alt={`${player.firstName} ${player.lastName}`}
             className="w-full h-full object-cover"
             onError={() => {
-              console.warn(`[PlayerCard] Failed to load image for player ${player.id}:`, player.imageUrl || player.image);
+              const errorMsg = `[PlayerCard] Failed to load image for ${player.firstName} ${player.lastName}`;
+              if (player.imageSource === 'gdrive') {
+                console.warn(errorMsg, '\n⚠️ Google Drive image failed. Check:', 
+                  '\n1. File sharing is set to "Anyone with the link"',
+                  '\n2. Open this link in incognito to test:', player.imageUrl || player.image);
+              } else {
+                console.warn(errorMsg + ':', player.imageUrl || player.image);
+              }
               setImageError(true);
             }}
             data-testid={`img-player-${player.id}`}

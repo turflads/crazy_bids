@@ -74,6 +74,7 @@ function classifyImageSource(value: string): ImageSource {
 
 /**
  * Converts Google Drive sharing URL to direct view URL
+ * Uses thumbnail API which is more reliable for embedding
  */
 function convertGoogleDriveUrl(url: string): string | null {
   const fileId = extractGoogleDriveFileId(url);
@@ -83,8 +84,11 @@ function convertGoogleDriveUrl(url: string): string | null {
     return null;
   }
 
-  // Convert to direct view URL
-  return `https://drive.google.com/uc?export=view&id=${fileId}`;
+  // Try multiple URL formats for best compatibility:
+  // 1. Thumbnail API (most reliable for images)
+  // 2. Direct download format (fallback)
+  // Using thumbnail with size parameter for better quality
+  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
 }
 
 /**

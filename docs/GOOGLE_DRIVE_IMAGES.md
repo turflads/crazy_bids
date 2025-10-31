@@ -58,8 +58,10 @@ The system automatically recognizes and converts these Google Drive URL patterns
 
 All formats above are automatically converted to:
 ```
-https://drive.google.com/uc?export=view&id=1AbC123xyz
+https://drive.google.com/thumbnail?id=1AbC123xyz&sz=w1000
 ```
+
+**Why thumbnail API?** It's the most reliable format for embedding images with better CORS support and automatic optimization.
 
 ---
 
@@ -70,11 +72,14 @@ https://drive.google.com/uc?export=view&id=1AbC123xyz
 2. Upload all player photos to this folder
 
 ### Step 2: Set Sharing Permissions
-**IMPORTANT:** Images must be publicly accessible
+**⚠️ CRITICAL:** Images must be publicly accessible or they won't load
 
 1. Right-click the image → **Share** → **Get link**
-2. Change to: **"Anyone with the link" can view**
-3. Copy the sharing link
+2. Change to: **"Anyone with the link" can view** ✅
+3. Click **Done**
+4. Copy the sharing link
+
+**Test the link:** Open it in an incognito/private browser window. If you see the image, it's configured correctly!
 
 ### Step 3: Add Links to Excel
 In your Excel file's `photo` column, paste the Google Drive link:
@@ -141,10 +146,26 @@ If an image fails to load (network error, invalid link, etc.):
 ## Troubleshooting
 
 ### Image Not Showing
-1. **Check sharing permissions**: Image must be "Anyone with the link"
-2. **Verify the link**: Open it in incognito browser - should show image
-3. **Check console**: Look for `[PlayerCard]` or `[Excel Import]` warnings
-4. **File ID format**: Ensure the URL contains a valid file ID
+1. **Check sharing permissions**: 
+   - Right-click image in Drive → Share
+   - Must be set to "Anyone with the link" can VIEW
+   - Click "Copy link" and verify it works in incognito browser
+   
+2. **Test the converted URL**:
+   - Open browser console (F12)
+   - Look for the warning message with the thumbnail URL
+   - Copy and test that URL in incognito mode
+   
+3. **Common mistakes**:
+   - ❌ "Restricted" - Only specific people can view
+   - ❌ Sharing disabled for your organization
+   - ❌ File is in a private folder
+   - ✅ "Anyone with the link" can view
+   
+4. **Check browser console**: 
+   - Press F12 → Console tab
+   - Look for `[PlayerCard]` warnings
+   - The warning shows the exact URL being used
 
 ### Invalid Link Format
 If the system can't extract the file ID, check that your link:
