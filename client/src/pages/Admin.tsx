@@ -94,7 +94,7 @@ export default function Admin() {
           // Check if current player is sold (may have been sold by Super Admin)
           const currentPlayer = apiState.players[restoredIndex];
           if (currentPlayer && currentPlayer.status === 'sold') {
-            const firstUnsoldIndex = apiState.players.findIndex(p => p.status !== 'sold');
+            const firstUnsoldIndex = apiState.players.findIndex((p: any) => p.status !== 'sold');
             if (firstUnsoldIndex !== -1) {
               restoredIndex = firstUnsoldIndex;
             }
@@ -127,7 +127,7 @@ export default function Admin() {
           
           const currentPlayer = restoredPlayers[restoredIndex];
           if (currentPlayer && currentPlayer.status === 'sold') {
-            const firstUnsoldIndex = restoredPlayers.findIndex(p => p.status !== 'sold');
+            const firstUnsoldIndex = restoredPlayers.findIndex((p: any) => p.status !== 'sold');
             if (firstUnsoldIndex !== -1) {
               restoredIndex = firstUnsoldIndex;
             }
