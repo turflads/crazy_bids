@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import NavBar from "@/components/NavBar";
+import ExcelUpload from "@/components/ExcelUpload";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,9 @@ import { getTeamState } from "@/lib/teamState";
 import { saveAuctionStateWithBroadcast, saveTeamStateWithBroadcast } from "@/lib/webSocketState";
 import { loadAuctionConfig, type Team } from "@/lib/auctionConfig";
 import { useToast } from "@/hooks/use-toast";
-import { Edit2, Save, X, AlertTriangle, DollarSign, Users, Shield } from "lucide-react";
+import { Edit2, Save, X, AlertTriangle, DollarSign, Users, Shield, Upload as UploadIcon } from "lucide-react";
+import * as XLSX from "xlsx";
+import { resolvePlayerImage } from "@/lib/playerImageResolver";
 
 export default function SuperAdmin() {
   const [, setLocation] = useLocation();
@@ -240,6 +243,83 @@ export default function SuperAdmin() {
     }).format(amount);
   };
 
+  const handleExcelUpload = async (file: File) => {
+    try {
+      const config = await loadAuctionConfig();
+      const arrayBuffer = await file.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(firstSheet) as any[];
+
+      const EXCEL_COLUMNS = {
+        NAME_COLUMN: "name",
+        GRADE_COLUMN: "grade",
+        PHOTO_COLUMN: "photo",
+        PHONE_COLUMN: "phone",
+        BATTING_STYLE_COLUMN: "Role",
+        RUNS_COLUMN: "MZPL RUNS",
+        WICKETS_COLUMN: "MZPL WKTS",
+      };
+
+      const newPlayers = data.map((row, index) => {
+        const name = row[EXCEL_COLUMNS.NAME_COLUMN] || "";
+        const nameParts = name.trim().split(" ");
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || "";
+        const grade = (row[EXCEL_COLUMNS.GRADE_COLUMN] || "C").toString().toUpperCase();
+        const photo = row[EXCEL_COLUMNS.PHOTO_COLUMN] || "";
+        const phone = row[EXCEL_COLUMNS.PHONE_COLUMN] || "";
+        const battingStyle = row[EXCEL_COLUMNS.BATTING_STYLE_COLUMN];
+        const runs = row[EXCEL_COLUMNS.RUNS_COLUMN];
+        const wickets = row[EXCEL_COLUMNS.WICKETS_COLUMN];
+
+        const resolvedImage = resolvePlayerImage(photo);
+
+        return {
+          id: (index + 1).toString(),
+          firstName,
+          lastName,
+          grade,
+          basePrice: config.gradeBasePrices[grade] || 1000000,
+          status: "unsold" as const,
+          imageOriginal: photo,
+          imageUrl: resolvedImage.resolvedUrl,
+          imageSource: resolvedImage.sourceKind,
+          phoneNumber: phone,
+          battingStyle,
+          runs,
+          wickets,
+        };
+      });
+
+      const auctionState = {
+        currentPlayerIndex: 0,
+        currentBid: newPlayers[0]?.basePrice || 0,
+        isAuctionActive: false,
+        players: newPlayers,
+        lastBidTeam: '',
+        bidHistory: [],
+        hasBids: false,
+      };
+
+      saveAuctionStateWithBroadcast(auctionState);
+      setPlayers(newPlayers);
+      setCurrentPlayerIndex(0);
+
+      toast({
+        title: "Players Uploaded",
+        description: `Successfully loaded ${newPlayers.length} players from Excel file.`,
+      });
+    } catch (error) {
+      console.error("Error uploading Excel:", error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to process Excel file. Please check the file format.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     setLocation("/");
@@ -266,8 +346,12 @@ export default function SuperAdmin() {
           </div>
         </div>
 
-        <Tabs defaultValue="teams" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="upload" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="upload" data-testid="tab-upload">
+              <UploadIcon className="h-4 w-4 mr-2" />
+              Upload Players
+            </TabsTrigger>
             <TabsTrigger value="teams" data-testid="tab-teams">
               <DollarSign className="h-4 w-4 mr-2" />
               Teams & Purse
@@ -277,6 +361,43 @@ export default function SuperAdmin() {
               Players
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="upload" className="space-y-4">
+            <ExcelUpload onUpload={handleExcelUpload} />
+            
+            {players.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Current Status</CardTitle>
+                  <CardDescription>
+                    {players.length} players loaded in the database
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <p className="text-2xl font-bold text-green-600">
+                        {players.filter(p => p.status === 'sold').length}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Sold</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-yellow-600">
+                        {players.filter(p => p.status === 'unsold').length}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Unsold</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-blue-600">
+                        {players.length}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Total</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
 
           <TabsContent value="teams" className="space-y-4">
             {Object.entries(teams).map(([teamName, teamData]: [string, any]) => (
