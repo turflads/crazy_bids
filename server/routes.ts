@@ -5,8 +5,9 @@ import { storage } from "./storage";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { getAuctionStateFromDB, saveAuctionStateToDB, getTeamStateFromDB, saveTeamStateToDB } from "./auctionService";
 
-// Server-side in-memory state cache for cross-device sync
+// Server-side in-memory state cache for cross-device sync (deprecated, using DB now)
 let serverAuctionState: any = null;
 let serverTeamState: any = null;
 
@@ -45,26 +46,52 @@ const upload = multer({
 export async function registerRoutes(app: Express): Promise<Server> {
   // API endpoints for state synchronization
   
-  // Get current auction state
-  app.get('/api/auction-state', (req, res) => {
-    res.json(serverAuctionState || {});
+  // Get current auction state from database
+  app.get('/api/auction-state', async (req, res) => {
+    try {
+      const state = await getAuctionStateFromDB();
+      serverAuctionState = state; // Update cache for WebSocket
+      res.json(state);
+    } catch (error) {
+      console.error('Error fetching auction state:', error);
+      res.status(500).json({ error: 'Failed to fetch auction state' });
+    }
   });
 
-  // Update auction state
-  app.post('/api/auction-state', (req, res) => {
-    serverAuctionState = req.body;
-    res.json({ success: true });
+  // Update auction state in database
+  app.post('/api/auction-state', async (req, res) => {
+    try {
+      await saveAuctionStateToDB(req.body);
+      serverAuctionState = req.body; // Update cache for WebSocket
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error saving auction state:', error);
+      res.status(500).json({ error: 'Failed to save auction state' });
+    }
   });
 
-  // Get current team state
-  app.get('/api/team-state', (req, res) => {
-    res.json(serverTeamState || {});
+  // Get current team state from database
+  app.get('/api/team-state', async (req, res) => {
+    try {
+      const teams = await getTeamStateFromDB();
+      serverTeamState = teams; // Update cache for WebSocket
+      res.json(teams);
+    } catch (error) {
+      console.error('Error fetching team state:', error);
+      res.status(500).json({ error: 'Failed to fetch team state' });
+    }
   });
 
-  // Update team state
-  app.post('/api/team-state', (req, res) => {
-    serverTeamState = req.body;
-    res.json({ success: true });
+  // Update team state in database
+  app.post('/api/team-state', async (req, res) => {
+    try {
+      await saveTeamStateToDB(req.body);
+      serverTeamState = req.body; // Update cache for WebSocket
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error saving team state:', error);
+      res.status(500).json({ error: 'Failed to save team state' });
+    }
   });
 
   // Upload presentation endpoint
@@ -91,25 +118,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Set up WebSocket server on /ws path (distinct from Vite's HMR websocket)
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
 
-  wss.on('connection', (ws: WebSocket) => {
+  wss.on('connection', async (ws: WebSocket) => {
     console.log('New WebSocket client connected');
     
-    // Send current server state to newly connected client
-    if (serverAuctionState || serverTeamState) {
-      if (serverAuctionState) {
+    // Load latest state from database and send to newly connected client
+    try {
+      const auctionState = await getAuctionStateFromDB();
+      const teamStateData = await getTeamStateFromDB();
+      
+      serverAuctionState = auctionState;
+      serverTeamState = teamStateData;
+      
+      if (auctionState) {
         ws.send(JSON.stringify({
           type: 'auction_update',
           timestamp: Date.now(),
-          data: serverAuctionState,
+          data: auctionState,
         }));
       }
-      if (serverTeamState) {
+      if (teamStateData) {
         ws.send(JSON.stringify({
           type: 'team_update',
           timestamp: Date.now(),
-          data: serverTeamState,
+          data: teamStateData,
         }));
       }
+    } catch (error) {
+      console.error('Error loading state for WebSocket client:', error);
     }
 
     ws.on('message', (message: string) => {

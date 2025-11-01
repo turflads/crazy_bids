@@ -82,21 +82,51 @@ export default function Admin() {
       setGradeBasePrices(config.gradeBasePrices);
       setGradeMaxBidCaps(config.gradeMaxBidCaps || {});
       
+      // Try to load from database first (for multi-device sync)
+      try {
+        const apiStateResponse = await fetch('/api/auction-state');
+        const apiState = await apiStateResponse.json();
+        
+        if (apiState && apiState.players && apiState.players.length > 0) {
+          // Use database state (multi-device sync)
+          let restoredIndex = apiState.currentPlayerIndex;
+          
+          // Check if current player is sold (may have been sold by Super Admin)
+          const currentPlayer = apiState.players[restoredIndex];
+          if (currentPlayer && currentPlayer.status === 'sold') {
+            const firstUnsoldIndex = apiState.players.findIndex(p => p.status !== 'sold');
+            if (firstUnsoldIndex !== -1) {
+              restoredIndex = firstUnsoldIndex;
+            }
+          }
+          
+          setPlayers(apiState.players);
+          setCurrentPlayerIndex(restoredIndex);
+          setCurrentBid(apiState.players[restoredIndex]?.basePrice || apiState.currentBid);
+          setIsAuctionActive(apiState.isAuctionActive);
+          setBidHistory(apiState.bidHistory || []);
+          setHasBids(apiState.hasBids || false);
+          setIsLoadingPlayers(false);
+          return;
+        }
+      } catch (error) {
+        console.warn('Could not load from database, falling back to Excel:', error);
+      }
+      
+      // Fallback: Load from Excel if database is empty
       const loadedPlayers = await loadPlayersFromExcel();
       
       if (loadedPlayers.length > 0) {
+        // Check localStorage as secondary fallback
         const existingState = getAuctionState();
         
         if (existingState && existingState.players.length > 0) {
-          // Restore complete auction state from localStorage
+          // Restore from localStorage
           const restoredPlayers = existingState.players;
           let restoredIndex = existingState.currentPlayerIndex;
           
-          // Check if current player is sold (may have been sold by Super Admin)
-          // If so, find the first unsold player
           const currentPlayer = restoredPlayers[restoredIndex];
           if (currentPlayer && currentPlayer.status === 'sold') {
-            // Find first unsold player
             const firstUnsoldIndex = restoredPlayers.findIndex(p => p.status !== 'sold');
             if (firstUnsoldIndex !== -1) {
               restoredIndex = firstUnsoldIndex;
@@ -110,7 +140,7 @@ export default function Admin() {
           setBidHistory(existingState.bidHistory || []);
           setHasBids(existingState.hasBids || false);
         } else {
-          // Initialize fresh auction state
+          // Initialize fresh auction state from Excel
           const auctionState = initializeAuctionState(loadedPlayers);
           setPlayers(auctionState.players);
           setCurrentPlayerIndex(auctionState.currentPlayerIndex);
