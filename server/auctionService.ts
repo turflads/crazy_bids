@@ -5,6 +5,11 @@ import { eq } from "drizzle-orm";
 
 // Auction State Operations
 export async function getAuctionStateFromDB() {
+  if (!db) {
+    console.log('Database not available - returning null for auction state');
+    return null;
+  }
+  
   const [state] = await db.select().from(auctionState).where(eq(auctionState.id, 1));
   
   if (!state) {
@@ -41,6 +46,11 @@ export async function saveAuctionStateToDB(state: {
   hasBids: boolean;
   lastBidTeam?: string;
 }) {
+  if (!db) {
+    console.log('Database not available - skipping auction state save');
+    return null;
+  }
+  
   const dbState = {
     id: 1,
     currentPlayerIndex: state.currentPlayerIndex,
@@ -67,6 +77,11 @@ export async function saveAuctionStateToDB(state: {
 
 // Team State Operations
 export async function getTeamStateFromDB() {
+  if (!db) {
+    console.log('Database not available - returning null for team state');
+    return null;
+  }
+  
   const [state] = await db.select().from(teamState).where(eq(teamState.id, 1));
   
   if (!state) {
@@ -77,6 +92,11 @@ export async function getTeamStateFromDB() {
 }
 
 export async function saveTeamStateToDB(teams: Record<string, any>) {
+  if (!db) {
+    console.log('Database not available - skipping team state save');
+    return null;
+  }
+  
   const dbState = {
     id: 1,
     teams: teams,
@@ -97,6 +117,11 @@ export async function saveTeamStateToDB(teams: Record<string, any>) {
 
 // Clear all auction data (for reset)
 export async function clearAuctionDataFromDB() {
+  if (!db) {
+    console.log('Database not available - skipping auction data clear');
+    return;
+  }
+  
   await db.delete(auctionState).where(eq(auctionState.id, 1));
   await db.delete(teamState).where(eq(teamState.id, 1));
 }

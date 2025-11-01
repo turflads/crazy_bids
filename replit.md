@@ -28,7 +28,13 @@ The system incorporates a robust **Bidding Validation System** with four tiers: 
 
 ### Authentication & Authorization
 
-A simple **Credentials System** uses hardcoded username/password pairs for four distinct roles: Super Admin (full editing rights), Admin (full auction control), Owner (view-only team/player access), and Viewer (public dashboard). Session persistence is managed via localStorage.
+A simple **Credentials System** uses hardcoded username/password pairs for four distinct roles:
+- **Super Admin** (superadmin/superadmin123): Full editing rights
+- **Admin** (admin/admin123): Full auction control
+- **Owner** (owner/owner123): View-only team/player access
+- **Viewer** (viewer/viewer123): Public dashboard access
+
+Session persistence is managed via localStorage.
 
 ### Cross-Tab Synchronization
 
@@ -46,10 +52,13 @@ The application ensures real-time updates and consistent auction state across mu
 - **date-fns**: Date formatting.
 - **Zod**: Runtime validation (via drizzle-zod).
 
-### Database (Configured, Not Used)
-- **Drizzle ORM**: Configured for PostgreSQL.
-- **@neondatabase/serverless**: Neon serverless Postgres driver.
-- **connect-pg-simple**: Session store for PostgreSQL.
+### Database (Active - PostgreSQL)
+- **Drizzle ORM**: PostgreSQL schema and queries.
+- **@neondatabase/serverless**: Neon serverless Postgres driver (Helium in dev, Railway in production).
+- **Database Tables**: 
+  - `auction_state` (singleton): Current player, bids, auction status
+  - `team_state` (singleton): Teams, purses, players, grade counts
+- **Deployment**: Database migration runs automatically via `npm run db:push` in build phase.
 
 ### Development Tools
 - **tsx**: TypeScript execution for development.
