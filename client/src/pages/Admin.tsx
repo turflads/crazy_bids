@@ -671,10 +671,30 @@ export default function Admin() {
           setHasBids(false);
         }}
         onResetAuction={async () => {
+          // Clear localStorage
           clearTeamState();
           clearAuctionState();
-          initializeTeams(teams);
           
+          // Clear database
+          try {
+            await fetch('/api/reset-auction', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+            });
+          } catch (error) {
+            console.error('Failed to clear database:', error);
+          }
+          
+          // Reinitialize teams and save to database
+          initializeTeams(teams);
+          const teamState = getTeamState();
+          await fetch('/api/team-state', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(teamState),
+          }).catch(err => console.error('Failed to save team state after reset:', err));
+          
+          // Reinitialize auction and save to database
           const loadedPlayers = await loadPlayersFromExcel();
           const auctionState = initializeAuctionState(loadedPlayers);
           setPlayers(auctionState.players);
@@ -683,6 +703,13 @@ export default function Admin() {
           setIsAuctionActive(false);
           setBidHistory([]);
           setHasBids(false);
+          
+          // Explicitly save initialized auction state to database
+          await fetch('/api/auction-state', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(auctionState),
+          }).catch(err => console.error('Failed to save auction state after reset:', err));
         }}
       />
       {celebrationData && (

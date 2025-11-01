@@ -94,6 +94,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Clear all auction data (reset)
+  app.post('/api/reset-auction', async (req, res) => {
+    try {
+      const { clearAuctionDataFromDB } = await import('./auctionService');
+      await clearAuctionDataFromDB();
+      serverAuctionState = null;
+      serverTeamState = null;
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error clearing auction data:', error);
+      res.status(500).json({ error: 'Failed to clear auction data' });
+    }
+  });
+
   // Upload presentation endpoint
   app.post('/api/upload-presentation', upload.single('presentation'), (req, res) => {
     try {
@@ -147,15 +161,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error loading state for WebSocket client:', error);
     }
 
-    ws.on('message', (message: string) => {
+    ws.on('message', async (message: string) => {
       try {
         const data = JSON.parse(message.toString());
         
-        // Update server-side state cache
+        // Update server-side state cache AND database
         if (data.type === 'auction_update' && data.data) {
           serverAuctionState = data.data;
+          // Persist to database
+          await saveAuctionStateToDB(data.data).catch(err => 
+            console.error('Failed to save auction state from WebSocket:', err)
+          );
         } else if (data.type === 'team_update' && data.data) {
           serverTeamState = data.data;
+          // Persist to database
+          await saveTeamStateToDB(data.data).catch(err =>
+            console.error('Failed to save team state from WebSocket:', err)
+          );
         }
         // Handle chat messages and reactions - broadcast to all clients
         else if (data.type === 'chat_message' || data.type === 'chat_reaction') {
