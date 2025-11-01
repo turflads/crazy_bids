@@ -1,0 +1,120 @@
+Nov 2, 2025, 1:14 AM
+Starting Container
+npm warn config production Use `--omit=dev` instead.
+> rest-express@1.0.0 start
+> NODE_ENV=production node dist/index.js
+7:48:06 PM [express] serving on port 8080
+Error saving team state: ErrorEvent {
+  [Symbol(kTarget)]: WebSocket {
+    _events: [Object: null prototype] {
+      error: [Function],
+      message: [Function],
+      close: [Function],
+      open: [Function]
+    },
+    _eventsCount: 4,
+    _maxListeners: undefined,
+    _binaryType: 'arraybuffer',
+    _closeCode: 1006,
+    _closeFrameReceived: false,
+    _closeFrameSent: false,
+    _closeMessage: <Buffer >,
+    _closeTimer: null,
+    _errorEmitted: true,
+    _extensions: {},
+    _paused: false,
+    _protocol: '',
+    _readyState: 3,
+    _receiver: null,
+    _sender: null,
+    _socket: null,
+    _bufferedAmount: 0,
+    _isServer: false,
+    _redirects: 0,
+    _autoPong: true,
+    _url: 'wss://postgres.railway.internal/v2',
+    _req: null,
+    [Symbol(kCapture)]: false
+  },
+  [Symbol(kType)]: 'error',
+  [Symbol(kError)]: Error: connect ECONNREFUSED fd12:92a7:709f:1:9000:41:7074:7cf8:443
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) {
+    errno: -111,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: 'fd12:92a7:709f:1:9000:41:7074:7cf8',
+    port: 443
+  },
+  [Symbol(kMessage)]: 'connect ECONNREFUSED fd12:92a7:709f:1:9000:41:7074:7cf8:443'
+}
+7:48:11 PM [express] POST /api/team-state 500 in 196ms :: {"error":"Failed to save team state"}
+    _binaryType: 'arraybuffer',
+    _closeCode: 1006,
+    _closeFrameReceived: false,
+    _closeFrameSent: false,
+    _closeMessage: <Buffer >,
+    _closeTimer: null,
+    _errorEmitted: true,
+    _extensions: {},
+    _paused: false,
+    _protocol: '',
+    _readyState: 3,
+    _receiver: null,
+    _sender: null,
+    _socket: null,
+    _bufferedAmount: 0,
+    _isServer: false,
+    _redirects: 0,
+    _autoPong: true,
+    _url: 'wss://postgres.railway.internal/v2',
+New WebSocket client connected
+Error loading state for WebSocket client: ErrorEvent {
+  [Symbol(kTarget)]: WebSocket {
+    _events: [Object: null prototype] {
+      error: [Function],
+      message: [Function],
+      close: [Function],
+      open: [Function]
+    },
+    _eventsCount: 4,
+    _maxListeners: undefined,
+    _req: null,
+    [Symbol(kCapture)]: false
+  },
+  [Symbol(kType)]: 'error',
+  [Symbol(kError)]: Error: connect ECONNREFUSED fd12:92a7:709f:1:9000:41:7074:7cf8:443
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) {
+    errno: -111,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: 'fd12:92a7:709f:1:9000:41:7074:7cf8',
+    port: 443
+  },
+  [Symbol(kMessage)]: 'connect ECONNREFUSED fd12:92a7:709f:1:9000:41:7074:7cf8:443'
+}
+Error saving auction state: ErrorEvent {
+  [Symbol(kTarget)]: WebSocket {
+    _events: [Object: null prototype] {
+      error: [Function],
+      message: [Function],
+      close: [Function],
+      open: [Function]
+    },
+    _eventsCount: 4,
+    _maxListeners: undefined,
+    _binaryType: 'arraybuffer',
+    _closeCode: 1006,
+    _closeFrameReceived: false,
+    _closeFrameSent: false,
+    _url: 'wss://postgres.railway.internal/v2',
+    _req: null,
+  [Symbol(kMessage)]: 'connect ECONNREFUSED fd12:92a7:709f:1:9000:41:7074:7cf8:443'
+    [Symbol(kCapture)]: false
+  },
+}
+  [Symbol(kType)]: 'error',
+  [Symbol(kError)]: Error: connect ECONNREFUSED fd12:92a7:709f:1:9000:41:7074:7cf8:443
+    syscall: 'connect',
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) {
+    _closeMessage: <Buffer >,
+    errno: -111,
