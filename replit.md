@@ -67,9 +67,10 @@ The application ensures real-time updates and consistent auction state across mu
 - **@replit/vite-plugin-dev-banner**: Development environment indicator.
 
 ### Build & Deployment
-- **esbuild**: Server bundling.
+- **esbuild**: Server bundling with custom `build.js` script that includes Node.js 18 compatibility polyfill for `import.meta.dirname`.
 - **Vite**: Client bundling and asset optimization.
 - **PostCSS** with **Autoprefixer**: CSS processing.
+- **Railway Deployment**: Configured via `railway.json` with automatic database migration. Node.js 18 compatibility ensured through esbuild banner injection.
 
 ### Form Management
 - **react-hook-form**: Form state management.

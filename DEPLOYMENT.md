@@ -1,6 +1,6 @@
 # Railway Deployment Guide
 
-**✅ Development Status**: PostgreSQL database successfully configured and running in Replit development environment with Helium database. All database tables created and tested. Application ready for Railway deployment.
+**✅ Ready for Deployment**: All Railway deployment issues fixed! The Node.js 18 compatibility issue has been resolved with a custom build script that polyfills `import.meta.dirname`.
 
 This guide explains how to deploy your Cricket Auction app to Railway with PostgreSQL database for multi-device synchronization.
 
@@ -43,37 +43,76 @@ railway up
 
 ### Step 3: Add PostgreSQL Database
 
-In Railway Dashboard:
-1. Click your project
-2. Click "New" → "Database" → "Add PostgreSQL"
-3. Railway automatically sets `DATABASE_URL` environment variable ✅
+**After your app service is deployed**, add the database:
 
-### Step 4: Configure Build Command (if needed)
+**Using Command Menu (Fastest):**
+1. Press `Ctrl + K` (Windows) or `Cmd + K` (Mac)
+2. Type "PostgreSQL"
+3. Select it from the list
 
-Railway should auto-detect from `railway.json`, but if not:
+**Using + New Button:**
+1. Click **"+ New"** on your Project Canvas
+2. Select **"Database"** → **"Add PostgreSQL"**
+3. Wait for deployment
 
-1. Go to your service → Settings
-2. Under "Build", set custom build command:
-   ```
-   npm install && npm run build && npm run db:push
-   ```
-3. Under "Deploy", start command should be:
-   ```
-   npm start
-   ```
+**Link Database to App:**
+1. Click your **app service** (not the database)
+2. Go to **"Variables"** tab
+3. Click **"New Variable"**
+4. Type `DATABASE_URL`
+5. Select **`${{Postgres.DATABASE_URL}}`** from dropdown
+6. Save
 
-### Step 5: Set Environment Variables (if needed)
+Railway automatically sets `DATABASE_URL` environment variable ✅
+
+### Step 4: Generate Public Domain
+
+1. Click your **app service**
+2. Go to **Settings** → **Networking**
+3. Click **"Generate Domain"**
+4. When asked for port, enter: **5000**
+5. You'll get a URL like: `https://your-app.up.railway.app`
+
+### Step 5: Wait for Deployment
+
+Railway will automatically:
+- Run `npm install`
+- Build frontend with `vite build`
+- Build backend with custom build script (includes Node.js 18 compatibility fix)
+- Create database tables with `npm run db:push`
+- Start the app with `npm start`
+
+Check the build logs to monitor progress!
+
+### Step 6: Set Environment Variables (if needed)
 
 In Railway Dashboard → Variables:
 - `NODE_ENV` = `production` (optional, auto-set)
 - `DATABASE_URL` = Auto-set by PostgreSQL service ✅
 - `SESSION_SECRET` = (generate a random string)
 
-### Step 6: Deploy & Access
+### Step 7: Access Your App
 
-1. Railway will build and deploy automatically
-2. You'll get a URL like: `https://your-auction.up.railway.app`
-3. Open this URL on **multiple devices** to test sync!
+Once deployment is complete:
+1. Railway will give you a URL like: `https://your-auction.up.railway.app`
+2. Open this URL on **multiple devices** to test sync!
+3. Login credentials:
+   - Admin: `admin` / `admin123`
+   - Super Admin: `superadmin` / `superadmin123`
+   - Owner: `owner` / `owner123`
+   - Viewer: `viewer` / `viewer123`
+
+## Technical Details: Node.js 18 Compatibility Fix
+
+**Problem**: Railway uses Node.js 18 by default, but the code used `import.meta.dirname` which was only added in Node.js 20.11+.
+
+**Solution**: Created `build.js` with esbuild banner that polyfills `import.meta.dirname`:
+
+```javascript
+import.meta.dirname = import.meta.dirname || dirname(fileURLToPath(import.meta.url));
+```
+
+This is automatically injected during Railway build via the custom build script. No manual intervention needed!
 
 ## How Multi-Device Sync Works
 
