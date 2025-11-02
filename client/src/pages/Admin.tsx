@@ -159,10 +159,10 @@ export default function Admin() {
 
   // Initialize teams
   useEffect(() => {
-    if (teams.length > 0) {
-      initializeTeams(teams);
+    if (teams.length > 0 && Object.keys(gradeQuotas).length > 0) {
+      initializeTeams(teams, gradeQuotas);
     }
-  }, [teams]);
+  }, [teams, gradeQuotas]);
 
   // Push current state to server on mount to populate server-side cache
   useEffect(() => {
@@ -686,7 +686,7 @@ export default function Admin() {
           }
           
           // Reinitialize teams and save to database
-          initializeTeams(teams);
+          initializeTeams(teams, gradeQuotas);
           const teamState = getTeamState();
           await fetch('/api/team-state', {
             method: 'POST',

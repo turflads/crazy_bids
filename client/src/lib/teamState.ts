@@ -32,9 +32,25 @@ import('./webSocketState').then(module => {
 // Export the wrapper function to use in other components
 export { saveTeamStateWithBroadcast };
 
-export const initializeTeams = (teamNames: { name: string; flag?: string; logo?: string; totalPurse?: number }[]) => {
+export const initializeTeams = (
+  teamNames: { name: string; flag?: string; logo?: string; totalPurse?: number }[],
+  gradeQuotas?: Record<string, number>
+) => {
   const existing = getTeamState();
   const teams: Record<string, TeamData> = {};
+  
+  // Create initial grade count from gradeQuotas (all zeros)
+  const initialGradeCount: Record<string, number> = {};
+  if (gradeQuotas) {
+    Object.keys(gradeQuotas).forEach(grade => {
+      initialGradeCount[grade] = 0;
+    });
+  } else {
+    // Fallback to default grades
+    initialGradeCount.A = 0;
+    initialGradeCount.B = 0;
+    initialGradeCount.C = 0;
+  }
   
   teamNames.forEach(team => {
     if (existing[team.name]) {
@@ -52,7 +68,7 @@ export const initializeTeams = (teamNames: { name: string; flag?: string; logo?:
         totalPurse: team.totalPurse || 100000000,
         usedPurse: 0,
         players: [],
-        gradeCount: { A: 0, B: 0, C: 0 },
+        gradeCount: { ...initialGradeCount },
       };
     }
   });
