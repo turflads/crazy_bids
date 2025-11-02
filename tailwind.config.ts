@@ -85,6 +85,11 @@ export default {
           a: "hsl(270 60% 60%)",
           b: "hsl(200 70% 50%)",
           c: "hsl(40 75% 55%)",
+          "b-plus": "hsl(160 70% 50%)",
+          "40-plus-a": "hsl(30 75% 55%)",
+          "category-a": "hsl(270 60% 60%)",
+          "category-b": "hsl(200 70% 50%)",
+          "category-c": "hsl(40 75% 55%)",
         },
         auction: {
           live: "hsl(25 95% 55%)",

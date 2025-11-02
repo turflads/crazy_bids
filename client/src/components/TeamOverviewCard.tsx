@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 import TeamLogo from "./TeamLogo";
+import { getGradeBgClass } from "@/lib/gradeUtils";
 
 interface TeamOverviewCardProps {
   teamName: string;
@@ -88,7 +89,7 @@ export default function TeamOverviewCard({
             return (
               <Badge 
                 key={grade} 
-                className={`text-xs ${isComplete ? 'bg-auction-sold' : `bg-grade-${grade.toLowerCase()}`} text-white`}
+                className={`text-xs ${getGradeBgClass(grade, isComplete)} text-white`}
                 data-testid={`badge-grade-${grade}-${teamName.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 {grade}: {current}/{required}

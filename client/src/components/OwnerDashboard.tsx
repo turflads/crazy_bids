@@ -13,6 +13,7 @@ import { Search, Trophy, Users, Gavel, User } from "lucide-react";
 import PlayerCard from "./PlayerCard";
 import TeamLogo from "./TeamLogo";
 import { audioManager } from "@/lib/audioManager";
+import { getGradeBgClass } from "@/lib/gradeUtils";
 
 interface TeamData {
   team: string;
@@ -50,13 +51,6 @@ export default function OwnerDashboard({
 }: OwnerDashboardProps) {
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
   const prevPlayerIdRef = useRef(currentPlayer?.id);
-
-  const gradeColorMap: Record<string, string> = {
-    A: 'bg-grade-a',
-    B: 'bg-grade-b',
-    C: 'bg-grade-c',
-  };
-  const gradeColor = currentPlayer ? (gradeColorMap[currentPlayer.grade] || 'bg-primary') : 'bg-primary';
 
   // Play entrance music when a new player appears (only if auction is active)
   useEffect(() => {
@@ -100,7 +94,7 @@ export default function OwnerDashboard({
                       <User className="w-12 h-12 text-muted-foreground" />
                     </div>
                   )}
-                  <Badge className={`absolute top-2 right-2 ${gradeColor} text-white`}>
+                  <Badge className={`absolute top-2 right-2 ${getGradeBgClass(currentPlayer.grade)} text-white`}>
                     Grade {currentPlayer.grade}
                   </Badge>
                 </div>
@@ -261,15 +255,18 @@ export default function OwnerDashboard({
                   </div>
                 )}
                 <div className="flex flex-wrap gap-2">
-                  <Badge className="bg-grade-a text-white text-xs">
-                    A: {team.gradeCount.A || 0}/{gradeQuotas.A || 3}
-                  </Badge>
-                  <Badge className="bg-grade-b text-white text-xs">
-                    B: {team.gradeCount.B || 0}/{gradeQuotas.B || 4}
-                  </Badge>
-                  <Badge className="bg-grade-c text-white text-xs">
-                    C: {team.gradeCount.C || 0}/{gradeQuotas.C || 5}
-                  </Badge>
+                  {gradeQuotas && Object.entries(gradeQuotas).map(([grade, required]) => {
+                    const current = team.gradeCount[grade] || 0;
+                    const isComplete = current >= required;
+                    return (
+                      <Badge 
+                        key={grade}
+                        className={`text-xs ${getGradeBgClass(grade, isComplete)} text-white`}
+                      >
+                        {grade}: {current}/{required}
+                      </Badge>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
