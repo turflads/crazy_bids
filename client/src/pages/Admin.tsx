@@ -62,6 +62,37 @@ export default function Admin() {
     return null;
   };
 
+  // Helper function to find the previous unsold player
+  // Searches backwards (wraps around) EXCLUDING current index
+  // Returns index of previous unsold player, or null if none exist
+  const findPrevUnsoldPlayer = (currentIndex: number, playersList: any[]): number | null => {
+    // Handle empty player list
+    if (playersList.length === 0) {
+      return null;
+    }
+    
+    // Search backward from current position (skip current)
+    let prevIndex = currentIndex - 1;
+    while (prevIndex >= 0) {
+      const player = playersList[prevIndex];
+      if (player.status !== 'sold') {
+        return prevIndex;
+      }
+      prevIndex--;
+    }
+    
+    // Wrap around: search from end down to (but NOT including) current
+    for (let i = playersList.length - 1; i > currentIndex; i--) {
+      const player = playersList[i];
+      if (player.status !== 'sold') {
+        return i;
+      }
+    }
+    
+    // No other unsold player exists
+    return null;
+  };
+
   // Initialize auction state
   const [players, setPlayers] = useState<any[]>([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -291,6 +322,31 @@ export default function Admin() {
     return () => clearInterval(interval);
   }, [currentPlayerIndex, players]);
 
+  // Auto-skip sold players during active auction
+  useEffect(() => {
+    if (!isAuctionActive || players.length === 0) return;
+    
+    const currentPlayer = players[currentPlayerIndex];
+    
+    // If current player is sold during active auction, auto-skip to next unsold
+    if (currentPlayer && currentPlayer.status === 'sold') {
+      console.log('[Auto-Skip] Current player is already sold, finding next unsold player...');
+      const nextUnsoldIndex = findNextUnsoldPlayer(currentPlayerIndex, players);
+      
+      if (nextUnsoldIndex !== null) {
+        console.log(`[Auto-Skip] Moving to player index ${nextUnsoldIndex}`);
+        setCurrentPlayerIndex(nextUnsoldIndex);
+        setCurrentBid(players[nextUnsoldIndex]?.basePrice || 0);
+        setBidHistory([]);
+        setHasBids(false);
+      } else {
+        console.log('[Auto-Skip] No unsold players remaining');
+        setIsAuctionActive(false);
+        alert('All players have been sold. Auction complete!');
+      }
+    }
+  }, [isAuctionActive, currentPlayerIndex, players]);
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     setLocation("/");
@@ -384,7 +440,21 @@ export default function Admin() {
           setCurrentPlayerIndex(nextUnsoldIndex);
           setCurrentBid(nextPlayer?.basePrice || 0);
         }}
-        onPrevPlayer={() => setCurrentPlayerIndex(Math.max(currentPlayerIndex - 1, 0))}
+        onPrevPlayer={() => {
+          const prevUnsoldIndex = findPrevUnsoldPlayer(currentPlayerIndex, players);
+          
+          // If no previous unsold player exists, stay on current
+          if (prevUnsoldIndex === null) {
+            alert('No previous unsold players.');
+            return;
+          }
+          
+          const prevPlayer = players[prevUnsoldIndex];
+          setCurrentPlayerIndex(prevUnsoldIndex);
+          setCurrentBid(prevPlayer?.basePrice || 0);
+          setBidHistory([]);
+          setHasBids(false);
+        }}
         onStartAuction={() => {
           // When starting auction, find first unsold player
           // (in case Super Admin has pre-sold some players)
