@@ -1,6 +1,8 @@
 import { createContext, useContext, ReactNode, useEffect } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { setWebSocketBroadcaster } from '@/lib/webSocketState';
+import { saveAuctionState } from '@/lib/auctionState';
+import { saveTeamState } from '@/lib/teamState';
 
 interface WebSocketContextType {
   isConnected: boolean;
@@ -37,6 +39,36 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       broadcastTeamUpdate,
     });
   }, []);
+
+  // CRITICAL: Listen for incoming WebSocket messages and update localStorage
+  // This ensures all devices stay synchronized with the database
+  useEffect(() => {
+    if (!lastMessage) return;
+
+    console.log('[WebSocket] Received message:', lastMessage.type);
+
+    // When we receive auction state from server, immediately update localStorage
+    if (lastMessage.type === 'auction_update' && lastMessage.data) {
+      console.log('[WebSocket] Updating auction state from server');
+      saveAuctionState(lastMessage.data);
+      // Trigger a storage event to notify other tabs/components
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'auctionState',
+        newValue: JSON.stringify(lastMessage.data),
+      }));
+    }
+
+    // When we receive team state from server, immediately update localStorage
+    if (lastMessage.type === 'team_update' && lastMessage.data) {
+      console.log('[WebSocket] Updating team state from server');
+      saveTeamState(lastMessage.data);
+      // Trigger a storage event to notify other tabs/components
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'teamState',
+        newValue: JSON.stringify(lastMessage.data),
+      }));
+    }
+  }, [lastMessage]);
 
   return (
     <WebSocketContext.Provider value={{ isConnected, lastMessage, broadcastAuctionUpdate, broadcastTeamUpdate }}>

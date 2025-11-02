@@ -36,9 +36,13 @@ A simple **Credentials System** uses hardcoded username/password pairs for four 
 
 Session persistence is managed via localStorage.
 
-### Cross-Tab Synchronization
+### Cross-Device & Cross-Tab Synchronization
 
-The application ensures real-time updates and consistent auction state across multiple connected clients through **Storage Events** for same-origin tab communication, a 2-second polling interval as a fallback, and a window focus event handler for immediate synchronization.
+The application ensures real-time updates and consistent auction state across multiple devices and tabs through:
+- **WebSocket Real-Time Sync**: Server broadcasts all auction/team state changes to all connected clients via WebSocket. The `WebSocketProvider` listens for incoming `auction_update` and `team_update` messages and immediately updates localStorage, ensuring all devices stay synchronized with the database.
+- **Database Persistence**: All state changes are saved to PostgreSQL, providing a single source of truth.
+- **Storage Events**: For same-origin tab communication within the same device.
+- **Critical Fix (Nov 2024)**: Added WebSocket message listener in `WebSocketProvider` that processes incoming server updates and immediately writes them to localStorage, fixing the multi-device synchronization issue where new logins would show stale data.
 
 ## External Dependencies
 
