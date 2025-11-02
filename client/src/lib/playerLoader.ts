@@ -43,6 +43,53 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
+// Check if players are sorted by grade (all same grades are consecutive)
+function isGradeSorted(players: PlayerData[]): boolean {
+  const seenGrades = new Set<string>();
+  let currentGrade = players[0]?.grade;
+  
+  for (const player of players) {
+    if (player.grade !== currentGrade) {
+      // Grade changed - check if we've seen this grade before
+      if (seenGrades.has(player.grade)) {
+        return false; // This grade appeared earlier, so not sorted
+      }
+      seenGrades.add(currentGrade);
+      currentGrade = player.grade;
+    }
+  }
+  
+  return true;
+}
+
+// Shuffle players within their grade groups while maintaining grade order
+function shuffleWithinGrades(players: PlayerData[]): PlayerData[] {
+  // Group players by grade while preserving original order of grades
+  const gradeOrder: string[] = [];
+  const gradeGroups: { [grade: string]: PlayerData[] } = {};
+  
+  players.forEach(player => {
+    if (!gradeGroups[player.grade]) {
+      gradeGroups[player.grade] = [];
+      gradeOrder.push(player.grade);
+    }
+    gradeGroups[player.grade].push(player);
+  });
+  
+  // Shuffle each grade group independently
+  Object.keys(gradeGroups).forEach(grade => {
+    gradeGroups[grade] = shuffleArray(gradeGroups[grade]);
+  });
+  
+  // Reconstruct array maintaining grade order but with shuffled players within each grade
+  const result: PlayerData[] = [];
+  gradeOrder.forEach(grade => {
+    result.push(...gradeGroups[grade]);
+  });
+  
+  return result;
+}
+
 export interface PlayerData {
   id: string;
   firstName: string;
@@ -134,8 +181,16 @@ export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
       };
     });
 
-    // Randomize player order regardless of Excel sorting
-    const shuffledPlayers = shuffleArray(players);
+    // Smart randomization based on Excel organization:
+    // - If grade-sorted: shuffle within each grade group only
+    // - If not grade-sorted: shuffle all players together
+    const isGradeOrganized = isGradeSorted(players);
+    const shuffledPlayers = isGradeOrganized 
+      ? shuffleWithinGrades(players)
+      : shuffleArray(players);
+    
+    console.log(`[Excel Import] Players are ${isGradeOrganized ? 'grade-organized' : 'randomly organized'}`);
+    console.log(`[Excel Import] Applying ${isGradeOrganized ? 'within-grade' : 'full'} randomization`);
     
     // Re-assign sequential IDs after shuffling
     return shuffledPlayers.map((player, index) => ({
