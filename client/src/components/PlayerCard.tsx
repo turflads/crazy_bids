@@ -46,12 +46,12 @@ export default function PlayerCard({ player, onViewDetails, showStats = true }: 
       className={`overflow-visible hover-elevate ${isSold ? 'border-l-4 border-l-auction-sold' : ''}`}
       data-testid={`card-player-${player.id}`}
     >
-      <div className="aspect-video bg-muted relative overflow-hidden">
+      <div className="aspect-video bg-muted relative overflow-hidden flex items-center justify-center">
         {(player.imageUrl || player.image) && !imageError ? (
           <img 
             src={player.imageUrl || player.image} 
             alt={`${player.firstName} ${player.lastName}`}
-            className="w-full h-full object-contain"
+            className="h-full w-auto"
             onError={() => {
               const errorMsg = `[PlayerCard] Failed to load image for ${player.firstName} ${player.lastName}`;
               if (player.imageSource === 'gdrive') {
