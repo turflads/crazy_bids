@@ -18,6 +18,12 @@
 
 export const LEAGUE_NAME = "TLPL S4";
 
+// League logo (optional)
+// To add a league logo:
+// 1. Place your league logo image in client/public/images/ folder
+// 2. Update LEAGUE_LOGO with the filename (e.g., "/images/league-logo.png")
+export const LEAGUE_LOGO = ""; // e.g., "/images/league-logo.png"
+
 // League sponsor branding (optional)
 // To add a sponsor logo:
 // 1. Place your sponsor logo image in client/public/images/ folder
@@ -26,6 +32,6 @@ export const LEAGUE_NAME = "TLPL S4";
 export const SPONSOR_NAME = "Powered by Your Sponsor";
 export const SPONSOR_LOGO = ""; // e.g., "/images/sponsor-logo.png"
 
-// You can add more branding configuration here in the future:
-// export const LEAGUE_LOGO = "/images/league-logo.png";
-// export const LEAGUE_DESCRIPTION = "Official auction platform";
+// Developer credit
+// Update DEVELOPER_NAME with your name to display "Developed by [Your Name]"
+export const DEVELOPER_NAME = "Your Name"; // e.g., "John Doe"

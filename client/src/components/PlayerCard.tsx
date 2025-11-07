@@ -51,7 +51,7 @@ export default function PlayerCard({ player, onViewDetails, showStats = true }: 
           <img 
             src={player.imageUrl || player.image} 
             alt={`${player.firstName} ${player.lastName}`}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-top"
             onError={() => {
               const errorMsg = `[PlayerCard] Failed to load image for ${player.firstName} ${player.lastName}`;
               if (player.imageSource === 'gdrive') {
