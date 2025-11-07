@@ -8,9 +8,10 @@ Welcome to the complete documentation for the Cricket Player Auction platform!
 
 New to the system? Start here:
 
-1. **[START_HERE.md](./START_HERE.md)** - Quick overview and first steps
-2. **[HOW_TO_CONFIGURE_AUCTION.txt](./HOW_TO_CONFIGURE_AUCTION.txt)** - Basic auction setup
-3. **[CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md)** - Detailed configuration options
+1. **Login** - Use default credentials to access different roles
+2. **[CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md)** - Set up teams, purses, and grade quotas
+3. **[EXCEL_COLUMN_CONFIG.md](./EXCEL_COLUMN_CONFIG.md)** - Import players from Excel
+4. **Start the auction** - Use Admin dashboard to begin bidding
 
 ---
 
@@ -18,31 +19,40 @@ New to the system? Start here:
 
 ### **Setup & Configuration**
 - **[CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md)** - Complete config.json reference
-- **[HOW_TO_CONFIGURE_AUCTION.txt](./HOW_TO_CONFIGURE_AUCTION.txt)** - Step-by-step auction setup
-- **[HOW_TO_CHANGE_LEAGUE_NAME.md](./HOW_TO_CHANGE_LEAGUE_NAME.md)** - Customize league branding
+  - Team setup and purses
+  - Grade quotas configuration
+  - Bid increments and base prices
+  - League branding (logo, name, sponsor)
 
 ### **Player Management**
 - **[EXCEL_COLUMN_CONFIG.md](./EXCEL_COLUMN_CONFIG.md)** - Excel file format and column mapping
+  - Required columns
+  - Google Drive image support
+  - Player randomization
 - **[PLAYER_STATS_GUIDE.md](./PLAYER_STATS_GUIDE.md)** - Player statistics and data fields
 
 ### **Advanced Features**
 - **[GRADE_MAX_BID_CAPS_GUIDE.md](./GRADE_MAX_BID_CAPS_GUIDE.md)** - Set maximum bid limits per grade
-- **[GRADE_SPENDING_LIMITS.md](./GRADE_SPENDING_LIMITS.md)** - Category-wise budget caps (inactive feature)
+  - Excel-style formula: MIN(purse - sum of unsold, grade cap)
+  - Real-time max bid calculation
 - **[UNSOLD_PLAYER_STRATEGIES.md](./UNSOLD_PLAYER_STRATEGIES.md)** - Two modes for handling unsold players
-- **[QUICK_SWITCH_GUIDE.txt](./QUICK_SWITCH_GUIDE.txt)** - Quick reference for switching unsold strategies
+  - Grade-based re-auction
+  - All unsold at end
 
 ### **Technical Documentation**
-- **[REACTIVE_TEAM_STATE_FIX.md](./REACTIVE_TEAM_STATE_FIX.md)** - Nov 2024 critical bug fix (grade quotas)
+- **[REACTIVE_TEAM_STATE_FIX.md](./REACTIVE_TEAM_STATE_FIX.md)** - Nov 2024 critical bug fix
+  - Grade quota enforcement
+  - Real-time state synchronization
 
 ### **Deployment**
 - **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - Deploy to Railway or Fly.io
-
-### **Design & Development**
-- **[design_guidelines.md](./design_guidelines.md)** - UI/UX design principles and component usage
+  - PostgreSQL database setup
+  - Environment configuration
+  - Production deployment
 
 ---
 
-## 🎯 **Quick Links**
+## 🎯 **Quick Reference**
 
 ### **Common Tasks**
 
@@ -50,7 +60,7 @@ New to the system? Start here:
 |------|--------------|
 | Set up teams and purses | [CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md) |
 | Import players from Excel | [EXCEL_COLUMN_CONFIG.md](./EXCEL_COLUMN_CONFIG.md) |
-| Change league name/logo | [HOW_TO_CHANGE_LEAGUE_NAME.md](./HOW_TO_CHANGE_LEAGUE_NAME.md) |
+| Configure league branding | [CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md) - Edit `client/src/config/leagueConfig.ts` |
 | Configure grade quotas | [CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md) |
 | Set max bid limits | [GRADE_MAX_BID_CAPS_GUIDE.md](./GRADE_MAX_BID_CAPS_GUIDE.md) |
 | Handle unsold players | [UNSOLD_PLAYER_STRATEGIES.md](./UNSOLD_PLAYER_STRATEGIES.md) |
@@ -58,52 +68,44 @@ New to the system? Start here:
 
 ---
 
-## 📋 **Feature Documentation**
+## 📋 **Key Features**
 
-### **Unsold Player System**
-The platform supports **two different strategies** for handling unsold players:
+### **Max Bid Formula (Excel-Style)**
+```
+Max Bid = MIN(
+  Total Purse - Sum of all unsold players' base prices,
+  Grade Max Bid Cap
+)
+```
 
-1. **Grade-Based Re-Auction** (for sorted Excel files)
-   - Unsold Grade A players come back after all Grade A players
-   - Like real IPL auction flow
-   
-2. **All Unsold at End** (for random Excel files)
-   - All unsold players come together at the end
-   - Works with any Excel file order
-
-📖 **Read more**: [UNSOLD_PLAYER_STRATEGIES.md](./UNSOLD_PLAYER_STRATEGIES.md) | [QUICK_SWITCH_GUIDE.txt](./QUICK_SWITCH_GUIDE.txt)
-
-### **Grade Max Bid Caps**
-Optional feature to set maximum bid limits per grade:
-- Grade A max: ₹15M
-- Grade B max: ₹10M  
-- Grade C max: ₹5M
+This ensures teams:
+- Always have enough money for remaining players
+- Cannot exceed grade-specific spending limits
+- Get real-time max bid calculations
 
 📖 **Read more**: [GRADE_MAX_BID_CAPS_GUIDE.md](./GRADE_MAX_BID_CAPS_GUIDE.md)
 
-### **Excel Report Export**
-Admin can download auction results as Excel file with:
-- Player Name
-- Phone Number
-- Team
-- Grade
-- Sold Price
+### **Unsold Player Strategies**
+Two different strategies for handling unsold players:
 
-📖 **Read more**: [EXCEL_COLUMN_CONFIG.md](./EXCEL_COLUMN_CONFIG.md)
+1. **Grade-Based Re-Auction** - Unsold players return after their grade group
+2. **All Unsold at End** - All unsold players return together at the end
 
----
+📖 **Read more**: [UNSOLD_PLAYER_STRATEGIES.md](./UNSOLD_PLAYER_STRATEGIES.md)
 
-## 🎨 **UI/UX Guidelines**
+### **League Branding**
+Customize your auction with:
+- League name and logo
+- Sponsor branding
+- Developer credit
+- Custom team logos
 
-For developers working on the frontend:
+📖 **Configuration**: Edit `client/src/config/leagueConfig.ts`
 
-📖 **Read**: [design_guidelines.md](./design_guidelines.md)
-
-Covers:
-- Component usage (shadcn/ui)
-- Color system and theming
-- Responsive design patterns
-- Dark mode implementation
+### **Player Images**
+- **Full image display** - Shows complete player image without cropping
+- **Google Drive support** - Import images directly from Google Drive links
+- **Local images** - Support for local image paths
 
 ---
 
@@ -122,22 +124,13 @@ Edit: `client/src/pages/Login.tsx`
 
 ---
 
-## 🆘 **Need Help?**
+## 🎨 **UI Features**
 
-### **Documentation Issues**
-- Check if you're reading the latest version
-- Look for related guides in this folder
-- Search for keywords in the docs
-
-### **Technical Issues**
-- Check browser console (F12) for errors
-- Verify configuration files are correct
-- Ensure Excel file format matches documentation
-
-### **Feature Requests**
-- Review existing documentation first
-- Check if feature exists but needs configuration
-- Consider if it aligns with project goals
+- **Responsive Design** - Works on desktop, tablet, and mobile
+- **Dark Mode Support** - Automatic theme switching
+- **Real-time Updates** - WebSocket synchronization across all devices
+- **Celebration Animations** - Player sold celebrations
+- **Audio Feedback** - In-auction sound effects
 
 ---
 
@@ -150,55 +143,86 @@ Edit: `client/src/pages/Login.tsx`
 
 ### **Production**
 - Railway or Fly.io account
+- PostgreSQL database (provided by Railway/Fly.io)
 - Custom domain (optional)
-- SSL certificate (provided by platforms)
 
 ---
 
 ## 🎓 **Learning Path**
 
 **New Users:**
-1. Read START_HERE.md
-2. Configure teams in config.json
-3. Import players from Excel
-4. Test auction flow locally
+1. Login with default credentials
+2. Configure teams in `config.json`
+3. Import players from Excel (Super Admin)
+4. Test auction flow (Admin)
 
 **Advanced Users:**
 1. Configure grade max bid caps
 2. Choose unsold player strategy
 3. Customize league branding
-4. Deploy to production
+4. Deploy to Railway
 
 **Developers:**
-1. Read design_guidelines.md
-2. Understand state management (replit.md)
-3. Review component architecture
-4. Follow TypeScript patterns
+1. Review system architecture in `replit.md`
+2. Understand reactive state management
+3. Review component patterns
+4. Follow TypeScript conventions
 
 ---
 
 ## 📅 **Recent Updates - November 2024**
 
-### ✅ Critical Bug Fixes
+### ✅ Latest Changes
+
+**Player Display:**
+- Updated to show full player images using `object-contain`
+- No cropping - entire player visible from head to toe
+
+**Max Bid Formula:**
+- Simplified to Excel-style formula
+- Formula: `MIN(Total Purse - Sum of unsold base prices, Grade Cap)`
+- Real-time calculation as players are sold
+
+**League Branding:**
+- Centralized configuration in `client/src/config/leagueConfig.ts`
+- League name and developer credit displayed in navbar center
+- Sponsor branding in navbar right
+
+**Grade Management:**
+- Fixed leading space bug in grade trimming
+- Proper grade quota enforcement
+- Real-time grade count updates
+
+### 🔧 Critical Bug Fixes
 - **Grade Quota Enforcement** - Fixed via reactive team state management
   - Teams can no longer exceed configured grade quotas
   - Grade counts update in real-time across all devices
-  - Bid validation uses live data (no more stale data issues)
+  - Bid validation uses live data
   - 📖 **Details**: [REACTIVE_TEAM_STATE_FIX.md](./REACTIVE_TEAM_STATE_FIX.md)
 
-### 📋 Documentation Updates
-- All line number references updated to match current codebase
-- Added comprehensive reactive state fix documentation
-- Updated unsold player strategy documentation (lines 689-722 and 724-738)
-- Fixed Excel column configuration references (lines 15-30)
-- Updated Login credentials location (line 20)
+---
 
-### 🔧 Version History
-See **[replit.md](../replit.md)** in the root folder for:
-- Complete system architecture
-- Technical specifications
-- Development notes
-- Feature history
+## 🆘 **Need Help?**
+
+### **Documentation Issues**
+- Check if you're reading the latest version
+- Look for related guides in this folder
+- Search for keywords in the docs
+
+### **Technical Issues**
+- Check browser console (F12) for errors
+- Verify configuration files are correct (use JSONLint.com)
+- Ensure Excel file format matches documentation
+- Hard refresh browser: Ctrl+Shift+R
+
+### **Common Problems**
+
+| Problem | Solution |
+|---------|----------|
+| Max bid seems wrong | Check [GRADE_MAX_BID_CAPS_GUIDE.md](./GRADE_MAX_BID_CAPS_GUIDE.md) - verify formula |
+| Images not loading | Check Google Drive sharing settings |
+| Grade quotas not working | Use reactive team state (already implemented) |
+| Players not importing | Verify Excel column names in [EXCEL_COLUMN_CONFIG.md](./EXCEL_COLUMN_CONFIG.md) |
 
 ---
 
@@ -211,4 +235,4 @@ Pick a guide from above and get started. 🏏
 ---
 
 *Last Updated: November 7, 2024*  
-*Platform Version: 2.0 (Reactive Team State)*
+*Platform Version: 2.1 (Excel-Style Max Bid Formula)*
