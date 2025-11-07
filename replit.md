@@ -8,6 +8,20 @@ This project is a comprehensive web application designed for conducting live cri
 
 Preferred communication style: Simple, everyday language.
 
+## Documentation
+
+Comprehensive guides are available in the `docs/` directory:
+
+- **[docs/README.md](docs/README.md)** - Complete documentation index
+- **[docs/REACTIVE_TEAM_STATE_FIX.md](docs/REACTIVE_TEAM_STATE_FIX.md)** - Nov 2024 critical bug fix details
+- **[docs/CONFIGURATION_GUIDE.md](docs/CONFIGURATION_GUIDE.md)** - User credentials and team logos
+- **[docs/EXCEL_COLUMN_CONFIG.md](docs/EXCEL_COLUMN_CONFIG.md)** - Excel column configuration (lines 15-30 in playerLoader.ts)
+- **[docs/PLAYER_STATS_GUIDE.md](docs/PLAYER_STATS_GUIDE.md)** - Player statistics setup
+- **[docs/UNSOLD_PLAYER_STRATEGIES.md](docs/UNSOLD_PLAYER_STRATEGIES.md)** - Re-auction strategies (lines 689-722 and 724-738 in Admin.tsx)
+- **[docs/GRADE_MAX_BID_CAPS_GUIDE.md](docs/GRADE_MAX_BID_CAPS_GUIDE.md)** - Per-grade bid limits
+- **[docs/GRADE_SPENDING_LIMITS.md](docs/GRADE_SPENDING_LIMITS.md)** - Category budget caps (inactive feature)
+- **[docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)** - Production deployment guide
+
 ## System Architecture
 
 ### Frontend Architecture
@@ -24,7 +38,7 @@ The core data models include **Player Schema** (firstName, lastName, grade, base
 
 ### Business Logic
 
-The system incorporates a robust **Bidding Validation System** with four tiers: grade quota fulfillment, purse sufficiency, optional grade-specific max bid caps, and a smart max bid calculation formula. **Grade Quota Management** allows configurable quotas per grade with progress tracking. **Auction Flow** is Admin-controlled, supporting start/pause/reset, unsold player handling, and celebration popups. **Skip-Sold-Players Feature** enables Super Admin to pre-sell players before auction starts; Admin auction flow automatically skips already-sold players using wrap-around roster search, detecting auction completion when no unsold players remain and auto-pausing with completion alert. An **Excel Import System** with configurable column mapping and automatic image path resolution is included. A **PowerPoint Presentation System** enables admins to upload and display presentations during auction breaks using Office Online viewer integration.
+The system incorporates a robust **Bidding Validation System** with four tiers: grade quota fulfillment, purse sufficiency, optional grade-specific max bid caps, and a smart max bid calculation formula. **Grade Quota Management** allows configurable quotas per grade with progress tracking. **Auction Flow** is Admin-controlled, supporting start/pause/reset, unsold player handling, and celebration popups. **Skip-Sold-Players Feature** (Nov 2024) enables Super Admin to pre-sell players before auction starts; Admin auction flow automatically skips already-sold players in all navigation scenarios (Next, Previous, Start) using bidirectional wrap-around roster search with dedicated helper functions (`findNextUnsoldPlayer`, `findPrevUnsoldPlayer`). An auto-skip effect monitors the current player during active auction and automatically advances to the next unsold player if the current one becomes sold (e.g., via cross-tab update from Super Admin). The system detects auction completion when no unsold players remain and auto-pauses with completion alert. An **Excel Import System** with configurable column mapping, automatic image path resolution, and **Smart Player Randomization** (Nov 2024) that intelligently detects Excel organization: if players are grade-sorted (all A's together, then B's, then C's), randomizes within each grade group only while maintaining grade order; if players are mixed/random, fully randomizes all players together. Uses Fisher-Yates shuffle algorithm with sequential ID reassignment post-shuffle. **Max Bid Display** (Nov 2024) in admin auction controls shows the maximum available bid for the team that placed the current bid, calculated based on remaining purse and grade quotas, displayed below the team name in the format "(Max Bid: ₹X,XXX,XXX)". A **PowerPoint Presentation System** enables admins to upload and display presentations during auction breaks using Office Online viewer integration.
 
 ### Authentication & Authorization
 
@@ -43,6 +57,7 @@ The application ensures real-time updates and consistent auction state across mu
 - **Database Persistence**: All state changes are saved to PostgreSQL, providing a single source of truth.
 - **Storage Events**: For same-origin tab communication within the same device.
 - **Critical Fix (Nov 2024)**: Added WebSocket message listener in `WebSocketProvider` that processes incoming server updates and immediately writes them to localStorage, fixing the multi-device synchronization issue where new logins would show stale data.
+- **Reactive Team State (Nov 2024)**: Implemented `useTeamState` hook with React Context to provide reactive team state management. This replaced stale localStorage reads with real-time updates, fixing critical bugs where grade quotas weren't enforced and bid validation used outdated team data. The hook subscribes to both WebSocket messages and localStorage events, ensuring UI updates immediately when players are purchased.
 
 ## External Dependencies
 

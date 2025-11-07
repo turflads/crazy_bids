@@ -9,10 +9,12 @@ import { saveAuctionStateWithBroadcast } from "@/lib/webSocketState";
 import { loadPlayersFromExcel } from "@/lib/playerLoader";
 import { loadAuctionConfig, type Team } from "@/lib/auctionConfig";
 import { calculateMaxBidSync } from "@/lib/maxBidCalculator";
+import { useTeamState } from "@/hooks/useTeamState";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
   const [user, setUser] = useState<{ username: string; role: string } | null>(null);
+  const { teamState, refreshTeamState } = useTeamState();
   const [celebrationData, setCelebrationData] = useState<{
     open: boolean;
     playerName: string;
@@ -59,6 +61,37 @@ export default function Admin() {
     }
     
     // No OTHER unsold player exists (current might be unsold, but no others)
+    return null;
+  };
+
+  // Helper function to find the previous unsold player
+  // Searches backwards (wraps around) EXCLUDING current index
+  // Returns index of previous unsold player, or null if none exist
+  const findPrevUnsoldPlayer = (currentIndex: number, playersList: any[]): number | null => {
+    // Handle empty player list
+    if (playersList.length === 0) {
+      return null;
+    }
+    
+    // Search backward from current position (skip current)
+    let prevIndex = currentIndex - 1;
+    while (prevIndex >= 0) {
+      const player = playersList[prevIndex];
+      if (player.status !== 'sold') {
+        return prevIndex;
+      }
+      prevIndex--;
+    }
+    
+    // Wrap around: search from end down to (but NOT including) current
+    for (let i = playersList.length - 1; i > currentIndex; i--) {
+      const player = playersList[i];
+      if (player.status !== 'sold') {
+        return i;
+      }
+    }
+    
+    // No other unsold player exists
     return null;
   };
 
@@ -291,6 +324,31 @@ export default function Admin() {
     return () => clearInterval(interval);
   }, [currentPlayerIndex, players]);
 
+  // Auto-skip sold players during active auction
+  useEffect(() => {
+    if (!isAuctionActive || players.length === 0) return;
+    
+    const currentPlayer = players[currentPlayerIndex];
+    
+    // If current player is sold during active auction, auto-skip to next unsold
+    if (currentPlayer && currentPlayer.status === 'sold') {
+      console.log('[Auto-Skip] Current player is already sold, finding next unsold player...');
+      const nextUnsoldIndex = findNextUnsoldPlayer(currentPlayerIndex, players);
+      
+      if (nextUnsoldIndex !== null) {
+        console.log(`[Auto-Skip] Moving to player index ${nextUnsoldIndex}`);
+        setCurrentPlayerIndex(nextUnsoldIndex);
+        setCurrentBid(players[nextUnsoldIndex]?.basePrice || 0);
+        setBidHistory([]);
+        setHasBids(false);
+      } else {
+        console.log('[Auto-Skip] No unsold players remaining');
+        setIsAuctionActive(false);
+        alert('All players have been sold. Auction complete!');
+      }
+    }
+  }, [isAuctionActive, currentPlayerIndex, players]);
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     setLocation("/");
@@ -309,7 +367,7 @@ export default function Admin() {
   }
 
   // Get team data with max bid calculations
-  const teamState = getTeamState();
+  // teamState is now from useTeamState hook (reactive)
   const currentPlayer = players[currentPlayerIndex];
   const teamData = teams.map(team => {
     const state = teamState[team.name] || {
@@ -384,7 +442,21 @@ export default function Admin() {
           setCurrentPlayerIndex(nextUnsoldIndex);
           setCurrentBid(nextPlayer?.basePrice || 0);
         }}
-        onPrevPlayer={() => setCurrentPlayerIndex(Math.max(currentPlayerIndex - 1, 0))}
+        onPrevPlayer={() => {
+          const prevUnsoldIndex = findPrevUnsoldPlayer(currentPlayerIndex, players);
+          
+          // If no previous unsold player exists, stay on current
+          if (prevUnsoldIndex === null) {
+            alert('No previous unsold players.');
+            return;
+          }
+          
+          const prevPlayer = players[prevUnsoldIndex];
+          setCurrentPlayerIndex(prevUnsoldIndex);
+          setCurrentBid(prevPlayer?.basePrice || 0);
+          setBidHistory([]);
+          setHasBids(false);
+        }}
         onStartAuction={() => {
           // When starting auction, find first unsold player
           // (in case Super Admin has pre-sold some players)
@@ -559,6 +631,8 @@ export default function Admin() {
           
           // Update team state
           updateTeamAfterPurchase(soldTeam, currentPlayer, soldPrice);
+          // Refresh team state to update UI immediately
+          refreshTeamState();
           
           // Find team data
           const team = teams.find(t => t.name === soldTeam);

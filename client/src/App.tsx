@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
+import { TeamStateProvider } from "@/hooks/useTeamState";
 import Login from "@/pages/Login";
 import SuperAdmin from "@/pages/SuperAdmin";
 import Admin from "@/pages/Admin";
@@ -29,8 +30,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WebSocketProvider>
-          <Toaster />
-          <Router />
+          <TeamStateProvider>
+            <Toaster />
+            <Router />
+          </TeamStateProvider>
         </WebSocketProvider>
       </TooltipProvider>
     </QueryClientProvider>

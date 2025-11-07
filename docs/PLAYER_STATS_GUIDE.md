@@ -181,7 +181,7 @@ A: Yes! Add only the columns you want. For example, you could add only `runs` an
 A: No! Leave cells empty if you don't have that data. Empty cells will be ignored.
 
 **Q: What happens if my Excel has different column names?**  
-A: The code checks multiple variations (see Column Name Reference above). If your column name doesn't match any variation, add it to the list in `playerLoader.ts` lines 54-60.
+A: Update the column names in the `EXCEL_COLUMNS` configuration section at lines 15-30 in `playerLoader.ts` to match your Excel file exactly.
 
 **Q: Can I fetch stats automatically from CricHeroes?**  
 A: CricHeroes doesn't provide an official API, and web scraping would violate their terms of service. The best approach is to manually add stats to your Excel file.
