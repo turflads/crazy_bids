@@ -53,7 +53,8 @@ export default function Owner() {
       currentPlayer.grade,
       gradeBasePrices,
       gradeQuotas,
-      gradeMaxBidCaps
+      gradeMaxBidCaps,
+      allPlayers
     ) : 0;
 
     return {

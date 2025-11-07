@@ -389,7 +389,8 @@ export default function Admin() {
       currentPlayer.grade,
       gradeBasePrices,
       gradeQuotas,
-      gradeMaxBidCaps
+      gradeMaxBidCaps,
+      players
     ) : 0;
 
     return {
