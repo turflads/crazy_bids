@@ -43,6 +43,7 @@ The application ensures real-time updates and consistent auction state across mu
 - **Database Persistence**: All state changes are saved to PostgreSQL, providing a single source of truth.
 - **Storage Events**: For same-origin tab communication within the same device.
 - **Critical Fix (Nov 2024)**: Added WebSocket message listener in `WebSocketProvider` that processes incoming server updates and immediately writes them to localStorage, fixing the multi-device synchronization issue where new logins would show stale data.
+- **Reactive Team State (Nov 2024)**: Implemented `useTeamState` hook with React Context to provide reactive team state management. This replaced stale localStorage reads with real-time updates, fixing critical bugs where grade quotas weren't enforced and bid validation used outdated team data. The hook subscribes to both WebSocket messages and localStorage events, ensuring UI updates immediately when players are purchased.
 
 ## External Dependencies
 
