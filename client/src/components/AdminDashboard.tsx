@@ -87,7 +87,6 @@ export default function AdminDashboard({
   const { toast } = useToast();
   const currentPlayer = players[currentPlayerIndex];
   const prevPlayerIndexRef = useRef(currentPlayerIndex);
-  const isDrumRollPlayingRef = useRef(false);
   const [isAudioMuted, setIsAudioMuted] = useState(audioManager.isMutedState());
   const [audioVolume, setAudioVolume] = useState(audioManager.getVolume());
 
@@ -98,33 +97,6 @@ export default function AdminDashboard({
       prevPlayerIndexRef.current = currentPlayerIndex;
     }
   }, [currentPlayerIndex, currentPlayer, isAuctionActive]);
-
-  // Start drum roll when bidding begins (first bid placed)
-  useEffect(() => {
-    if (hasBids && isAuctionActive && !isDrumRollPlayingRef.current) {
-      audioManager.startDrumRoll();
-      isDrumRollPlayingRef.current = true;
-    } else if (!hasBids && isDrumRollPlayingRef.current) {
-      audioManager.stopDrumRoll();
-      isDrumRollPlayingRef.current = false;
-    }
-  }, [hasBids, isAuctionActive]);
-
-  // Stop drum roll when auction is paused
-  useEffect(() => {
-    if (!isAuctionActive && isDrumRollPlayingRef.current) {
-      audioManager.stopDrumRoll();
-      isDrumRollPlayingRef.current = false;
-    }
-  }, [isAuctionActive]);
-
-  // Stop drum roll when player is sold or unsold
-  useEffect(() => {
-    if (currentPlayer && (currentPlayer.status === 'sold' || currentPlayer.status === 'unsold') && isDrumRollPlayingRef.current) {
-      audioManager.stopDrumRoll();
-      isDrumRollPlayingRef.current = false;
-    }
-  }, [currentPlayer?.status]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
