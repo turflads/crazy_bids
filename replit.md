@@ -8,6 +8,20 @@ This project is a comprehensive web application designed for conducting live cri
 
 Preferred communication style: Simple, everyday language.
 
+## Documentation
+
+Comprehensive guides are available in the `docs/` directory:
+
+- **[docs/README.md](docs/README.md)** - Complete documentation index
+- **[docs/REACTIVE_TEAM_STATE_FIX.md](docs/REACTIVE_TEAM_STATE_FIX.md)** - Nov 2024 critical bug fix details
+- **[docs/CONFIGURATION_GUIDE.md](docs/CONFIGURATION_GUIDE.md)** - User credentials and team logos
+- **[docs/EXCEL_COLUMN_CONFIG.md](docs/EXCEL_COLUMN_CONFIG.md)** - Excel column configuration (lines 15-30 in playerLoader.ts)
+- **[docs/PLAYER_STATS_GUIDE.md](docs/PLAYER_STATS_GUIDE.md)** - Player statistics setup
+- **[docs/UNSOLD_PLAYER_STRATEGIES.md](docs/UNSOLD_PLAYER_STRATEGIES.md)** - Re-auction strategies (lines 689-722 and 724-738 in Admin.tsx)
+- **[docs/GRADE_MAX_BID_CAPS_GUIDE.md](docs/GRADE_MAX_BID_CAPS_GUIDE.md)** - Per-grade bid limits
+- **[docs/GRADE_SPENDING_LIMITS.md](docs/GRADE_SPENDING_LIMITS.md)** - Category budget caps (inactive feature)
+- **[docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)** - Production deployment guide
+
 ## System Architecture
 
 ### Frontend Architecture

@@ -5,7 +5,7 @@ This guide shows you how to configure user credentials and team logos for the au
 ## 📝 Changing User Credentials
 
 ### Location
-File: `client/src/pages/Login.tsx` (Lines 22-26)
+File: `client/src/pages/Login.tsx` (Line 20 onwards)
 
 ### How to Change
 
