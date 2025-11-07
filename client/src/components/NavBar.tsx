@@ -46,9 +46,14 @@ export default function NavBar({ userRole, username, isAuctionLive, onLogout }: 
           )}
         </div>
 
-        {/* CENTER: League Name */}
-        <div className="flex-1 flex justify-center min-w-0">
+        {/* CENTER: League Name & Developer Credit */}
+        <div className="flex-1 flex flex-col items-center justify-center min-w-0">
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-center truncate px-2">{LEAGUE_NAME}</h1>
+          {DEVELOPER_NAME && (
+            <p className="text-[10px] sm:text-xs text-muted-foreground text-center" data-testid="text-developer">
+              Developed by {DEVELOPER_NAME}
+            </p>
+          )}
         </div>
 
         {/* RIGHT: Sponsor, User Info, Logout */}
@@ -90,15 +95,6 @@ export default function NavBar({ userRole, username, isAuctionLive, onLogout }: 
           </Button>
         </div>
       </div>
-
-      {/* FOOTER: Developer Credit */}
-      {DEVELOPER_NAME && (
-        <div className="border-t bg-muted/30 px-4 sm:px-6 py-1">
-          <p className="text-xs text-center text-muted-foreground" data-testid="text-developer">
-            Developed by {DEVELOPER_NAME}
-          </p>
-        </div>
-      )}
     </nav>
   );
 }
