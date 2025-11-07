@@ -4,6 +4,7 @@ import NavBar from "@/components/NavBar";
 import OwnerDashboard from "@/components/OwnerDashboard";
 import CelebrationPopup from "@/components/CelebrationPopup";
 import { useAuctionSync } from "@/hooks/useAuctionSync";
+import { useTeamState } from "@/hooks/useTeamState";
 import { loadAuctionConfig } from "@/lib/auctionConfig";
 import { calculateMaxBidSync } from "@/lib/maxBidCalculator";
 
@@ -23,8 +24,9 @@ export default function Owner() {
     grade: string;
   } | null>(null);
   
-  // Use synced auction and team state
-  const { auctionState, teamState } = useAuctionSync();
+  // Use synced auction state and reactive team state
+  const { auctionState } = useAuctionSync();
+  const { teamState } = useTeamState();
   
   // Track previous players to detect new sales
   const previousPlayersRef = useRef<any[]>([]);

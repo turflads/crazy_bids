@@ -4,6 +4,7 @@ import NavBar from "@/components/NavBar";
 import ViewerDashboard from "@/components/ViewerDashboard";
 import CelebrationPopup from "@/components/CelebrationPopup";
 import { useAuctionSync } from "@/hooks/useAuctionSync";
+import { useTeamState } from "@/hooks/useTeamState";
 
 export default function Viewer() {
   const [, setLocation] = useLocation();
@@ -18,8 +19,9 @@ export default function Viewer() {
     grade: string;
   } | null>(null);
   
-  // Use synced auction and team state
-  const { auctionState, teamState } = useAuctionSync();
+  // Use synced auction state and reactive team state
+  const { auctionState } = useAuctionSync();
+  const { teamState } = useTeamState();
   
   // Track previous players to detect new sales
   const previousPlayersRef = useRef<any[]>([]);

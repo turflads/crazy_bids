@@ -246,6 +246,10 @@ export default function AdminDashboard({
       newBid = currentPlayer.basePrice;
     } else {
       const increment = gradeIncrements[currentPlayer.grade] || 500000;
+      console.log('[BID DEBUG] Player:', currentPlayer.firstName, currentPlayer.lastName);
+      console.log('[BID DEBUG] Grade:', currentPlayer.grade);
+      console.log('[BID DEBUG] gradeIncrements:', JSON.stringify(gradeIncrements));
+      console.log('[BID DEBUG] Increment for this grade:', increment);
       newBid = currentBid + increment;
     }
     onBid(teamName, newBid);

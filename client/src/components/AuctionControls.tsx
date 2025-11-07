@@ -159,8 +159,12 @@ export default function AuctionControls({
         {/* Next Increment */}
         <div className="p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground mb-1">Next Increment</p>
-          <p className="text-lg font-semibold font-mono">
-            +₹{gradeIncrements[currentPlayer.grade]?.toLocaleString() || '0'}
+          <p className="text-lg font-semibold font-mono" data-testid="text-next-increment">
+            +₹{(() => {
+              const increment = gradeIncrements[currentPlayer.grade];
+              console.log('[INCREMENT DISPLAY] Grade:', currentPlayer.grade, 'Increment:', increment, 'All:', gradeIncrements);
+              return increment?.toLocaleString() || '0';
+            })()}
           </p>
         </div>
 
