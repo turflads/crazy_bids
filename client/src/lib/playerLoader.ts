@@ -33,16 +33,6 @@ const EXCEL_COLUMNS = {
 // END OF CONFIGURATION - DO NOT MODIFY CODE BELOW THIS LINE
 // ============================================================================
 
-// Fisher-Yates shuffle algorithm for randomizing array
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
 export interface PlayerData {
   id: string;
   firstName: string;
@@ -134,14 +124,7 @@ export async function loadPlayersFromExcel(): Promise<PlayerData[]> {
       };
     });
 
-    // Randomize player order regardless of Excel sorting
-    const shuffledPlayers = shuffleArray(players);
-    
-    // Re-assign sequential IDs after shuffling
-    return shuffledPlayers.map((player, index) => ({
-      ...player,
-      id: (index + 1).toString()
-    }));
+    return players;
   } catch (error) {
     console.error("Error loading players from Excel:", error);
     return [];

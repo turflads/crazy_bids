@@ -387,7 +387,6 @@ export default function AdminDashboard({
             lastBidTeamFlag={teams.find(t => t.name === currentPlayer?.lastBidTeam)?.flag}
             gradeIncrements={gradeIncrements}
             teams={teams}
-            teamData={teamData}
             isAuctionActive={isAuctionActive}
             hasBids={hasBids}
             onBid={onBid}

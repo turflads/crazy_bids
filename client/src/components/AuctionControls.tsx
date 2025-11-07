@@ -20,19 +20,6 @@ interface Team {
   logo?: string;
 }
 
-interface TeamData {
-  name: string;
-  flag?: string;
-  logo?: string;
-  playersCount: number;
-  purseUsed: number;
-  purseRemaining: number;
-  totalPurse: number;
-  gradeCount: Record<string, number>;
-  players: any[];
-  maxBid?: number;
-}
-
 interface AuctionControlsProps {
   currentPlayer?: {
     firstName: string;
@@ -46,7 +33,6 @@ interface AuctionControlsProps {
   lastBidTeamFlag?: string;
   gradeIncrements: Record<string, number>;
   teams: Team[];
-  teamData?: TeamData[];
   isAuctionActive: boolean;
   hasBids: boolean;
   onBid: (team: string, amount: number) => void;
@@ -63,7 +49,6 @@ export default function AuctionControls({
   lastBidTeamFlag,
   gradeIncrements,
   teams,
-  teamData,
   isAuctionActive,
   hasBids,
   onBid,
@@ -73,9 +58,6 @@ export default function AuctionControls({
 }: AuctionControlsProps) {
   const [customAmount, setCustomAmount] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("");
-
-  // Find max bid for the team that placed the last bid
-  const lastBidTeamMaxBid = teamData?.find(team => team.name === lastBidTeam)?.maxBid;
 
   const handleCustomBid = () => {
     if (!customAmount || !selectedTeam || !currentPlayer || !isAuctionActive) return;
@@ -133,25 +115,16 @@ export default function AuctionControls({
             ₹{currentBid.toLocaleString()}
           </p>
           {hasBids && lastBidTeam && (
-            <div className="mt-4 pt-4 border-t border-primary/20">
-              <div className="flex items-center justify-center gap-3">
-                <TeamLogo 
-                  logo={lastBidTeamLogo} 
-                  flag={lastBidTeamFlag} 
-                  name={lastBidTeam}
-                  className="w-8 h-8 flex-shrink-0"
-                />
-                <div className="flex flex-col items-start">
-                  <span className="text-sm font-semibold text-muted-foreground" data-testid="text-last-bid-team">
-                    {lastBidTeam}
-                  </span>
-                  {lastBidTeamMaxBid !== undefined && (
-                    <span className="text-xs text-muted-foreground/80" data-testid="text-max-bid-available">
-                      (Max Bid: ₹{lastBidTeamMaxBid.toLocaleString()})
-                    </span>
-                  )}
-                </div>
-              </div>
+            <div className="mt-4 pt-4 border-t border-primary/20 flex items-center justify-center gap-3">
+              <TeamLogo 
+                logo={lastBidTeamLogo} 
+                flag={lastBidTeamFlag} 
+                name={lastBidTeam}
+                className="w-8 h-8 flex-shrink-0"
+              />
+              <span className="text-sm font-semibold text-muted-foreground" data-testid="text-last-bid-team">
+                {lastBidTeam}
+              </span>
             </div>
           )}
         </div>
