@@ -64,7 +64,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       saveTeamState(lastMessage.data);
       // Trigger a storage event to notify other tabs/components
       window.dispatchEvent(new StorageEvent('storage', {
-        key: 'teamState',
+        key: 'cricket_auction_teams',
         newValue: JSON.stringify(lastMessage.data),
       }));
     }
