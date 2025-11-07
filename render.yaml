@@ -1,0 +1,25 @@
+services:
+  # Web Service (Backend + Frontend)
+  - type: web
+    name: cricket-auction
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build && npm run db:push
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cricket-auction-db
+          property: connectionString
+    autoDeploy: true
+
+# PostgreSQL Database
+databases:
+  - name: cricket-auction-db
+    region: oregon
+    plan: free
+    databaseName: cricket_auction
+    user: cricket_auction_user
