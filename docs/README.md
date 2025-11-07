@@ -27,12 +27,8 @@ New to the system? Start here:
 
 ### **Advanced Features**
 - **[GRADE_MAX_BID_CAPS_GUIDE.md](./GRADE_MAX_BID_CAPS_GUIDE.md)** - Set maximum bid limits per grade
-- **[GRADE_SPENDING_LIMITS.md](./GRADE_SPENDING_LIMITS.md)** - Category-wise budget caps (inactive feature)
 - **[UNSOLD_PLAYER_STRATEGIES.md](./UNSOLD_PLAYER_STRATEGIES.md)** - Two modes for handling unsold players
 - **[QUICK_SWITCH_GUIDE.txt](./QUICK_SWITCH_GUIDE.txt)** - Quick reference for switching unsold strategies
-
-### **Technical Documentation**
-- **[REACTIVE_TEAM_STATE_FIX.md](./REACTIVE_TEAM_STATE_FIX.md)** - Nov 2024 critical bug fix (grade quotas)
 
 ### **Deployment**
 - **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - Deploy to Railway or Fly.io
@@ -177,28 +173,13 @@ Edit: `client/src/pages/Login.tsx`
 
 ---
 
-## 📅 **Recent Updates - November 2024**
+## 📅 **Version History**
 
-### ✅ Critical Bug Fixes
-- **Grade Quota Enforcement** - Fixed via reactive team state management
-  - Teams can no longer exceed configured grade quotas
-  - Grade counts update in real-time across all devices
-  - Bid validation uses live data (no more stale data issues)
-  - 📖 **Details**: [REACTIVE_TEAM_STATE_FIX.md](./REACTIVE_TEAM_STATE_FIX.md)
-
-### 📋 Documentation Updates
-- All line number references updated to match current codebase
-- Added comprehensive reactive state fix documentation
-- Updated unsold player strategy documentation (lines 689-722 and 724-738)
-- Fixed Excel column configuration references (lines 15-30)
-- Updated Login credentials location (line 20)
-
-### 🔧 Version History
 See **[replit.md](../replit.md)** in the root folder for:
-- Complete system architecture
+- Recent updates
+- System architecture
 - Technical specifications
 - Development notes
-- Feature history
 
 ---
 
@@ -210,5 +191,4 @@ Pick a guide from above and get started. 🏏
 
 ---
 
-*Last Updated: November 7, 2024*  
-*Platform Version: 2.0 (Reactive Team State)*
+*Last Updated: October 2025*

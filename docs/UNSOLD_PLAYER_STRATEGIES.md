@@ -31,7 +31,7 @@ Step 6: B1 starts (Grade B begins)
 ```
 
 ### Code Status:
-**CURRENTLY: COMMENTED OUT** (lines 689-722 in `client/src/pages/Admin.tsx`)
+**CURRENTLY: COMMENTED OUT** (lines 441-464 in `client/src/pages/Admin.tsx`)
 
 ---
 
@@ -61,7 +61,7 @@ Step 8: A2 comes back! (unsold round)
 ```
 
 ### Code Status:
-**CURRENTLY: ACTIVE** (lines 724-738 in `client/src/pages/Admin.tsx`)
+**CURRENTLY: ACTIVE** (lines 466-479 in `client/src/pages/Admin.tsx`)
 
 ---
 
@@ -70,17 +70,17 @@ Step 8: A2 comes back! (unsold round)
 ### To Switch from Strategy 2 → Strategy 1:
 
 1. Open `client/src/pages/Admin.tsx`
-2. Go to line 689 (look for `STRATEGY 1`)
-3. **Remove the `/*` on line 691 and `*/` on line 722** to uncomment Strategy 1
-4. **Add `/*` before line 727 and `*/` after line 738** to comment out Strategy 2
+2. Go to line ~441 (look for `STRATEGY 1`)
+3. **Remove the `/*` on line 441 and `*/` on line 464** to uncomment Strategy 1
+4. **Add `/*` before line 469 and `*/` after line 479** to comment out Strategy 2
 5. Save the file
 6. Hard refresh browser: `Ctrl + Shift + R`
 
 ### To Switch from Strategy 1 → Strategy 2:
 
 1. Open `client/src/pages/Admin.tsx`
-2. **Add `/*` before line 691 and `*/` after line 722** to comment out Strategy 1
-3. **Remove the `/*` and `*/` around lines 727-738** to uncomment Strategy 2
+2. **Add `/*` before line 441 and `*/` after line 464** to comment out Strategy 1
+3. **Remove the `/*` and `*/` around lines 469-479** to uncomment Strategy 2
 4. Save the file
 5. Hard refresh browser: `Ctrl + Shift + R`
 
@@ -137,7 +137,7 @@ Step 8: A2 comes back! (unsold round)
 
 File: `client/src/pages/Admin.tsx`
 Function: `onUnsold` handler
-Lines: 658-746
+Lines: ~408-488
 
 Look for the big comment block:
 ```

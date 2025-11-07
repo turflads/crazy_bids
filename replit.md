@@ -8,20 +8,6 @@ This project is a comprehensive web application designed for conducting live cri
 
 Preferred communication style: Simple, everyday language.
 
-## Documentation
-
-Comprehensive guides are available in the `docs/` directory:
-
-- **[docs/README.md](docs/README.md)** - Complete documentation index
-- **[docs/REACTIVE_TEAM_STATE_FIX.md](docs/REACTIVE_TEAM_STATE_FIX.md)** - Nov 2024 critical bug fix details
-- **[docs/CONFIGURATION_GUIDE.md](docs/CONFIGURATION_GUIDE.md)** - User credentials and team logos
-- **[docs/EXCEL_COLUMN_CONFIG.md](docs/EXCEL_COLUMN_CONFIG.md)** - Excel column configuration (lines 15-30 in playerLoader.ts)
-- **[docs/PLAYER_STATS_GUIDE.md](docs/PLAYER_STATS_GUIDE.md)** - Player statistics setup
-- **[docs/UNSOLD_PLAYER_STRATEGIES.md](docs/UNSOLD_PLAYER_STRATEGIES.md)** - Re-auction strategies (lines 689-722 and 724-738 in Admin.tsx)
-- **[docs/GRADE_MAX_BID_CAPS_GUIDE.md](docs/GRADE_MAX_BID_CAPS_GUIDE.md)** - Per-grade bid limits
-- **[docs/GRADE_SPENDING_LIMITS.md](docs/GRADE_SPENDING_LIMITS.md)** - Category budget caps (inactive feature)
-- **[docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)** - Production deployment guide
-
 ## System Architecture
 
 ### Frontend Architecture
@@ -57,7 +43,6 @@ The application ensures real-time updates and consistent auction state across mu
 - **Database Persistence**: All state changes are saved to PostgreSQL, providing a single source of truth.
 - **Storage Events**: For same-origin tab communication within the same device.
 - **Critical Fix (Nov 2024)**: Added WebSocket message listener in `WebSocketProvider` that processes incoming server updates and immediately writes them to localStorage, fixing the multi-device synchronization issue where new logins would show stale data.
-- **Reactive Team State (Nov 2024)**: Implemented `useTeamState` hook with React Context to provide reactive team state management. This replaced stale localStorage reads with real-time updates, fixing critical bugs where grade quotas weren't enforced and bid validation used outdated team data. The hook subscribes to both WebSocket messages and localStorage events, ensuring UI updates immediately when players are purchased.
 
 ## External Dependencies
 

@@ -14,68 +14,50 @@
 
   "teams": [
     {
-      "name": "Jainam Gainers",
+      "name": "Chennai Super Kings",
       "flag": "🟡",
       "logo": "/images/chennai-super-kings.png",
       "totalPurse": 100000000
     },
     {
-      "name": "VGA Supernova's",
+      "name": "Chennai Super Kings2",
       "flag": "🟡",
       "logo": "/images/chennai-super-kings.png",
       "totalPurse": 100000000
     },
     {
-      "name": "We Realtors",
+      "name": "Chennai Super Kings3",
       "flag": "🟡",
       "logo": "/images/chennai-super-kings.png",
       "totalPurse": 100000000
     },
     {
-      "name": "Classic Auto",
+      "name": "Chennai Super Kings4",
       "flag": "🟡",
       "logo": "/images/chennai-super-kings.png",
       "totalPurse": 100000000
     },
     {
-      "name": "Dhruve Challengers",
+      "name": "Royal Challengers",
       "flag": "🔴",
       "logo": "/images/royal-challengers.png",
       "totalPurse": 100000000
     },
     {
-      "name": "Goregaon Stars",
+      "name": "Delhi Capitals",
       "flag": "🔷",
       "logo": "/images/delhi-capitals.png",
       "totalPurse": 100000000
     },
     {
-      "name": "Kiyaan Mavericks",
-      "flag": "🔷",
-      "logo": "/images/delhi.png",
-      "totalPurse": 100000000
-    },
-    {
-      "name": "Killer",
-      "flag": "🔷",
-      "logo": "/images/delhi.png",
-      "totalPurse": 100000000
-    },
-    {
-      "name": "Joseph Jabardast",
-      "flag": "🔷",
-      "logo": "/images/delhi.png",
-      "totalPurse": 100000000
-    },
-    {
-      "name": "Riddhi's Dental Strikers",
+      "name": "Delhi",
       "flag": "🔷",
       "logo": "/images/delhi.png",
       "totalPurse": 100000000
     }
   ],
   "gradeQuotas": {
-    "A": 4,
+    "A": 3,
     "B": 4,
     "B+": 2,
     "40+A": 1

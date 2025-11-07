@@ -4,11 +4,11 @@
 
 Open this file: **`client/src/lib/playerLoader.ts`**
 
-Look for lines **15-30** at the top of the file. This is where you change column names to match your Excel file.
+Look for lines **13-27** at the top of the file. This is where you change column names to match your Excel file.
 
 ---
 
-## 📝 Configuration Section (Lines 15-30)
+## 📝 Configuration Section (Lines 13-27)
 
 ```typescript
 const EXCEL_COLUMNS = {
@@ -106,7 +106,7 @@ const EXCEL_COLUMNS = {
      CRICHEROES_LINK_COLUMN: '',  // Leave empty
      ```
 
-4. **Don't modify anything below line 30**
+4. **Don't modify anything below line 31**
    - Only change the `EXCEL_COLUMNS` section
    - Everything below that is automatic
 
@@ -170,7 +170,7 @@ const EXCEL_COLUMNS = {
 
 2. **Open** `client/src/lib/playerLoader.ts`
 
-3. **Find lines 15-30** (the `EXCEL_COLUMNS` section)
+3. **Find lines 13-27** (the `EXCEL_COLUMNS` section)
 
 4. **Update each column name** to match your Excel exactly
 

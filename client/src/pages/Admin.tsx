@@ -9,12 +9,10 @@ import { saveAuctionStateWithBroadcast } from "@/lib/webSocketState";
 import { loadPlayersFromExcel } from "@/lib/playerLoader";
 import { loadAuctionConfig, type Team } from "@/lib/auctionConfig";
 import { calculateMaxBidSync } from "@/lib/maxBidCalculator";
-import { useTeamState } from "@/hooks/useTeamState";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
   const [user, setUser] = useState<{ username: string; role: string } | null>(null);
-  const { teamState, refreshTeamState } = useTeamState();
   const [celebrationData, setCelebrationData] = useState<{
     open: boolean;
     playerName: string;
@@ -367,7 +365,7 @@ export default function Admin() {
   }
 
   // Get team data with max bid calculations
-  // teamState is now from useTeamState hook (reactive)
+  const teamState = getTeamState();
   const currentPlayer = players[currentPlayerIndex];
   const teamData = teams.map(team => {
     const state = teamState[team.name] || {
@@ -631,8 +629,6 @@ export default function Admin() {
           
           // Update team state
           updateTeamAfterPurchase(soldTeam, currentPlayer, soldPrice);
-          // Refresh team state to update UI immediately
-          refreshTeamState();
           
           // Find team data
           const team = teams.find(t => t.name === soldTeam);
