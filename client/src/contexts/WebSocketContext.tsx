@@ -56,6 +56,10 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         key: 'auctionState',
         newValue: JSON.stringify(lastMessage.data),
       }));
+      // Dispatch custom event for useAuctionSync hook
+      window.dispatchEvent(new CustomEvent('websocket_message', {
+        detail: { type: 'auction_update', data: lastMessage.data }
+      }));
     }
 
     // When we receive team state from server, immediately update localStorage
@@ -66,6 +70,10 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       window.dispatchEvent(new StorageEvent('storage', {
         key: 'cricket_auction_teams',
         newValue: JSON.stringify(lastMessage.data),
+      }));
+      // Dispatch custom event for useTeamState hook to trigger reactive updates
+      window.dispatchEvent(new CustomEvent('websocket_message', {
+        detail: { type: 'team_update', data: lastMessage.data }
       }));
     }
   }, [lastMessage]);

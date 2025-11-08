@@ -320,9 +320,37 @@ export default function AdminDashboard({
         {/* Left: Player Card + Team Buttons */}
         <div className="space-y-4">
           {currentPlayer && (
-            <div className="max-w-md mx-auto">
-              <PlayerCard player={currentPlayer} />
-            </div>
+            <>
+              <div className="max-w-md mx-auto">
+                <PlayerCard player={currentPlayer} />
+              </div>
+              
+              {/* Average Price Indicator for Current Grade */}
+              {(() => {
+                const currentGrade = currentPlayer.grade;
+                const gradePlayers = players.filter(p => p.grade === currentGrade && p.status === 'sold');
+                const gradeAvgPrice = gradePlayers.length > 0 
+                  ? Math.round(gradePlayers.reduce((sum, p) => sum + (p.soldPrice || 0), 0) / gradePlayers.length)
+                  : 0;
+                const gradeSoldCount = gradePlayers.length;
+                const gradeTotalCount = players.filter(p => p.grade === currentGrade).length;
+                
+                return gradeAvgPrice > 0 ? (
+                  <div className="max-w-md mx-auto bg-muted/50 border rounded-lg p-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Grade {currentGrade} Average Price</p>
+                        <p className="text-lg font-bold text-primary">₹{gradeAvgPrice.toLocaleString()}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-muted-foreground">Players Sold</p>
+                        <p className="text-lg font-semibold">{gradeSoldCount}/{gradeTotalCount}</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : null;
+              })()}
+            </>
           )}
           
           {/* Team Bidding Buttons - Single Horizontal Row */}

@@ -32,12 +32,17 @@ import('./webSocketState').then(module => {
 // Export the wrapper function to use in other components
 export { saveTeamStateWithBroadcast };
 
-export const initializeTeams = (teamNames: { name: string; flag?: string; logo?: string; totalPurse?: number }[]) => {
-  const existing = getTeamState();
+export const initializeTeams = (
+  teamNames: { name: string; flag?: string; logo?: string; totalPurse?: number }[],
+  options?: { forceFresh?: boolean }
+) => {
+  const forceFresh = options?.forceFresh ?? false;
+  const existing = forceFresh ? {} : getTeamState();
   const teams: Record<string, TeamData> = {};
   
   teamNames.forEach(team => {
-    if (existing[team.name]) {
+    if (existing[team.name] && !forceFresh) {
+      // Preserve existing state only if not forcing fresh
       teams[team.name] = {
         ...existing[team.name],
         flag: team.flag,
@@ -45,6 +50,7 @@ export const initializeTeams = (teamNames: { name: string; flag?: string; logo?:
         totalPurse: team.totalPurse || 100000000,
       };
     } else {
+      // Create fresh team state
       teams[team.name] = {
         name: team.name,
         flag: team.flag,

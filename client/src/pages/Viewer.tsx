@@ -3,6 +3,8 @@ import { useLocation } from "wouter";
 import NavBar from "@/components/NavBar";
 import ViewerDashboard from "@/components/ViewerDashboard";
 import CelebrationPopup from "@/components/CelebrationPopup";
+import WelcomeScreen from "@/components/WelcomeScreen";
+import CategoryTransitionScreen from "@/components/CategoryTransitionScreen";
 import { useAuctionSync } from "@/hooks/useAuctionSync";
 import { useTeamState } from "@/hooks/useTeamState";
 
@@ -18,6 +20,8 @@ export default function Viewer() {
     soldPrice: number;
     grade: string;
   } | null>(null);
+  const [showCategoryTransition, setShowCategoryTransition] = useState(false);
+  const [transitionGrade, setTransitionGrade] = useState<{ completed: string; next: string | null } | null>(null);
   
   // Use synced auction state and reactive team state
   const { auctionState } = useAuctionSync();
@@ -104,12 +108,68 @@ export default function Viewer() {
     }
   }, [setLocation]);
 
+  // Watch for category transitions from broadcast auction state
+  useEffect(() => {
+    if (auctionState?.showCategoryTransition) {
+      // Admin has broadcast a category transition
+      setTransitionGrade({
+        completed: auctionState.lastCompletedGrade || 'Unknown',
+        next: auctionState.nextGrade ?? null
+      });
+      setShowCategoryTransition(true);
+    } else {
+      // Transition cleared by Admin
+      setShowCategoryTransition(false);
+      setTransitionGrade(null);
+    }
+  }, [auctionState?.showCategoryTransition, auctionState?.lastCompletedGrade, auctionState?.nextGrade]);
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     setLocation("/");
   };
 
   if (!user) return null;
+
+  const auctionStarted = auctionState?.auctionStarted ?? false;
+
+  // Show Welcome Screen if auction hasn't started yet
+  if (!auctionStarted) {
+    return (
+      <div className="min-h-screen bg-background">
+        <NavBar
+          userRole={user.role as 'viewer'}
+          username={user.username}
+          onLogout={handleLogout}
+        />
+        <WelcomeScreen 
+          showStartButton={false}
+        />
+      </div>
+    );
+  }
+
+  // Show Category Transition Screen
+  if (showCategoryTransition && transitionGrade) {
+    return (
+      <div className="min-h-screen bg-background">
+        <NavBar
+          userRole={user.role as 'viewer'}
+          username={user.username}
+          onLogout={handleLogout}
+        />
+        <CategoryTransitionScreen
+          completedGrade={transitionGrade.completed}
+          nextGrade={transitionGrade.next ?? undefined}
+          onTransitionComplete={() => {
+            setShowCategoryTransition(false);
+            setTransitionGrade(null);
+          }}
+          autoHideDuration={4000}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

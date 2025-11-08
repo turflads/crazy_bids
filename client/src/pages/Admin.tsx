@@ -3,6 +3,8 @@ import { useLocation } from "wouter";
 import NavBar from "@/components/NavBar";
 import AdminDashboard from "@/components/AdminDashboard";
 import CelebrationPopup from "@/components/CelebrationPopup";
+import WelcomeScreen from "@/components/WelcomeScreen";
+import CategoryTransitionScreen from "@/components/CategoryTransitionScreen";
 import {
   getAuctionState,
   initializeAuctionState,
@@ -13,8 +15,9 @@ import {
   updateTeamAfterPurchase,
   clearTeamState,
   getTeamState,
+  saveTeamState,
 } from "@/lib/teamState";
-import { saveAuctionStateWithBroadcast } from "@/lib/webSocketState";
+import { saveAuctionStateWithBroadcast, saveTeamStateWithBroadcast } from "@/lib/webSocketState";
 import { loadPlayersFromExcel } from "@/lib/playerLoader";
 import { loadAuctionConfig, type Team } from "@/lib/auctionConfig";
 import { calculateMaxBidSync } from "@/lib/maxBidCalculator";
@@ -47,6 +50,29 @@ export default function Admin() {
   const [gradeMaxBidCaps, setGradeMaxBidCaps] = useState<
     Record<string, number>
   >({});
+
+  // Helper function to check if a grade is complete
+  const checkGradeCompletion = (playersList: any[], currentGrade: string): {completed: string, next?: string} | null => {
+    // Count remaining unsold players by grade
+    const unsoldByGrade: Record<string, number> = {};
+    playersList.forEach(player => {
+      if (player.status !== "sold") {
+        unsoldByGrade[player.grade] = (unsoldByGrade[player.grade] || 0) + 1;
+      }
+    });
+    
+    // If current grade has no more unsold players, it's complete
+    if (unsoldByGrade[currentGrade] === 0 || unsoldByGrade[currentGrade] === undefined) {
+      // Find next grade with unsold players
+      const nextGrade = Object.keys(unsoldByGrade).find(grade => unsoldByGrade[grade] > 0);
+      return {
+        completed: currentGrade,
+        next: nextGrade
+      };
+    }
+    
+    return null;
+  };
 
   // Helper function to find the next unsold player
   // Searches entire roster (wraps around) EXCLUDING current index
@@ -123,10 +149,15 @@ export default function Admin() {
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [currentBid, setCurrentBid] = useState(0);
   const [isAuctionActive, setIsAuctionActive] = useState(false);
+  const [auctionStarted, setAuctionStarted] = useState(false);  // Track if auction has been started
   const [bidHistory, setBidHistory] = useState<
     Array<{ team: string; amount: number }>
   >([]);
   const [hasBids, setHasBids] = useState(false);
+  
+  // Category transition state
+  const [showCategoryTransition, setShowCategoryTransition] = useState(false);
+  const [transitionGrade, setTransitionGrade] = useState<{completed: string, next?: string} | null>(null);
 
   // Load configuration and players
   useEffect(() => {
@@ -166,6 +197,7 @@ export default function Admin() {
             apiState.players[restoredIndex]?.basePrice || apiState.currentBid,
           );
           setIsAuctionActive(apiState.isAuctionActive);
+          setAuctionStarted(apiState.auctionStarted || false);  // Load auctionStarted state
           setBidHistory(apiState.bidHistory || []);
           setHasBids(apiState.hasBids || false);
           setIsLoadingPlayers(false);
@@ -207,6 +239,7 @@ export default function Admin() {
               existingState.currentBid,
           );
           setIsAuctionActive(existingState.isAuctionActive);
+          setAuctionStarted(existingState.auctionStarted || false);  // Load auctionStarted state
           setBidHistory(existingState.bidHistory || []);
           setHasBids(existingState.hasBids || false);
         } else {
@@ -216,6 +249,7 @@ export default function Admin() {
           setCurrentPlayerIndex(auctionState.currentPlayerIndex);
           setCurrentBid(auctionState.currentBid);
           setIsAuctionActive(auctionState.isAuctionActive);
+          setAuctionStarted(auctionState.auctionStarted || false);  // Load auctionStarted state
           setBidHistory(auctionState.bidHistory);
           setHasBids(auctionState.hasBids);
         }
@@ -312,24 +346,36 @@ export default function Admin() {
 
   // Save auction state whenever it changes and broadcast via WebSocket
   useEffect(() => {
+    // Skip saving during category transitions to prevent overwriting transition state
+    if (showCategoryTransition) {
+      return;
+    }
+    
     if (players.length > 0) {
       saveAuctionStateWithBroadcast({
         currentPlayerIndex,
         currentBid,
         isAuctionActive,
+        auctionStarted,  // Include auction started flag
         players,
         lastBidTeam: "",
         bidHistory,
         hasBids,
+        currentGrade: players[currentPlayerIndex]?.grade,
+        showCategoryTransition: false,  // Ensure it's false during normal updates
+        lastCompletedGrade: undefined,
+        nextGrade: undefined,
       });
     }
   }, [
     currentPlayerIndex,
     currentBid,
     isAuctionActive,
+    auctionStarted,
     players,
     bidHistory,
     hasBids,
+    showCategoryTransition,  // Monitored to skip during transitions
   ]);
 
   useEffect(() => {
@@ -496,6 +542,92 @@ export default function Admin() {
       maxBid,
     };
   });
+
+  // Handler for starting auction from welcome screen
+  const handleWelcomeStartAuction = () => {
+    console.log('[WELCOME] Admin starting auction...');
+    
+    // Find first unsold player
+    const firstUnsoldIndex = findNextUnsoldPlayer(-1, players);
+    
+    if (firstUnsoldIndex === null) {
+      alert("No unsold players available. Cannot start auction.");
+      return;
+    }
+    
+    const firstPlayer = players[firstUnsoldIndex];
+    setCurrentPlayerIndex(firstUnsoldIndex);
+    setCurrentBid(firstPlayer?.basePrice || 0);
+    setAuctionStarted(true);  // Mark auction as officially started
+    setIsAuctionActive(true);  // Start the auction
+    
+    console.log('[WELCOME] Auction started successfully');
+  };
+  
+  // Handler for category transition completion
+  const handleCategoryTransitionComplete = () => {
+    setShowCategoryTransition(false);
+    setTransitionGrade(null);
+    // Resume auction if there are more players
+    const nextIndex = findNextUnsoldPlayer(currentPlayerIndex, players);
+    if (nextIndex !== null) {
+      setIsAuctionActive(true);
+    }
+    
+    // Clear transition state and broadcast to all clients
+    saveAuctionStateWithBroadcast({
+      currentPlayerIndex,
+      currentBid,
+      isAuctionActive: nextIndex !== null,
+      auctionStarted,
+      players,
+      lastBidTeam: "",
+      bidHistory,
+      hasBids,
+      currentGrade: players[currentPlayerIndex]?.grade,
+      showCategoryTransition: false,  // Clear transition flag
+      lastCompletedGrade: undefined,
+      nextGrade: undefined,
+    });
+  };
+
+  // Show Welcome Screen if auction hasn't been started yet
+  if (!auctionStarted && !isLoadingPlayers) {
+    return (
+      <div className="min-h-screen bg-background">
+        <NavBar
+          userRole={user.role as "admin"}
+          username={user.username}
+          isAuctionLive={false}
+          onLogout={handleLogout}
+        />
+        <WelcomeScreen 
+          onStartAuction={handleWelcomeStartAuction}
+          showStartButton={true}
+        />
+      </div>
+    );
+  }
+
+  // Show Category Transition Screen
+  if (showCategoryTransition && transitionGrade) {
+    return (
+      <div className="min-h-screen bg-background">
+        <NavBar
+          userRole={user.role as "admin"}
+          username={user.username}
+          isAuctionLive={false}
+          onLogout={handleLogout}
+        />
+        <CategoryTransitionScreen
+          completedGrade={transitionGrade.completed}
+          nextGrade={transitionGrade.next}
+          onTransitionComplete={handleCategoryTransitionComplete}
+          autoHideDuration={4000}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -735,6 +867,31 @@ export default function Admin() {
           setBidHistory([]);
           setHasBids(false);
 
+          // Check for grade completion
+          const gradeCompletion = checkGradeCompletion(updatedPlayers, currentPlayer.grade);
+          if (gradeCompletion) {
+            console.log(`Grade ${gradeCompletion.completed} completed! ${gradeCompletion.next ? `Moving to ${gradeCompletion.next}` : 'Auction complete!'}`);
+            setTransitionGrade(gradeCompletion);
+            setShowCategoryTransition(true);
+            setIsAuctionActive(false);  // Pause during transition
+            
+            // Broadcast transition state to all clients
+            saveAuctionStateWithBroadcast({
+              currentPlayerIndex,
+              currentBid,
+              isAuctionActive: false,
+              auctionStarted,
+              players: updatedPlayers,
+              lastBidTeam: "",
+              bidHistory: [],
+              hasBids: false,
+              currentGrade: currentPlayer.grade,
+              showCategoryTransition: true,
+              lastCompletedGrade: gradeCompletion.completed,
+              nextGrade: gradeCompletion.next ?? undefined,
+            });
+          }
+          
           // Check if no more unsold players - auction complete!
           if (nextIndex === null) {
             console.log("All players have been sold! Auction complete.");
@@ -870,49 +1027,81 @@ export default function Admin() {
           setHasBids(false);
         }}
         onResetAuction={async () => {
-          // Clear localStorage
+          console.log('[RESET] Starting auction reset...');
+          
+          // Step 1: Clear localStorage
           clearTeamState();
           clearAuctionState();
+          console.log('[RESET] Cleared localStorage');
 
-          // Clear database
+          // Step 2: Broadcast empty state to all clients FIRST (invalidate caches)
+          // This prevents other tabs from pushing stale data back
+          saveTeamStateWithBroadcast({});
+          saveAuctionStateWithBroadcast({
+            currentPlayerIndex: 0,
+            currentBid: 0,
+            isAuctionActive: false,
+            auctionStarted: false,  // Reset to show welcome screen again
+            players: [],
+            bidHistory: [],
+            hasBids: false,
+            showCategoryTransition: false,  // Clear transition state
+            lastCompletedGrade: undefined,
+            nextGrade: undefined,
+          });
+          console.log('[RESET] Broadcasted empty state to all clients');
+
+          // Step 3: Clear database
           try {
             await fetch("/api/reset-auction", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
             });
+            console.log('[RESET] Cleared database');
           } catch (error) {
             console.error("Failed to clear database:", error);
           }
 
-          // Reinitialize teams and save to database
-          initializeTeams(teams);
-          const teamState = getTeamState();
+          // Step 4: Reinitialize teams with forceFresh flag (no merging with old state)
+          const freshTeamState = initializeTeams(teams, { forceFresh: true });
+          console.log('[RESET] Initialized fresh team state');
+          
+          // Save to database
           await fetch("/api/team-state", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(teamState),
+            body: JSON.stringify(freshTeamState),
           }).catch((err) =>
             console.error("Failed to save team state after reset:", err),
           );
 
-          // Reinitialize auction and save to database
+          // Step 5: Reload players from Excel and initialize auction
           const loadedPlayers = await loadPlayersFromExcel();
-          const auctionState = initializeAuctionState(loadedPlayers);
-          setPlayers(auctionState.players);
-          setCurrentPlayerIndex(auctionState.currentPlayerIndex);
-          setCurrentBid(auctionState.currentBid);
+          const freshAuctionState = initializeAuctionState(loadedPlayers);
+          console.log('[RESET] Loaded players and initialized auction state');
+          
+          // Update local state
+          setPlayers(freshAuctionState.players);
+          setCurrentPlayerIndex(freshAuctionState.currentPlayerIndex);
+          setCurrentBid(freshAuctionState.currentBid);
           setIsAuctionActive(false);
+          setAuctionStarted(false);  // Reset to show welcome screen
           setBidHistory([]);
           setHasBids(false);
 
-          // Explicitly save initialized auction state to database
+          // Save to database
           await fetch("/api/auction-state", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(auctionState),
+            body: JSON.stringify(freshAuctionState),
           }).catch((err) =>
             console.error("Failed to save auction state after reset:", err),
           );
+          
+          // Refresh team state hook to pick up the reset
+          refreshTeamState();
+          
+          console.log('[RESET] Auction reset complete!');
         }}
       />
       {celebrationData && (
