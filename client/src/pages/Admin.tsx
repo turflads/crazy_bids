@@ -605,6 +605,7 @@ export default function Admin() {
             gradeBasePrices,
             gradeQuotas,
             gradeMaxBidCaps,
+            players,
           );
 
           // Check if bid exceeds max allowed (considering reserve for remaining quotas)
