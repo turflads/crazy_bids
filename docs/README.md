@@ -22,7 +22,10 @@ New to the system? Start here:
   - Team setup and purses
   - Grade quotas configuration
   - Bid increments and base prices
-  - League branding (logo, name, sponsor)
+- **[LEAGUE_BRANDING_GUIDE.md](./LEAGUE_BRANDING_GUIDE.md)** - Customize league name, logos, and sponsor
+  - League name and logo
+  - Sponsor branding
+  - Developer credit
 
 ### **Player Management**
 - **[EXCEL_COLUMN_CONFIG.md](./EXCEL_COLUMN_CONFIG.md)** - Excel file format and column mapping
@@ -60,7 +63,7 @@ New to the system? Start here:
 |------|--------------|
 | Set up teams and purses | [CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md) |
 | Import players from Excel | [EXCEL_COLUMN_CONFIG.md](./EXCEL_COLUMN_CONFIG.md) |
-| Configure league branding | [CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md) - Edit `client/src/config/leagueConfig.ts` |
+| Change league name & sponsor | [LEAGUE_BRANDING_GUIDE.md](./LEAGUE_BRANDING_GUIDE.md) |
 | Configure grade quotas | [CONFIGURATION_GUIDE.md](./CONFIGURATION_GUIDE.md) |
 | Set max bid limits | [GRADE_MAX_BID_CAPS_GUIDE.md](./GRADE_MAX_BID_CAPS_GUIDE.md) |
 | Handle unsold players | [UNSOLD_PLAYER_STRATEGIES.md](./UNSOLD_PLAYER_STRATEGIES.md) |
