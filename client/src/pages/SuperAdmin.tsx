@@ -266,7 +266,7 @@ export default function SuperAdmin() {
         const nameParts = name.trim().split(" ");
         const firstName = nameParts[0] || "";
         const lastName = nameParts.slice(1).join(" ") || "";
-        const grade = (row[EXCEL_COLUMNS.GRADE_COLUMN] || "C").toString().toUpperCase();
+        const grade = (row[EXCEL_COLUMNS.GRADE_COLUMN] || "C").toString().trim().toUpperCase();
         const photo = row[EXCEL_COLUMNS.PHOTO_COLUMN] || "";
         const phone = row[EXCEL_COLUMNS.PHONE_COLUMN] || "";
         const battingStyle = row[EXCEL_COLUMNS.BATTING_STYLE_COLUMN];
