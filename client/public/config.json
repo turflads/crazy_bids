@@ -1,15 +1,15 @@
 {
   "gradeBasePrices": {
-    "A": 2000000,
-    "B": 1500000,
-    "B+": 1500000,
-    "40+A": 1000000
+    "A": 100000,
+    "B": 80000,
+    "B+": 80000,
+    "40+A": 100000
   },
   "gradeIncrements": {
-    "A": 500000,
-    "B": 300000,
-    "B+": 200000,
-    "40+A": 100000
+    "A": 20000,
+    "B": 20000,
+    "B+": 20000,
+    "40+A": 20000
   },
 
   "teams": [
@@ -17,61 +17,61 @@
       "name": "Jainam Gainers",
       "flag": "🟡",
       "logo": "/images/chennai-super-kings.png",
-      "totalPurse": 100000000
+      "totalPurse": 2500000
     },
     {
       "name": "VGA Supernova's",
       "flag": "🟡",
       "logo": "/images/chennai-super-kings.png",
-      "totalPurse": 100000000
+      "totalPurse": 2500000
     },
     {
       "name": "We Realtors",
       "flag": "🟡",
       "logo": "/images/chennai-super-kings.png",
-      "totalPurse": 100000000
+      "totalPurse": 2500000
     },
     {
       "name": "Classic Auto",
       "flag": "🟡",
       "logo": "/images/chennai-super-kings.png",
-      "totalPurse": 100000000
+      "totalPurse": 2500000
     },
     {
       "name": "Dhruve Challengers",
       "flag": "🔴",
       "logo": "/images/royal-challengers.png",
-      "totalPurse": 100000000
+      "totalPurse": 2500000
     },
     {
       "name": "Goregaon Stars",
       "flag": "🔷",
       "logo": "/images/delhi-capitals.png",
-      "totalPurse": 100000000
+      "totalPurse": 2500000
     },
     {
       "name": "Kiyaan Mavericks",
       "flag": "🔷",
       "logo": "/images/delhi.png",
-      "totalPurse": 100000000
+      "totalPurse": 2500000
     },
     {
-      "name": "Killer",
+      "name": "K K Killer",
       "flag": "🔷",
       "logo": "/images/delhi.png",
-      "totalPurse": 100000000
+      "totalPurse": 2500000
     },
     {
       "name": "Joseph Jabardast",
       "flag": "🔷",
       "logo": "/images/delhi.png",
-      "totalPurse": 100000000
+      "totalPurse": 2500000
     },
     {
       "name": "Riddhi's Dental Strikers",
       "flag": "🔷",
       "logo": "/images/delhi.png",
-      "totalPurse": 100000000
+      "totalPurse": 2500000
     }
   ],
   "gradeQuotas": {
