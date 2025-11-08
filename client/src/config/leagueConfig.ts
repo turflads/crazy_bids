@@ -16,7 +16,7 @@
 //   export const LEAGUE_NAME = "My Local Cricket League";
 // ============================================================================
 
-export const LEAGUE_NAME = "TLPL S4";
+export const LEAGUE_NAME = "MZPL S7";
 
 // League logo (optional)
 // To add a league logo:
@@ -29,7 +29,7 @@ export const LEAGUE_LOGO = ""; // e.g., "/images/league-logo.png"
 // 1. Place your sponsor logo image in client/public/images/ folder
 // 2. Update SPONSOR_LOGO with the filename (e.g., "/images/sponsor-logo.png")
 // 3. Update SPONSOR_NAME with your sponsor's name
-export const SPONSOR_NAME = "Powered by Your Sponsor";
+export const SPONSOR_NAME = "Auction Sponsored by Multiple Investment";
 export const SPONSOR_LOGO = ""; // e.g., "/images/sponsor-logo.png"
 
 // Developer credit
