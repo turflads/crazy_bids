@@ -227,40 +227,72 @@ export default function Admin() {
     loadData();
   }, []);
 
-  // Initialize teams
+  // Initialize teams and sync to database
   useEffect(() => {
-    if (teams.length > 0) {
-      initializeTeams(teams);
-    }
+    const initAndSyncTeams = async () => {
+      if (teams.length > 0) {
+        console.log('[ADMIN] Initializing teams from config:', teams.map(t => t.name));
+        const initializedTeams = initializeTeams(teams);
+        
+        // Immediately sync to database to ensure consistency
+        try {
+          await fetch("/api/team-state", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(initializedTeams),
+          });
+          console.log('[ADMIN] Teams synced to database successfully');
+        } catch (err) {
+          console.error("Failed to sync teams to database:", err);
+        }
+      }
+    };
+    
+    initAndSyncTeams();
   }, [teams]);
 
-  // Push current state to server on mount to populate server-side cache
+  // Pull state from database on mount and validate teams match config
   useEffect(() => {
-    const syncStateToServer = async () => {
-      const currentAuctionState = getAuctionState();
-      const currentTeamState = getTeamState();
-
+    const syncFromServer = async () => {
       try {
-        await Promise.all([
-          fetch("/api/auction-state", {
+        // Fetch team state from database
+        const response = await fetch("/api/team-state");
+        const dbTeamState = await response.json();
+        
+        console.log('[ADMIN] Team state from database:', Object.keys(dbTeamState));
+        console.log('[ADMIN] Expected teams from config:', teams.map(t => t.name));
+        
+        // Check if all teams from config exist in database
+        const dbTeamNames = new Set(Object.keys(dbTeamState));
+        const missingTeams = teams.filter(t => !dbTeamNames.has(t.name));
+        
+        if (missingTeams.length > 0) {
+          console.warn('[ADMIN] Missing teams in database:', missingTeams.map(t => t.name));
+          console.warn('[ADMIN] Reinitializing teams from config...');
+          
+          // Reinitialize with correct teams from config
+          const freshTeams = initializeTeams(teams);
+          await fetch("/api/team-state", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(currentAuctionState),
-          }),
-          fetch("/api/team-state", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(currentTeamState),
-          }),
-        ]);
+            body: JSON.stringify(freshTeams),
+          });
+          console.log('[ADMIN] Teams reinitialized successfully');
+        } else {
+          // All teams exist, just update localStorage from database
+          saveTeamState(dbTeamState);
+          console.log('[ADMIN] Team state loaded from database');
+        }
       } catch (err) {
-        console.error("Failed to sync state to server:", err);
+        console.error("Failed to sync from server:", err);
       }
     };
 
-    // Sync after a short delay to ensure state is initialized
-    setTimeout(syncStateToServer, 1000);
-  }, []);
+    // Only run after teams are loaded from config
+    if (teams.length > 0) {
+      setTimeout(syncFromServer, 1500);
+    }
+  }, [teams]);
 
   // Refresh config periodically to sync team changes from config.json
   useEffect(() => {
@@ -551,7 +583,12 @@ export default function Admin() {
           // Validate bid
           const teamStateData = teamState[team];
           if (!teamStateData) {
-            alert(`Team "${team}" not found!`);
+            console.error('[BID ERROR] Team not found in teamState:', team);
+            console.error('[BID ERROR] Available teams:', Object.keys(teamState));
+            console.error('[BID ERROR] All team names from config:', teams.map(t => t.name));
+            alert(
+              `Team "${team}" not found!\n\nThis usually means the auction needs to be reset.\nGo to SuperAdmin > Reset Auction to reinitialize all teams.`
+            );
             return;
           }
 
