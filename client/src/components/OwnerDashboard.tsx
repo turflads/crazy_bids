@@ -121,7 +121,7 @@ export default function OwnerDashboard({
                       <div className="flex gap-4">
                         {currentPlayer.battingStyle && (
                           <p className="text-xs" data-testid="text-batting-current">
-                            <span className="text-muted-foreground">Bat:</span>{' '}
+                            <span className="text-muted-foreground">Role:</span>{' '}
                             <span className="font-medium">{currentPlayer.battingStyle}</span>
                           </p>
                         )}

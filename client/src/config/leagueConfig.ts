@@ -1,9 +1,9 @@
 // ============================================================================
 // LEAGUE BRANDING CONFIGURATION
 // ============================================================================
-// 
+//
 // This file contains the league name and branding settings for the auction app.
-// Change the LEAGUE_NAME value below to update the name displayed throughout 
+// Change the LEAGUE_NAME value below to update the name displayed throughout
 // the application (login page, navbar, etc.).
 //
 // INSTRUCTIONS TO CHANGE LEAGUE NAME:
@@ -34,4 +34,4 @@ export const SPONSOR_LOGO = ""; // e.g., "/images/sponsor-logo.png"
 
 // Developer credit
 // Update DEVELOPER_NAME with your name to display "Developed by [Your Name]"
-export const DEVELOPER_NAME = "Your Name"; // e.g., "John Doe"
+export const DEVELOPER_NAME = "Raj Shah"; // e.g., "John Doe"
