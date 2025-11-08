@@ -30,7 +30,7 @@ export const LEAGUE_LOGO = "/images/MZPL.jpg"; // e.g., "/images/league-logo.png
 // 2. Update SPONSOR_LOGO with the filename (e.g., "/images/sponsor-logo.png")
 // 3. Update SPONSOR_NAME with your sponsor's name
 export const SPONSOR_NAME = "Auction Sponsored by Multiple Investment";
-// export const SPONSOR_LOGO = ""; // e.g., "/images/sponsor-logo.png"
+export const SPONSOR_LOGO = ""; // e.g., "/images/sponsor-logo.png"
 
 // Developer credit
 // Update DEVELOPER_NAME with your name to display "Developed by [Your Name]"
