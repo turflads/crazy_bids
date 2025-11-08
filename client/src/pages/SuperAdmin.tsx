@@ -252,11 +252,11 @@ export default function SuperAdmin() {
       const data = XLSX.utils.sheet_to_json(firstSheet) as any[];
 
       const EXCEL_COLUMNS = {
-        NAME_COLUMN: "name",
+        NAME_COLUMN: "Name",
         GRADE_COLUMN: "grade",
         PHOTO_COLUMN: "photo",
         PHONE_COLUMN: "phone",
-        BATTING_STYLE_COLUMN: "Role",
+        BATTING_STYLE_COLUMN: "role",
         RUNS_COLUMN: "MZPL RUNS",
         WICKETS_COLUMN: "MZPL WKTS",
       };
