@@ -6,6 +6,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Play, Pause, RotateCcw, Users, Presentation, Upload, Download, Volume2, VolumeX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -81,6 +91,7 @@ export default function AdminDashboard({
 }: AdminDashboardProps) {
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [showResetConfirmDialog, setShowResetConfirmDialog] = useState(false);
   const [presentationPath, setPresentationPath] = useState<string | null>(
     localStorage.getItem("presentationPath")
   );
@@ -297,7 +308,7 @@ export default function AdminDashboard({
             <Upload className="w-4 h-4 sm:mr-2" />
             <span className="hidden sm:inline">Upload PPT</span>
           </Button>
-          <Button onClick={onResetAuction} variant="outline" size="sm" data-testid="button-reset-auction">
+          <Button onClick={() => setShowResetConfirmDialog(true)} variant="outline" size="sm" data-testid="button-reset-auction">
             <RotateCcw className="w-4 h-4 sm:mr-2" />
             <span className="hidden sm:inline">Reset</span>
           </Button>
@@ -520,6 +531,38 @@ export default function AdminDashboard({
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Reset Confirmation Dialog */}
+      <AlertDialog open={showResetConfirmDialog} onOpenChange={setShowResetConfirmDialog}>
+        <AlertDialogContent data-testid="dialog-reset-confirmation">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset Auction?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to reset the auction? This will:
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>Clear all player sales and bids</li>
+                <li>Reset all team purses to initial values</li>
+                <li>Remove all players from teams</li>
+                <li>Return to the welcome screen</li>
+              </ul>
+              <p className="mt-3 font-semibold text-destructive">This action cannot be undone.</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-reset-cancel">No, Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                onResetAuction();
+                setShowResetConfirmDialog(false);
+              }}
+              className="bg-destructive hover:bg-destructive/90"
+              data-testid="button-reset-confirm"
+            >
+              Yes, Reset Auction
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

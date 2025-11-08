@@ -16,62 +16,62 @@
     {
       "name": "Jainam Gainers",
       "flag": "🟡",
-      "logo": "/images/chennai-super-kings.png",
-      "totalPurse": 2500000
+      "logo": "/images/JG.jpg",
+      "totalPurse": 2800000
     },
     {
       "name": "VGA Supernova's",
       "flag": "🟡",
-      "logo": "/images/chennai-super-kings.png",
-      "totalPurse": 2500000
+      "logo": "/images/VGA.jpg",
+      "totalPurse": 2800000
     },
     {
       "name": "We Realtors",
       "flag": "🟡",
-      "logo": "/images/chennai-super-kings.png",
-      "totalPurse": 2500000
+      "logo": "/images/WR.jpg",
+      "totalPurse": 2800000
     },
     {
       "name": "Classic Auto",
       "flag": "🟡",
-      "logo": "/images/chennai-super-kings.png",
-      "totalPurse": 2500000
+      "logo": "/images/CA.jpg",
+      "totalPurse": 2800000
     },
     {
       "name": "Dhruve Challengers",
       "flag": "🔴",
-      "logo": "/images/royal-challengers.png",
-      "totalPurse": 2500000
+      "logo": "/images/Dhruve_Challengers.jpg",
+      "totalPurse": 2800000
     },
     {
       "name": "Goregaon Stars",
       "flag": "🔷",
-      "logo": "/images/delhi-capitals.png",
-      "totalPurse": 2500000
+      "logo": "/images/ZMS.jpg",
+      "totalPurse": 2800000
     },
     {
       "name": "Kiyaan Mavericks",
       "flag": "🔷",
-      "logo": "/images/delhi.png",
-      "totalPurse": 2500000
+      "logo": "/images/kiyaan.jpg",
+      "totalPurse": 2800000
     },
     {
       "name": "K K Killer",
       "flag": "🔷",
-      "logo": "/images/delhi.png",
-      "totalPurse": 2500000
+      "logo": "/images/Killer.jpg",
+      "totalPurse": 2800000
     },
     {
       "name": "Joseph Jabardast",
       "flag": "🔷",
-      "logo": "/images/delhi.png",
-      "totalPurse": 2500000
+      "logo": "/images/JJ.jpg",
+      "totalPurse": 2800000
     },
     {
       "name": "Riddhi's Dental Strikers",
       "flag": "🔷",
-      "logo": "/images/delhi.png",
-      "totalPurse": 2500000
+      "logo": "/images/RDS.jpg",
+      "totalPurse": 2800000
     }
   ],
   "gradeQuotas": {
